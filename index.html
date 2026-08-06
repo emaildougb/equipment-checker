@@ -1,0 +1,4278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#1C3A1C" />
+  <title>NCEMS Apparatus Check</title>
+  <link rel="icon" type="image/png" href="./logo.png" />
+  <link rel="apple-touch-icon" href="./logo.png" />
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <style>
+    :root {
+      --g-deep: #1C3A1C;
+      --g-dark: #254D25;
+      --g-mid:  #2E6B2E;
+      --g-accent: #3A8A3A;
+      --g-light: #C8E6C8;
+      --g-pale:  #EBF5EB;
+      --warn:    #B87E0A;
+      --warn-bg: #FFF4E0;
+      --bad:     #C13E3E;
+      --bad-bg:  #FDECEC;
+      --info:    #1F5C8B;
+      --text:    #1A2B1A;
+      --muted:   #6B7B6B;
+      --bg:      #F7FAF7;
+      --white:   #FFFFFF;
+      --border:  #D8E6D8;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    button, .unit-btn, .home-btn, .check-btn, .fuel-btn, .yn-btn, .item-btn, .mark-all-btn, .submit-btn, .back-btn, .home-link, .compartment-head, .bag-head {
+      touch-action: manipulation;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+      min-height: 100vh;
+      overscroll-behavior-y: contain;
+      -webkit-text-size-adjust: 100%;
+    }
+    body {
+      padding-bottom: 88px;
+      padding-bottom: calc(88px + env(safe-area-inset-bottom));
+    }
+    .screen { display: none; min-height: 100vh; }
+    .screen.active { display: block; }
+
+    /* ============ HOME SCREEN (locked, no scroll, fit to one screen) ============ */
+    .home {
+      background: linear-gradient(180deg, var(--g-deep) 0%, var(--g-mid) 100%);
+      color: var(--white);
+      padding: 16px 20px;
+      padding-top: calc(12px + env(safe-area-inset-top));
+      padding-bottom: calc(12px + env(safe-area-inset-bottom));
+      height: 100vh;
+      height: 100dvh;
+      min-height: 0;
+      text-align: center;
+      gap: 8px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    /* Only display home when it is the active screen (base .screen rule hides it otherwise) */
+    .home.active {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    /* ── 3D flip card for logo / admin login ── */
+    .logo-flip-wrap {
+      width: 200px;
+      max-width: 52%;
+      height: 200px;
+      max-height: 26vh;
+      margin: 0 auto 4px;
+      perspective: 900px;
+      cursor: pointer;
+      flex: 0 1 auto;
+      position: relative;
+      z-index: 1;
+    }
+    .logo-flip-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transition: transform 0.65s cubic-bezier(0.4, 0.2, 0.2, 1);
+    }
+    .logo-flip-wrap.flipped .logo-flip-inner {
+      transform: rotateY(180deg);
+    }
+    .logo-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .logo-face-front {
+      background: transparent;
+    }
+    .logo-face-front img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: transparent;
+    }
+    .logo-face-back {
+      transform: rotateY(180deg);
+      background: rgba(255,255,255,0.12);
+      backdrop-filter: blur(8px);
+      border: 2px solid rgba(255,255,255,0.3);
+      flex-direction: column;
+      gap: 10px;
+      padding: 20px;
+    }
+    .logo-back-title {
+      color: var(--white);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .logo-back-input {
+      width: 100%;
+      padding: 12px;
+      font-size: 22px;
+      letter-spacing: 0.4em;
+      text-align: center;
+      border: 2px solid rgba(255,255,255,0.5);
+      border-radius: 10px;
+      background: rgba(0,0,0,0.35);
+      color: var(--white);
+      font-family: inherit;
+      outline: none;
+    }
+    .logo-back-input:focus {
+      border-color: var(--white);
+      background: rgba(0,0,0,0.5);
+    }
+    .logo-back-input::placeholder { color: rgba(255,255,255,0.35); }
+    .logo-back-btn {
+      width: 100%;
+      padding: 12px;
+      background: var(--white);
+      color: var(--g-deep);
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      min-height: 44px;
+    }
+    .logo-back-btn:active { background: var(--g-light); }
+    .logo-back-err {
+      color: #ffb3b3;
+      font-size: 12px;
+      font-weight: 600;
+      min-height: 16px;
+      text-align: center;
+    }
+    .logo-flip-hint {
+      font-size: 11px;
+      color: rgba(255,255,255,0.4);
+      margin-top: 4px;
+      text-align: center;
+      letter-spacing: 0.05em;
+    }
+    .home-sub {
+      font-size: 14px;
+      color: var(--g-light);
+      font-weight: 600;
+      margin: 0 0 8px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+    .home-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      max-width: 480px;
+      width: 100%;
+      margin: 0 auto;
+      flex: 1 1 auto;
+      min-height: 0;
+      position: relative;
+      z-index: 2;
+    }
+    .home-btn {
+      position: relative;
+      z-index: 2;
+      display: block;
+      width: 100%;
+      flex: 1 1 0;
+      min-height: 96px;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 3px solid var(--white);
+      cursor: pointer;
+      background-size: cover;
+      background-position: center;
+      background-color: var(--g-dark);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+      transition: transform 0.08s;
+    }
+    .home-btn:active { transform: scale(0.97); }
+    .home-btn::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(180deg, rgba(28,58,28,0.45) 0%, rgba(28,58,28,0.75) 100%);
+    }
+    .home-btn-label {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--white);
+      font-size: 30px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+    }
+    .home-btn.ambulances { background-image: url('./ambulance.jpg'); }
+    .home-btn.others { background-image: url('./sar51.jpg'); }
+
+    .home-footer {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--g-light);
+      opacity: 0.75;
+      flex-shrink: 0;
+    }
+
+    /* ============ HEADER (sub-screens) ============ */
+    .header {
+      background: var(--g-deep);
+      color: var(--white);
+      padding: 14px 16px;
+      padding-top: calc(14px + env(safe-area-inset-top));
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .back-btn {
+      background: transparent;
+      color: var(--white);
+      border: 1.5px solid rgba(255,255,255,0.5);
+      border-radius: 10px;
+      padding: 8px 14px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      min-height: 44px;
+      min-width: 70px;
+    }
+    .back-btn:active { background: rgba(255,255,255,0.15); }
+    .header-title {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      flex: 1;
+    }
+    .header-sub {
+      font-size: 12px;
+      color: var(--g-light);
+      font-weight: 500;
+    }
+
+    /* ============ UNIT PICKERS ============ */
+    .picker-wrap {
+      padding: 20px 16px;
+      max-width: 560px;
+      margin: 0 auto;
+    }
+    .picker-intro {
+      font-size: 15px;
+      color: var(--muted);
+      margin: 4px 0 18px;
+    }
+    .due-banner {
+      background: var(--bad);
+      color: var(--white);
+      padding: 12px 16px;
+      border-radius: 12px;
+      margin-bottom: 14px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      font-size: 14px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(193,62,62,0.3);
+    }
+    .unit-btn {
+      width: 100%;
+      background: var(--white);
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: 22px 18px;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--g-deep);
+      text-align: left;
+      cursor: pointer;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 64px;
+      transition: transform 0.05s;
+    }
+    .unit-btn:active { transform: scale(0.98); background: var(--g-pale); }
+    .unit-btn.due-today {
+      background: var(--bad);
+      color: var(--white);
+      border-color: var(--bad);
+      box-shadow: 0 3px 10px rgba(193,62,62,0.25);
+    }
+    .unit-btn.due-today .unit-meta { color: rgba(255,255,255,0.85); }
+    .unit-btn .unit-meta {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+    }
+    .unit-btn-arrow { font-size: 26px; opacity: 0.6; }
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      text-transform: uppercase;
+      margin: 18px 0 8px;
+      padding-left: 4px;
+    }
+
+    /* ============ CHECK FORM ============ */
+    .form-wrap {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 16px 14px 20px;
+    }
+    .meta-block {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 14px 6px;
+      margin-bottom: 18px;
+    }
+    .meta-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .meta-row label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--muted);
+      min-width: 80px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .meta-row input[type="text"],
+    .meta-row input[type="number"],
+    .meta-row input[type="date"] {
+      flex: 1;
+      min-width: 0;
+      padding: 12px;
+      font-size: 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg);
+      font-family: inherit;
+      min-height: 44px;
+    }
+    .meta-row input:focus {
+      outline: none;
+      border-color: var(--g-mid);
+      background: var(--white);
+    }
+
+    .section {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+    .section-head {
+      background: var(--g-pale);
+      padding: 12px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--g-deep);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .section-body { padding: 6px 0; }
+
+    /* WNL / Abnormal item rows */
+    .check-row {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .check-row:last-child { border-bottom: none; }
+    .check-row-main {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .check-label {
+      flex: 1;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--text);
+    }
+    .check-buttons {
+      display: flex;
+      gap: 6px;
+    }
+    .check-btn {
+      padding: 10px 14px;
+      border: 1.5px solid var(--border);
+      background: var(--white);
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      min-width: 64px;
+      min-height: 44px;
+      transition: all 0.1s;
+      letter-spacing: 0.02em;
+    }
+    .check-btn:active { transform: scale(0.95); }
+    .check-btn.wnl.active {
+      background: var(--g-mid);
+      color: var(--white);
+      border-color: var(--g-mid);
+    }
+    .check-btn.bad.active {
+      background: var(--warn);
+      color: var(--white);
+      border-color: var(--warn);
+    }
+    .check-detail {
+      margin-top: 10px;
+      padding: 10px;
+      background: var(--warn-bg);
+      border-radius: 8px;
+      border-left: 3px solid var(--warn);
+    }
+    .check-detail textarea {
+      width: 100%;
+      min-height: 60px;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 14px;
+      resize: vertical;
+      background: var(--white);
+    }
+    .check-detail textarea:focus {
+      outline: none;
+      border-color: var(--warn);
+    }
+    .fixed-check {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+      font-size: 14px;
+      color: var(--info);
+      font-weight: 600;
+      cursor: pointer;
+      user-select: none;
+    }
+    .fixed-check input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      accent-color: var(--info);
+    }
+    .unfix-check {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+      font-size: 14px;
+      color: var(--bad);
+      font-weight: 700;
+      cursor: pointer;
+      user-select: none;
+    }
+    .unfix-check input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      accent-color: var(--bad);
+    }
+    .photo-input {
+      margin-top: 8px;
+      font-size: 13px;
+    }
+    .photo-input label {
+      display: inline-block;
+      padding: 8px 12px;
+      background: var(--g-pale);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--g-deep);
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .photo-input input[type="file"] { display: none; }
+    .photo-preview {
+      margin-top: 8px;
+      max-width: 200px;
+      max-height: 150px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+    }
+
+    /* Fuel picker */
+    .fuel-picker {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      padding: 12px 14px;
+    }
+    .fuel-btn {
+      padding: 12px 8px;
+      border: 1.5px solid var(--border);
+      background: var(--white);
+      border-radius: 10px;
+      font-size: 20px;
+      font-weight: 700;
+      cursor: pointer;
+      min-height: 56px;
+      color: var(--text);
+      transition: all 0.1s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+    }
+    .fuel-btn small { font-size: 11px; font-weight: 600; opacity: 0.7; }
+    .fuel-btn:active { transform: scale(0.96); }
+    .fuel-btn.active {
+      background: var(--warn);
+      color: var(--white);
+      border-color: var(--warn);
+    }
+    .fuel-btn.active.full {
+      background: var(--g-mid);
+      border-color: var(--g-mid);
+    }
+
+    /* Tire grid */
+    .tire-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding: 12px 14px;
+    }
+    .tire-cell {
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+    }
+    .tire-cell.bad { border-color: var(--bad); background: var(--bad-bg); }
+    .tire-cell label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin-bottom: 4px;
+    }
+    .tire-cell .range {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .tire-cell input {
+      width: 100%;
+      padding: 10px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: 700;
+      font-family: inherit;
+      background: var(--white);
+      text-align: center;
+      min-height: 44px;
+    }
+    .tire-cell.bad input { border-color: var(--bad); color: var(--bad); }
+
+    /* Electronics row */
+    .yn-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      gap: 12px;
+    }
+    .yn-row:last-child { border-bottom: none; }
+    .yn-row.critical-bad {
+      background: var(--bad-bg);
+    }
+    .yn-label {
+      flex: 1;
+      font-size: 16px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .crit-badge {
+      background: var(--bad);
+      color: var(--white);
+      font-size: 10px;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 4px;
+      letter-spacing: 0.05em;
+    }
+    .yn-buttons { display: flex; gap: 6px; }
+    .yn-btn {
+      padding: 10px 18px;
+      border: 1.5px solid var(--border);
+      background: var(--white);
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      min-width: 60px;
+      min-height: 44px;
+    }
+    .yn-btn.yes.active { background: var(--g-mid); color: var(--white); border-color: var(--g-mid); }
+    .yn-btn.no.active { background: var(--bad); color: var(--white); border-color: var(--bad); }
+
+    /* Cooler detail */
+    .cooler-detail {
+      padding: 12px 14px;
+      background: var(--bad-bg);
+      border-top: 1px solid var(--border);
+    }
+
+    /* Compartment cards */
+    .compartment-list { padding: 8px 12px; }
+    .compartment-card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+    .compartment-card.complete { border-color: var(--g-accent); }
+    .compartment-card.has-flag { border-color: var(--warn); }
+    .compartment-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      cursor: pointer;
+      gap: 8px;
+    }
+    .compartment-head-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      min-width: 0;
+    }
+    .compartment-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--g-deep);
+    }
+    .compartment-counts {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .compartment-expand {
+      font-size: 24px;
+      color: var(--muted);
+      transition: transform 0.2s;
+      width: 28px;
+      text-align: center;
+    }
+    .compartment-card.open .compartment-expand { transform: rotate(180deg); }
+    .compartment-body { display: none; padding: 0 14px 14px; }
+    .compartment-card.open .compartment-body { display: block; }
+    .compartment-status-row {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .item-row {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .item-row:last-child { border-bottom: none; }
+    .item-row-main {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .item-name {
+      flex: 1;
+      font-size: 15px;
+      line-height: 1.3;
+    }
+    .item-qty {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 500;
+      margin-left: 6px;
+    }
+    .item-ctrl-badge {
+      display: inline-block;
+      background: var(--info);
+      color: var(--white);
+      font-size: 9px;
+      font-weight: 800;
+      padding: 1px 5px;
+      border-radius: 3px;
+      letter-spacing: 0.05em;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+    .item-buttons { display: flex; gap: 4px; }
+    .item-btn {
+      padding: 7px 12px;
+      border: 1.5px solid var(--border);
+      background: var(--white);
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      min-height: 36px;
+      letter-spacing: 0.02em;
+    }
+    .item-btn.complete.active { background: var(--g-mid); color: var(--white); border-color: var(--g-mid); }
+    .item-btn.abnormal.active { background: var(--warn); color: var(--white); border-color: var(--warn); }
+    .item-detail {
+      margin-top: 8px;
+      padding: 10px;
+      background: var(--warn-bg);
+      border-radius: 8px;
+      border-left: 3px solid var(--warn);
+    }
+    .item-detail textarea {
+      width: 100%;
+      min-height: 50px;
+      padding: 8px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 14px;
+      resize: vertical;
+      background: var(--white);
+    }
+    .item-detail textarea:focus {
+      outline: none;
+      border-color: var(--warn);
+    }
+    .mark-all-btn {
+      width: 100%;
+      padding: 12px;
+      background: var(--g-pale);
+      border: 1px dashed var(--g-accent);
+      border-radius: 8px;
+      color: var(--g-deep);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 10px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .mark-all-btn:active { background: var(--g-light); }
+    .mark-all-btn.active {
+      background: var(--g-mid);
+      color: var(--white);
+      border-style: solid;
+      border-color: var(--g-mid);
+    }
+
+    /* Nested bag card inside a compartment */
+    .bag-card {
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      margin-top: 10px;
+      overflow: hidden;
+    }
+    .bag-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      cursor: pointer;
+      gap: 8px;
+      background: var(--g-pale);
+    }
+    .bag-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--g-deep);
+    }
+    .bag-icon { font-size: 12px; color: var(--muted); margin-right: 6px; }
+    .bag-counts {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .bag-expand {
+      font-size: 20px;
+      color: var(--muted);
+      transition: transform 0.15s;
+      width: 24px;
+      text-align: center;
+    }
+    .bag-card.open .bag-expand { transform: rotate(180deg); }
+    .bag-body { display: none; padding: 8px 12px 12px; }
+    .bag-card.open .bag-body { display: block; }
+    .lazy-placeholder { padding: 10px; color: var(--muted); font-size: 13px; text-align: center; }
+
+    /* Tire Yes/No */
+    .tire-yn-section {
+      padding: 12px 14px;
+    }
+    .tire-yn-label {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 10px;
+    }
+    .tire-yn-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .tire-yn-row .yn-buttons { display: flex; gap: 6px; }
+
+    /* Operational check (Yes/No) for specific items */
+    .op-check-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      padding: 10px 14px;
+      background: var(--g-pale);
+      border-bottom: 1px solid var(--border);
+      gap: 10px;
+    }
+    .op-check-row .op-detail { flex-basis: 100%; }
+    .req-star { color: var(--bad); font-weight: 900; margin-left: 3px; }
+    .op-check-label {
+      flex: 1;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--g-deep);
+      font-style: italic;
+    }
+    .op-check-row .yn-buttons { display: flex; gap: 6px; }
+
+    /* unit notice banner */
+    .unit-notice {
+      margin: 0 0 12px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      line-height: 1.35;
+      text-align: center;
+    }
+    .unit-notice.warn { background: #FBEAEA; color: var(--bad); border: 2px solid var(--bad); }
+    .unit-notice.info { background: var(--g-pale); color: var(--g-deep); border: 1.5px solid var(--g-accent); }
+
+    /* red tag */
+    .red-tag-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; background: #FBEAEA;
+      border: 1.5px solid var(--bad); border-radius: 8px; margin-bottom: 10px;
+    }
+    .red-tag-label { font-size: 14px; font-weight: 700; color: var(--bad); flex: 1; }
+    .red-tag-input {
+      width: 90px; padding: 10px; font-size: 18px; letter-spacing: 0.15em;
+      text-align: center; border: 1.5px solid var(--bad); border-radius: 8px; font-family: inherit;
+    }
+    .red-tag-confirm {
+      padding: 12px 14px; font-size: 14px; font-weight: 800; cursor: pointer;
+      border: 1.5px solid var(--bad); border-radius: 8px;
+      background: #fff; color: var(--bad); white-space: nowrap; font-family: inherit;
+    }
+    .red-tag-confirm.done { background: var(--g-accent); border-color: var(--g-accent); color: #fff; }
+    .red-tag-row.confirmed { background: var(--g-pale); border-color: var(--g-accent); }
+    .red-tag-row.confirmed .red-tag-label { color: var(--g-deep); }
+    .red-tag-row.confirmed .red-tag-input { border-color: var(--g-accent); }
+
+    /* controlled meds box */
+    .ctrl-box { margin: 12px 0; padding: 14px; border: 2px solid var(--info); border-radius: 10px; background: #EAF1F8; }
+    .ctrl-box-title { font-size: 14px; font-weight: 800; color: var(--info); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+    .ctrl-box-meds { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+    .ctrl-pill { background: var(--info); color: #fff; padding: 4px 12px; border-radius: 14px; font-size: 13px; font-weight: 700; }
+    .ctrl-box-note { font-size: 13px; color: var(--g-deep); line-height: 1.45; font-weight: 600; }
+
+    /* special checks (gurney) bad state */
+    .yn-row.special-bad { background: var(--warn-bg); border-radius: 8px; }
+
+    /* admin-edited marker (red font) */
+    .admin-edited { color: var(--bad) !important; }
+
+    /* unit button in-progress tint */
+    .unit-btn.in-progress { outline: 3px solid var(--warn); outline-offset: -3px; }
+    .unit-btn .progress-tag {
+      display: block; font-size: 11px; font-weight: 700; color: var(--warn);
+      background: rgba(255,255,255,0.92); border-radius: 6px; padding: 2px 6px; margin-top: 4px;
+    }
+
+    /* Compartment mark-all in header (no expand needed) */
+    .comp-header-mark-btn {
+      padding: 6px 12px;
+      background: var(--g-mid);
+      color: var(--white);
+      border: none;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      min-height: 34px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .comp-header-mark-btn:active { background: var(--g-accent); }
+    .comp-header-mark-btn.done {
+      background: var(--g-accent);
+    }
+
+    /* Confirmation modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.hidden { display: none; }
+    .modal-box {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    }
+    .modal-box h3 {
+      margin: 0 0 12px;
+      font-size: 18px;
+      color: var(--g-deep);
+    }
+    .modal-box p {
+      font-size: 15px;
+      color: var(--text);
+      margin: 0 0 8px;
+      line-height: 1.5;
+    }
+    .modal-box .modal-warn {
+      background: var(--warn-bg);
+      border-left: 3px solid var(--warn);
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-size: 14px;
+      color: var(--warn);
+      font-weight: 600;
+      margin: 12px 0;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .modal-actions button {
+      flex: 1;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      min-height: 48px;
+    }
+    .modal-confirm { background: var(--g-deep); color: var(--white); }
+    .modal-cancel { background: var(--bg); color: var(--text); border: 1.5px solid var(--border) !important; }
+    .modal-confirm:active { background: var(--g-mid); }
+    .modal-cancel:active { background: var(--g-light); }
+    .comments-box {
+      padding: 14px;
+    }
+    .comments-box textarea {
+      width: 100%;
+      min-height: 100px;
+      padding: 12px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 15px;
+      resize: vertical;
+      background: var(--bg);
+    }
+
+    /* Submit button */
+    .submit-wrap {
+      padding: 20px 14px 30px;
+      text-align: center;
+    }
+    .submit-btn {
+      background: var(--g-deep);
+      color: var(--white);
+      padding: 18px 28px;
+      font-size: 18px;
+      font-weight: 800;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      width: 100%;
+      max-width: 480px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      box-shadow: 0 4px 14px rgba(28,58,28,0.3);
+      min-height: 60px;
+    }
+    .submit-btn:active { transform: scale(0.98); }
+    .submit-btn:disabled {
+      background: var(--muted);
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Bottom status bar */
+    .status-bar {
+      position: fixed;
+      bottom: -1px; left: 0; right: 0;
+      background: var(--g-deep);
+      color: var(--white);
+      padding: 12px 16px;
+      padding-bottom: calc(12px + env(safe-area-inset-bottom));
+      box-shadow: 0 -2px 12px rgba(0,0,0,0.25);
+      z-index: 20;
+      display: none;
+    }
+    .status-bar.visible { display: block; cursor: pointer; }
+    .status-bar::after { /* bleed below the bar so scroll bounce never shows a gap */
+      content: ''; position: absolute; top: 100%; left: 0; right: 0; height: 80px; background: var(--g-deep);
+    }
+    #status-flags { text-decoration: underline; font-weight: 800; }
+    html, body { overscroll-behavior-y: none; }
+    .status-text {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .status-track {
+      height: 8px;
+      background: rgba(255,255,255,0.18);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .status-fill {
+      height: 100%;
+      background: var(--g-light);
+      transition: width 0.3s;
+      width: 0%;
+    }
+
+    /* Success */
+    .success {
+      text-align: center;
+      padding: 60px 24px;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    .success-icon {
+      font-size: 64px;
+      margin-bottom: 12px;
+    }
+    .success h2 {
+      font-size: 24px;
+      color: var(--g-deep);
+      margin: 0 0 8px;
+    }
+    .success p {
+      color: var(--muted);
+      margin: 8px 0;
+    }
+    .success-summary {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin: 20px 0;
+      text-align: left;
+    }
+    .success-summary .row {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+    .success-summary .row:last-child { border-bottom: none; }
+    .success-summary .row strong { color: var(--g-deep); }
+    .home-link {
+      display: inline-block;
+      margin-top: 16px;
+      padding: 14px 24px;
+      background: var(--g-deep);
+      color: var(--white);
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      font-size: 14px;
+    }
+
+    /* Loading / error */
+    .loading {
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--muted);
+    }
+    .error-box {
+      background: var(--bad-bg);
+      border: 1.5px solid var(--bad);
+      border-radius: 10px;
+      padding: 14px;
+      margin: 14px;
+      color: var(--bad);
+      font-size: 14px;
+    }
+
+    @media (min-width: 600px) {
+      .home-buttons { flex-direction: row; }
+      .home-btn { height: 220px; }
+      .tire-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+
+    /* ============ ADMIN MODE ============ */
+    .admin-banner {
+      background: var(--info);
+      color: var(--white);
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      text-align: center;
+    }
+    .admin-actions {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .admin-btn {
+      flex: 1;
+      min-width: 130px;
+      padding: 12px;
+      background: var(--white);
+      border: 1.5px solid var(--info);
+      color: var(--info);
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      min-height: 44px;
+    }
+    .admin-btn:active { background: var(--g-pale); }
+    .admin-btn.primary { background: var(--info); color: var(--white); }
+    .admin-btn.danger { border-color: var(--bad); color: var(--bad); }
+    .admin-btn.danger.primary { background: var(--bad); color: var(--white); }
+
+    .edit-item-row {
+      display: grid;
+      grid-template-columns: 1fr 80px auto;
+      gap: 8px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+      align-items: center;
+    }
+    .edit-item-row input {
+      padding: 8px;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: inherit;
+      background: var(--bg);
+      min-height: 36px;
+    }
+    .edit-item-row .remove-item {
+      padding: 6px 10px;
+      background: var(--bad-bg);
+      color: var(--bad);
+      border: 1px solid var(--bad);
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      min-height: 36px;
+    }
+    .add-item-btn {
+      width: 100%;
+      padding: 10px;
+      background: var(--white);
+      border: 1.5px dashed var(--g-accent);
+      color: var(--g-deep);
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 8px;
+      letter-spacing: 0.04em;
+    }
+    .password-prompt {
+      max-width: 320px;
+      margin: 60px auto;
+      padding: 24px;
+      background: var(--white);
+      border-radius: 14px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .password-prompt h2 {
+      color: var(--g-deep);
+      margin: 0 0 12px;
+      font-size: 18px;
+    }
+    .password-prompt input {
+      width: 100%;
+      padding: 14px;
+      font-size: 18px;
+      letter-spacing: 0.5em;
+      text-align: center;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 16px;
+      font-family: inherit;
+    }
+    .password-prompt button {
+      width: 100%;
+      padding: 14px;
+      background: var(--g-deep);
+      color: var(--white);
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ============ HOME SCREEN ============ -->
+<div class="screen home active" id="screen-home">
+  <div class="logo-flip-wrap" id="logo-flip-wrap">
+    <div class="logo-flip-inner" id="logo-flip-inner">
+      <!-- FRONT: logo -->
+      <div class="logo-face logo-face-front">
+        <img src="./logo.png" alt="North Country EMS" />
+      </div>
+      <!-- BACK: admin login -->
+      <div class="logo-face logo-face-back">
+        <div class="logo-back-title">⚙ Admin Login</div>
+        <input type="password" id="logo-admin-pw" inputmode="numeric" autocomplete="off" maxlength="20" placeholder="••••" class="logo-back-input" />
+        <button class="logo-back-btn" id="logo-admin-submit">Unlock</button>
+        <div class="logo-back-err" id="logo-admin-err"></div>
+      </div>
+    </div>
+  </div>
+  <div class="logo-flip-hint" id="logo-flip-hint">Tap logo to flip</div>
+  <div class="home-sub">Daily Apparatus Check</div>
+  <div class="home-buttons">
+    <button class="home-btn ambulances" id="home-btn-ambulances" type="button">
+      <div class="home-btn-label">Ambulances</div>
+    </button>
+    <button class="home-btn others" id="home-btn-others" type="button">
+      <div class="home-btn-label">Other Units</div>
+    </button>
+  </div>
+  <div class="home-footer">v<span id="version-tag">2.1.0</span> · <span id="today-date"></span></div>
+</div>
+
+<!-- ============ AMBULANCE PICKER ============ -->
+<div class="screen" id="screen-ambulance-picker">
+  <div class="header">
+    <button class="back-btn" onclick="goHome()">← Back</button>
+    <div class="header-title"></div>
+  </div>
+  <div class="picker-wrap" id="ambulance-picker-list"></div>
+</div>
+
+<!-- ============ RESCUE PICKER ============ -->
+<div class="screen" id="screen-rescue-picker">
+  <div class="header">
+    <button class="back-btn" onclick="goHome()">← Back</button>
+    <div class="header-title">Pick a Rescue Unit</div>
+  </div>
+  <div class="picker-wrap" id="rescue-picker-list"></div>
+</div>
+
+<!-- ============ CHECK FORM ============ -->
+<div class="screen" id="screen-check">
+  <div class="header">
+    <button class="back-btn" onclick="confirmExitCheck()">← Back</button>
+    <div class="header-title" id="check-title">Check</div>
+  </div>
+  <div class="form-wrap" id="check-body"></div>
+</div>
+
+<!-- ============ SUCCESS ============ -->
+<div class="screen" id="screen-success">
+  <div class="header">
+    <button class="back-btn" onclick="goHome()">← Home</button>
+    <div class="header-title">Submitted</div>
+  </div>
+  <div class="success" id="success-body"></div>
+</div>
+
+<!-- ============ ADMIN ============ -->
+<div class="screen" id="screen-admin-login">
+  <div class="header">
+    <button class="back-btn" onclick="goHome()">← Back</button>
+    <div class="header-title">Admin Login</div>
+  </div>
+  <div class="password-prompt">
+    <h2>Enter admin password</h2>
+    <input type="password" id="admin-pw" inputmode="numeric" autocomplete="off" maxlength="20" />
+    <button id="admin-pw-submit" type="button">Unlock</button>
+    <p id="admin-pw-error" style="color:var(--bad);font-size:13px;margin-top:10px;display:none;">Wrong password.</p>
+  </div>
+</div>
+
+<div class="screen" id="screen-admin-home">
+  <div class="header">
+    <button class="back-btn" onclick="goHome()">← Done</button>
+    <div class="header-title">Admin · Edit Inventory</div>
+  </div>
+  <div class="admin-banner">⚙ Admin mode — changes persist on this device</div>
+  <div class="picker-wrap" id="admin-home-body"></div>
+</div>
+
+<div class="screen" id="screen-admin-amb">
+  <div class="header">
+    <button class="back-btn" onclick="showAdminHome()">← Admin</button>
+    <div class="header-title" id="admin-amb-title">Edit ambulance</div>
+  </div>
+  <div class="admin-banner">⚙ Admin mode</div>
+  <div class="picker-wrap" id="admin-amb-body"></div>
+</div>
+
+<div class="screen" id="screen-admin-edit">
+  <div class="header">
+    <button class="back-btn" id="admin-edit-back">← Back</button>
+    <div class="header-title" id="admin-edit-title">Edit compartment</div>
+  </div>
+  <div class="admin-banner">⚙ Admin mode</div>
+  <div class="form-wrap" id="admin-edit-body"></div>
+</div>
+
+<!-- ============ CONFIRMATION MODAL ============ -->
+<div class="modal-overlay hidden" id="submit-modal">
+  <div class="modal-box">
+    <h3>Submit Apparatus Check</h3>
+    <p id="modal-body-text">By submitting, you confirm that you have checked all equipment and all items are complete as noted.</p>
+    <div class="modal-warn" id="modal-incomplete-warn" style="display:none;"></div>
+    <div class="modal-actions">
+      <button class="modal-cancel" id="modal-cancel-btn">Go Back</button>
+      <button class="modal-confirm" id="modal-confirm-btn">Submit</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ STATUS BAR ============ -->
+<div class="status-bar" id="status-bar">
+  <div class="status-text">
+    <span id="status-label">Check is 0% complete</span>
+    <span id="status-flags"></span>
+  </div>
+  <div class="status-track"><div class="status-fill" id="status-fill"></div></div>
+</div>
+
+<script>
+'use strict';
+
+/* ============================================================
+   APP STATE
+   ============================================================ */
+const APP = {
+  version: '2.13.1',
+  data: null,        // loaded units.json
+  screen: 'home',
+  check: null,       // current in-progress check
+};
+
+const DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+window.addEventListener('DOMContentLoaded', boot);
+
+async function boot() {
+  document.getElementById('today-date').textContent =
+    new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
+
+  // Deferred reports: send anything held past 5 PM, and re-check every minute
+  flushPendingSubmissions();
+  setInterval(flushPendingSubmissions, 60 * 1000);
+
+  // Track the last check element the user touched; tapping the progress bar jumps back to it
+  document.addEventListener('click', e => {
+    const t = e.target.closest('.item-btn, .check-btn, .yn-btn, .fuel-btn, .red-tag-confirm');
+    if (t) APP.lastTouched = t.closest('.item-row, .check-row, .yn-row, .op-check-row, .fuel-row, .red-tag-row') || t;
+  }, true);
+  document.getElementById('status-flags').addEventListener('click', e => {
+    e.stopPropagation();
+    cycleToNextFlag();
+  });
+  document.getElementById('status-bar').addEventListener('click', () => {
+    let target = (APP.lastTouched && document.body.contains(APP.lastTouched)) ? APP.lastTouched : null;
+    if (!target) {
+      // Fall back to the first unanswered row on the page
+      target = [...document.querySelectorAll('#check-body .check-row[data-key], #check-body .item-row, #check-body .yn-row')]
+        .find(row => row.querySelectorAll('.active').length === 0 && !row.closest('.op-detail'));
+    }
+    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+
+  // Wire up home buttons via addEventListener (robust on mobile)
+  document.getElementById('home-btn-ambulances').addEventListener('click', showAmbulancePicker);
+  document.getElementById('home-btn-others').addEventListener('click', showRescuePicker);
+
+  // Wire up the logo: click triggers admin spin + entry
+  setupLogoAdminTrigger();
+
+  // Wire up admin password submit
+  document.getElementById('admin-pw-submit').addEventListener('click', tryUnlockAdmin);
+  document.getElementById('admin-pw').addEventListener('keydown', e => {
+    if (e.key === 'Enter') tryUnlockAdmin();
+  });
+
+  // Wire up submit modal
+  document.getElementById('modal-cancel-btn').addEventListener('click', () => {
+    document.getElementById('submit-modal').classList.add('hidden');
+  });
+  document.getElementById('modal-confirm-btn').addEventListener('click', () => {
+    document.getElementById('submit-modal').classList.add('hidden');
+    submitCheck();
+  });
+
+  try {
+    const res = await fetch(`./units.json?t=${Date.now()}`, { cache: 'no-store' });
+    if (!res.ok) throw new Error(`Failed to load units.json: ${res.status}`);
+    APP.data = await res.json();
+    document.getElementById('version-tag').textContent = APP.data.version || APP.version;
+
+    // Overlay any admin edits from localStorage on top of the base data
+    applyOverrides();
+
+    // Initialize EmailJS
+    if (APP.data.emailjs && APP.data.emailjs.publicKey && window.emailjs) {
+      emailjs.init({ publicKey: APP.data.emailjs.publicKey });
+    }
+
+    // Now that data + email are ready, send any reports held past 5 PM
+    flushPendingSubmissions();
+  } catch (err) {
+    document.body.insertAdjacentHTML('afterbegin',
+      `<div class="error-box">Failed to load units.json: ${err.message}. Check that units.json is uploaded next to index.html.</div>`);
+    console.error(err);
+  }
+}
+
+function applyOverrides() {
+  try {
+    const raw = localStorage.getItem('wamboapp_overrides_v1');
+    if (!raw) return;
+    const overrides = JSON.parse(raw);
+    if (overrides.ambulanceCompartments) {
+      // Replace per-unit overrides (admin saves whole compartments structure per unit)
+      Object.keys(overrides.ambulanceCompartments).forEach(unitId => {
+        APP.data.ambulanceCompartments[unitId] = overrides.ambulanceCompartments[unitId];
+      });
+      console.log('Loaded admin overrides for:', Object.keys(overrides.ambulanceCompartments));
+    }
+  } catch (err) {
+    console.warn('Failed to apply overrides:', err);
+  }
+}
+
+function saveOverrides(unitId, compartments) {
+  let overrides = {};
+  try {
+    const raw = localStorage.getItem('wamboapp_overrides_v1');
+    if (raw) overrides = JSON.parse(raw);
+  } catch (e) {}
+  overrides.ambulanceCompartments = overrides.ambulanceCompartments || {};
+  overrides.ambulanceCompartments[unitId] = compartments;
+  localStorage.setItem('wamboapp_overrides_v1', JSON.stringify(overrides));
+  // Update in-memory copy too
+  APP.data.ambulanceCompartments[unitId] = compartments;
+}
+
+function clearAllOverrides() {
+  if (!confirm('Clear ALL admin edits on this device? Inventory will reset to whatever is in units.json on the server. This cannot be undone.')) return;
+  localStorage.removeItem('wamboapp_overrides_v1');
+  alert('Cleared. Reload the page to see the original inventory.');
+}
+
+/* Email this device's admin edits as a readable change request.
+   Diffs the local overrides against the LIVE units.json on the server,
+   so the email shows exactly what needs changing in the repo. */
+async function emailOverridesDiff() {
+  let overrides;
+  try { overrides = JSON.parse(localStorage.getItem('wamboapp_overrides_v1') || 'null'); } catch (e) {}
+  if (!overrides || !overrides.ambulanceCompartments || !Object.keys(overrides.ambulanceCompartments).length) {
+    alert('No admin edits on this device — nothing to email.');
+    return;
+  }
+
+  const btn = document.getElementById('admin-email-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
+
+  try {
+    // Fresh server copy so the diff reflects what's actually live
+    const res = await fetch(`./units.json?t=${Date.now()}`, { cache: 'no-store' });
+    if (!res.ok) throw new Error('Could not load server units.json');
+    const server = await res.json();
+
+    const flatten = (unit) => {
+      // { "Compartment::bag::item": qty } across exterior+interior(+cab)
+      const map = {};
+      const groups = [...(unit.exterior || []), ...(unit.interior || [])];
+      if (unit.cabArea) groups.push(unit.cabArea);
+      groups.forEach(comp => {
+        (comp.items || []).forEach(it => { map[`${comp.name}::${''}::${it.name}`] = it.qty; });
+        (comp.bags || []).forEach(bag => {
+          (bag.items || []).forEach(it => { map[`${comp.name}::${bag.name}::${it.name}`] = it.qty; });
+        });
+      });
+      return map;
+    };
+    const labelOf = (key) => {
+      const [comp, bag, item] = key.split('::');
+      return bag ? `${comp} → ${bag} — ${item}` : `${comp} — ${item}`;
+    };
+
+    let lines = [];
+    Object.entries(overrides.ambulanceCompartments).forEach(([unitId, edited]) => {
+      const base = server.ambulanceCompartments?.[unitId];
+      if (!base) { lines.push(`${unitId}: (unit not found in server units.json)`); return; }
+      const a = flatten(base), b = flatten(edited);
+      const unitLines = [];
+      Object.keys(b).forEach(k => {
+        if (!(k in a)) unitLines.push(`  + ADD    ${labelOf(k)} (x${b[k]})`);
+        else if (a[k] !== b[k]) unitLines.push(`  ~ QTY    ${labelOf(k)}: x${a[k]} → x${b[k]}`);
+      });
+      Object.keys(a).forEach(k => {
+        if (!(k in b)) unitLines.push(`  - REMOVE ${labelOf(k)} (was x${a[k]})`);
+      });
+      if (unitLines.length) lines.push(`${unitId}:\n` + unitLines.join('\n'));
+    });
+
+    if (!lines.length) {
+      alert('Your device\'s edits already match the live units.json — nothing to email.');
+      if (btn) { btn.disabled = false; btn.textContent = '📧 Email changes to admin'; }
+      return;
+    }
+
+    const senderNotes = (document.getElementById('admin-email-notes')?.value || '').trim();
+
+    // Paste-ready JSON of the changed units (EmailJS caps message size, so guard at ~35KB)
+    let jsonBlock = '';
+    const changedUnits = Object.keys(overrides.ambulanceCompartments);
+    const payload = JSON.stringify(
+      Object.fromEntries(changedUnits.map(u => [u, overrides.ambulanceCompartments[u]]))
+    );
+    if (payload.length <= 35000) {
+      jsonBlock =
+        `\n\n========== PASTE-READY JSON ==========\n` +
+        `Replace these keys inside "ambulanceCompartments" in units.json:\n\n` +
+        payload +
+        `\n======================================`;
+    } else {
+      jsonBlock =
+        `\n\n(Full JSON too large to email — on the sending device, tap "Download units.json" and upload that file to the repo instead.)`;
+    }
+
+    const message =
+      `ADMIN CHANGE REQUEST — WAMBOchecker\n` +
+      `From device, ${new Date().toLocaleString()}\n\n` +
+      (senderNotes ? `NOTES FROM SENDER:\n${senderNotes}\n\n` : '') +
+      `Apply these inventory changes to units.json in the repo:\n\n` +
+      lines.join('\n\n') +
+      jsonBlock +
+      `\n\n(Sent from admin mode. The full edited units.json can also be exported on the sending device via "Download units.json".)`;
+
+    await emailjs.send(APP.data.emailjs.serviceId, APP.data.emailjs.templateId, {
+      unit_id: 'ADMIN CHANGES',
+      check_date: new Date().toISOString().slice(0, 10),
+      check_type: 'admin',
+      initials: 'ADMIN',
+      message,
+      flags_count: 0,
+      to_email: APP.data.submissionEmail || 'd.boyce@northcountryems.org',
+    });
+
+    alert('Change request emailed. The edits still need to be applied to units.json in GitHub to go fleet-wide.');
+  } catch (err) {
+    console.error('Email diff failed:', err);
+    alert('Could not send: ' + (err.text || err.message || 'unknown error'));
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = '📧 Email changes to admin'; }
+  }
+}
+
+/* ============================================================
+   ADMIN TRIGGER — 3D flip card on logo
+   ============================================================ */
+function setupLogoAdminTrigger() {
+  const wrap = document.getElementById('logo-flip-wrap');
+  const inner = document.getElementById('logo-flip-inner');
+  const pw    = document.getElementById('logo-admin-pw');
+  const btn   = document.getElementById('logo-admin-submit');
+  const err   = document.getElementById('logo-admin-err');
+  const hint  = document.getElementById('logo-flip-hint');
+  if (!wrap) return;
+
+  // Flip on logo tap (front face click; ignore clicks on the back input/button)
+  wrap.addEventListener('click', e => {
+    const isFlipped = wrap.classList.contains('flipped');
+    // If showing front, flip to back
+    if (!isFlipped) {
+      wrap.classList.add('flipped');
+      hint.textContent = 'Tap outside to close';
+      setTimeout(() => { if (pw) pw.focus(); }, 680);
+      return;
+    }
+    // If showing back and they clicked the card background (not input/btn), flip back
+    if (e.target === wrap || e.target === inner || e.target.classList.contains('logo-face-back') || e.target.classList.contains('logo-back-title') || e.target.classList.contains('logo-back-err')) {
+      flipLogoBack();
+    }
+  });
+
+  // Tap outside flipped card to close
+  document.addEventListener('click', e => {
+    if (wrap.classList.contains('flipped') && !wrap.contains(e.target)) {
+      flipLogoBack();
+    }
+  });
+
+  function flipLogoBack() {
+    wrap.classList.remove('flipped');
+    hint.textContent = 'Tap logo to flip';
+    if (pw) pw.value = '';
+    if (err) err.textContent = '';
+  }
+
+  function tryLogoLogin() {
+    if (!pw) return;
+    if (pw.value.trim() === '4321') {
+      flipLogoBack();
+      showAdminHome();
+    } else {
+      err.textContent = 'Wrong password.';
+      pw.value = '';
+      pw.focus();
+    }
+  }
+
+  btn.addEventListener('click', tryLogoLogin);
+  pw.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); tryLogoLogin(); }
+  });
+}
+
+function tryUnlockAdmin() {
+  const pw = document.getElementById('admin-pw').value.trim();
+  if (pw === '4321') {
+    document.getElementById('admin-pw').value = '';
+    showAdminHome();
+  } else {
+    document.getElementById('admin-pw-error').style.display = 'block';
+  }
+}
+
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  window.scrollTo(0, 0);
+  APP.screen = id;
+  document.getElementById('status-bar').classList.toggle('visible', id === 'check');
+}
+
+function goHome() {
+  if (APP.screen === 'check' && hasUnsavedWork()) {
+    if (!confirm('You have unsaved work. Discard and go back to home?')) return;
+  }
+  APP.check = null;
+  showScreen('home');
+}
+
+function confirmExitCheck() {
+  if (hasUnsavedWork()) {
+    if (!confirm('You have unsaved work. Discard and go back?')) return;
+  }
+  APP.check = null;
+  showScreen('home');
+}
+
+function hasUnsavedWork() {
+  if (!APP.check) return false;
+  const c = APP.check;
+  return !!(c.initials || c.mileage || c.walkAround?.notes ||
+            Object.keys(c.mechanical || {}).length ||
+            Object.keys(c.fluids || {}).length ||
+            c.fuel || c.tireYN || c.oxygenYN ||
+            Object.keys(c.gurney || {}).length ||
+            Object.keys(c.opChecks || {}).length ||
+            c.cooler?.answered ||
+            Object.keys(c.compartments || {}).length ||
+            Object.keys(c.rescueChecks || {}).length ||
+            c.comments);
+}
+
+/* ============================================================
+   AMBULANCE PICKER
+   ============================================================ */
+function showAmbulancePicker() {
+  const list = document.getElementById('ambulance-picker-list');
+  list.innerHTML = '';
+  const intro = document.createElement('p');
+  intro.className = 'picker-intro';
+  intro.textContent = "Pick the ambulance you're checking today.";
+  list.appendChild(intro);
+
+  const progress = unitsWithProgressToday();
+
+  APP.data.ambulances.forEach(amb => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'unit-btn';
+    const inProg = progress[amb.id];
+    if (inProg) btn.classList.add('in-progress');
+    btn.innerHTML = `
+      <div>
+        <div>${escapeHTML(amb.name)}</div>
+        <div class="unit-meta">${escapeHTML(amb.type)}</div>
+        ${inProg ? '<span class="progress-tag">● Check in progress today</span>' : ''}
+      </div>
+      <div class="unit-btn-arrow">→</div>
+    `;
+    btn.addEventListener('click', () => startAmbulanceCheck(amb.id));
+    list.appendChild(btn);
+  });
+  showScreen('ambulance-picker');
+}
+
+/* ============================================================
+   RESCUE PICKER (with day-of-week rotation)
+   ============================================================ */
+function showRescuePicker() {
+  const list = document.getElementById('rescue-picker-list');
+  const today = DAY_NAMES[new Date().getDay()];
+  const dueToday = APP.data.rescueRotation[today] || [];
+  const allRescue = APP.data.allRescueUnits;
+  const rest = allRescue.filter(u => !dueToday.includes(u));
+
+  list.innerHTML = '';
+
+  if (dueToday.length > 0) {
+    const banner = document.createElement('div');
+    banner.className = 'due-banner';
+    banner.textContent = `Due Today (${today}): ${dueToday.join(', ')}`;
+    list.appendChild(banner);
+
+    const lbl = document.createElement('div');
+    lbl.className = 'section-label';
+    lbl.textContent = `Scheduled for ${today}`;
+    list.appendChild(lbl);
+
+    dueToday.forEach(u => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'unit-btn due-today';
+      btn.innerHTML = `
+        <div>
+          <div>${escapeHTML(u)}</div>
+          <div class="unit-meta">Due today</div>
+        </div>
+        <div class="unit-btn-arrow">→</div>
+      `;
+      btn.addEventListener('click', () => startRescueCheck(u));
+      list.appendChild(btn);
+    });
+
+    const lbl2 = document.createElement('div');
+    lbl2.className = 'section-label';
+    lbl2.textContent = 'Other rescue units';
+    list.appendChild(lbl2);
+  } else {
+    const intro = document.createElement('p');
+    intro.className = 'picker-intro';
+    intro.textContent = `No rigs scheduled for ${today}. Pick any unit to run a check.`;
+    list.appendChild(intro);
+  }
+
+  rest.forEach(u => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'unit-btn';
+    btn.innerHTML = `
+      <div>
+        <div>${escapeHTML(u)}</div>
+        <div class="unit-meta">Optional</div>
+      </div>
+      <div class="unit-btn-arrow">→</div>
+    `;
+    btn.addEventListener('click', () => startRescueCheck(u));
+    list.appendChild(btn);
+  });
+
+  showScreen('rescue-picker');
+}
+
+/* ============================================================
+   START AMBULANCE CHECK
+   ============================================================ */
+/* ============================================================
+   AUTOSAVE — persist in-progress check to localStorage
+   Keyed by unit + date so a bump-out restores same-day work.
+   ============================================================ */
+const AUTOSAVE_PREFIX = 'wamboapp_autosave_v1::';
+
+function autosaveKey(c) {
+  const id = c.unitId || c.unitName || 'unit';
+  return AUTOSAVE_PREFIX + id + '::' + c.date;
+}
+
+function saveAutosave() {
+  const c = APP.check;
+  if (!c) return;
+  try {
+    // Strip the heavy _comps reference and any base64 photo blobs before saving
+    const slim = JSON.parse(JSON.stringify(c, (k, v) => {
+      if (k === '_comps') return undefined;
+      // don't persist giant base64 photos; keep only uploaded URLs
+      if (k === 'photo' && v && v.type === 'base64') return undefined;
+      return v;
+    }));
+    localStorage.setItem(autosaveKey(c), JSON.stringify({ savedAt: Date.now(), check: slim }));
+  } catch (e) { /* localStorage may be full or blocked; fail quietly */ }
+}
+
+function restoreAutosave() {
+  const c = APP.check;
+  if (!c) return;
+  let raw;
+  try { raw = localStorage.getItem(autosaveKey(c)); } catch (e) { return; }
+  if (!raw) return;
+  let parsed;
+  try { parsed = JSON.parse(raw); } catch (e) { return; }
+  const saved = parsed.check;
+  if (!saved) return;
+  // Merge saved fields back into current check (keep live _comps)
+  Object.keys(saved).forEach(k => {
+    if (k === '_comps') return;
+    APP.check[k] = saved[k];
+  });
+  // Re-render so restored values show, then repaint field states
+  renderAmbulanceCheck();
+  repaintRestoredState();
+  updateProgress();
+}
+
+function clearAutosave() {
+  const c = APP.check;
+  if (!c) return;
+  try { localStorage.removeItem(autosaveKey(c)); } catch (e) {}
+}
+
+/* Mark which units have an in-progress autosave for today (for button tint) */
+function unitsWithProgressToday() {
+  const today = new Date().toISOString().slice(0,10);
+  const out = {};
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key && key.startsWith(AUTOSAVE_PREFIX) && key.endsWith('::' + today)) {
+        const id = key.slice(AUTOSAVE_PREFIX.length, key.length - ('::' + today).length);
+        out[id] = true;
+      }
+    }
+  } catch (e) {}
+  return out;
+}
+
+/* After restoring autosave, repaint the simple top-level field button states */
+function repaintRestoredState() {
+  const c = APP.check;
+  // initials/mileage
+  const ini = document.getElementById('meta-initials'); if (ini) ini.value = c.initials || '';
+  const mil = document.getElementById('meta-mileage'); if (mil) mil.value = c.mileage || '';
+  const wa = document.getElementById('walkaround-notes'); if (wa) wa.value = c.walkAround?.notes || '';
+  // fuel
+  if (c.fuel) document.querySelectorAll('.fuel-btn').forEach(b => b.classList.toggle('active', b.dataset.fuel === c.fuel));
+  // tire
+  if (c.tireYN) {
+    document.querySelectorAll('[data-tire-yn]').forEach(b => b.classList.toggle('active', b.dataset.tireYn === c.tireYN));
+    const td = document.getElementById('tire-detail'); if (td) td.style.display = c.tireYN === 'no' ? 'block' : 'none';
+    const tn = document.getElementById('tire-notes'); if (tn) tn.value = c.tireNotes || '';
+    const tf = document.getElementById('tire-fixed'); if (tf) tf.checked = !!c.tireFixed;
+    const tu = document.getElementById('tire-unfixed'); if (tu) tu.checked = !!c.tireUnfixed;
+  }
+  // oxygen
+  if (c.oxygenYN) {
+    document.querySelectorAll('[data-oxygen-yn]').forEach(b => b.classList.toggle('active', b.dataset.oxygenYn === c.oxygenYN));
+    const od = document.getElementById('oxygen-detail'); if (od) od.style.display = c.oxygenYN === 'no' ? 'block' : 'none';
+    const on = document.getElementById('oxygen-notes'); if (on) on.value = c.oxygenNotes || '';
+    const of = document.getElementById('oxygen-fixed'); if (of) of.checked = !!c.oxygenFixed;
+    const ou = document.getElementById('oxygen-unfixed'); if (ou) ou.checked = !!c.oxygenUnfixed;
+  }
+  // cooler
+  if (c.cooler?.answered) {
+    document.querySelectorAll('[data-cooler-yn]').forEach(b => b.classList.toggle('active', b.dataset.coolerYn === (c.cooler.ok ? 'yes' : 'no')));
+    const cd = document.getElementById('cooler-detail'); if (cd) cd.style.display = c.cooler.ok ? 'none' : 'block';
+    const cr = document.getElementById('cooler-reading'); if (cr) cr.value = c.cooler.reading || '';
+  }
+  // mechanical + fluids
+  ['mechanical','fluids'].forEach(bucket => {
+    Object.entries(c[bucket] || {}).forEach(([key, st]) => {
+      if (!st.status) return;
+      const row = document.querySelector(`.check-row[data-key="${cssEscape(key)}"][data-bucket="${bucket}"]`);
+      if (!row) return;
+      row.querySelectorAll('.check-btn').forEach(b => b.classList.toggle('active', b.dataset.status === st.status));
+      const safeKey = key.replace(/[^a-zA-Z0-9]/g, '_');
+      const det = document.getElementById('detail-' + safeKey);
+      if (det) {
+        det.style.display = st.status === 'bad' ? 'block' : 'none';
+        const ta = det.querySelector('textarea'); if (ta) ta.value = st.notes || '';
+        const fx = det.querySelector('[data-fixed]'); if (fx) fx.checked = !!st.fixed;
+        const ufx = det.querySelector('[data-unfixed]'); if (ufx) ufx.checked = !!st.unfixed;
+      }
+    });
+  });
+  // Note: compartment item states repaint when the user expands them (lazy),
+  // and ensureItemState already holds the restored values so counts stay correct.
+}
+
+function startAmbulanceCheck(unitId) {
+  const amb = APP.data.ambulances.find(a => a.id === unitId);
+  if (!amb) return;
+  const comps = APP.data.ambulanceCompartments[unitId];
+  if (!comps) {
+    alert(`No compartment data for ${unitId}. Check units.json.`);
+    return;
+  }
+  APP.check = {
+    type: 'ambulance',
+    unitId,
+    unitName: amb.name,
+    date: new Date().toISOString().slice(0,10),
+    initials: '',
+    mileage: '',
+    walkAround: { notes: '', photo: null },
+    mechanical: {},
+    fluids: {},
+    fuel: null,
+    tireYN: null,
+    tireNotes: '',
+    tireFixed: false,
+    tireUnfixed: false,
+    oxygenYN: null,
+    oxygenNotes: '',
+    oxygenFixed: false,
+    oxygenUnfixed: false,
+    cooler: { answered: false, ok: null, reading: '', photo: null },
+    gurney: {},        // { checkLabel: 'yes'|'no' }
+    redTags: {},       // { compOrBagName: 'last4' }
+    opChecks: {},      // { 'comp||bag||item': 'yes'|'no' }
+    // compartments: { compName: { items: {itemName: {status, notes, fixed}}, bags: { bagName: { items: {...} } } } }
+    compartments: {},
+    _comps: comps,
+    _cabArea: comps.cabArea || null,
+  };
+  renderAmbulanceCheck();
+  showScreen('check');
+  updateProgress();
+  restoreAutosave();    // restore any in-progress check for this unit+date
+}
+
+function renderAmbulanceCheck() {
+  const c = APP.check;
+  document.getElementById('check-title').innerHTML =
+    `${c.unitName} <span class="header-sub">· ${formatDate(c.date)}</span>`;
+
+  const body = document.getElementById('check-body');
+  body.innerHTML = `
+    ${renderUnitNotice()}
+    ${renderMetaBlock()}
+    ${renderWalkAroundSection()}
+    ${renderMechanicalSection()}
+    ${renderCabSection()}
+    ${renderFluidsSection()}
+    ${renderFuelSection()}
+    ${renderTireSection()}
+    ${renderCompartmentSection('Exterior Compartments', 'exterior', c._comps.exterior)}
+    ${renderCompartmentSection('Interior Compartments', 'interior', c._comps.interior)}
+    <div class="submit-wrap">
+      <button type="button" id="submit-flags" style="display:none;width:100%;margin-bottom:10px;padding:12px;font-family:inherit;font-size:15px;font-weight:800;color:var(--warn);background:var(--warn-bg);border:1.5px solid var(--warn);border-radius:10px;cursor:pointer;" onclick="cycleToNextFlag()"></button>
+      <button class="submit-btn" id="submit-btn" onclick="showSubmitModal()">Submit Check</button>
+    </div>
+  `;
+  attachAmbulanceHandlers();
+}
+
+// Cab items render right after Mechanical (moved out of interior walk)
+function renderCabSection() {
+  const cab = APP.check?._cabArea;
+  if (!cab) return '';
+  const safeId = 'cabarea';
+  return `
+    <div class="section"><div class="section-head">Cab</div>
+    <div class="compartment-list">
+      ${renderCompartmentCard(safeId, cab, 'cab')}
+    </div></div>`;
+}
+
+function renderUnitNotice() {
+  const c = APP.check;
+  const notices = APP.data.unitNotices || {};
+  const n = notices[c.unitId] || notices[c.unitName];
+  if (!n || !n.text) return '';
+  const cls = n.style === 'warn' ? 'unit-notice warn' : 'unit-notice info';
+  return `<div class="${cls}">${escapeHTML(n.text)}</div>`;
+}
+
+/* ============================================================
+   START RESCUE CHECK
+   ============================================================ */
+function startRescueCheck(unitName) {
+  APP.check = {
+    type: 'rescue',
+    unitId: unitName,
+    unitName: unitName,
+    date: new Date().toISOString().slice(0,10),
+    initials: '',
+    mileage: '',
+    rescueChecks: {},
+    comments: '',
+  };
+  renderRescueCheck();
+  showScreen('check');
+  updateProgress();
+}
+
+function renderRescueCheck() {
+  const c = APP.check;
+  document.getElementById('check-title').innerHTML =
+    `${c.unitName} <span class="header-sub">· ${formatDate(c.date)}</span>`;
+  const checks = APP.data.rescueRigChecks;
+  const body = document.getElementById('check-body');
+
+  body.innerHTML = `
+    <div class="meta-block">
+      <div class="meta-row">
+        <label>Initials</label>
+        <input type="text" id="rescue-initials" placeholder="e.g. DB" maxlength="6" />
+      </div>
+      <div class="meta-row">
+        <label>Mileage</label>
+        <input type="number" id="rescue-mileage" placeholder="Current mileage" />
+      </div>
+    </div>
+    ${renderRescueGroup('Exterior & Lights', 'exterior', checks.exterior)}
+    ${renderRescueGroup('Fluids & Fuel', 'fluids', checks.fluids)}
+    ${renderRescueGroup('Interior & Equipment', 'interior', checks.interior)}
+    ${renderRescueGroup('Operational', 'operational', checks.operational)}
+    ${renderRescueGroup('Cleaning', 'cleaning', checks.cleaning)}
+    <div class="section">
+      <div class="section-head">Comments</div>
+      <div class="comments-body comments-box">
+        <textarea id="rescue-comments" placeholder="Any notes, deficiencies, or observations..."></textarea>
+      </div>
+    </div>
+    <div class="submit-wrap">
+      <button class="submit-btn" onclick="showSubmitModal()">Submit Check</button>
+    </div>
+  `;
+  attachRescueHandlers();
+}
+
+function renderRescueGroup(title, group, items) {
+  let html = `<div class="section"><div class="section-head">${title}</div><div class="section-body">`;
+  items.forEach(item => {
+    const key = `${group}::${item}`;
+    html += renderWNLRow(item, key, 'rescueChecks');
+  });
+  html += `</div></div>`;
+  return html;
+}
+
+function attachRescueHandlers() {
+  document.getElementById('rescue-initials').oninput = e => { e.target.value = e.target.value.toUpperCase(); APP.check.initials = e.target.value; updateProgress(); saveAutosave(); };
+  document.getElementById('rescue-mileage').oninput = e => { APP.check.mileage = e.target.value; updateProgress(); };
+  document.getElementById('rescue-comments').oninput = e => { APP.check.comments = e.target.value; };
+
+  // Wire up the WNL rows for the rescue check
+  document.querySelectorAll('.check-row[data-bucket="rescueChecks"]').forEach(row => {
+    const key = row.dataset.key;
+    const safeKey = key.replace(/[^a-zA-Z0-9]/g, '_');
+    row.querySelectorAll('.check-btn').forEach(btn => {
+      btn.onclick = () => {
+        const status = btn.dataset.status;
+        const wasActive = btn.classList.contains('active');
+        row.querySelectorAll('.check-btn').forEach(b => b.classList.remove('active'));
+        if (wasActive) {
+          if (APP.check.rescueChecks[key]) APP.check.rescueChecks[key].status = null;
+          document.getElementById('detail-' + safeKey).style.display = 'none';
+        } else {
+          btn.classList.add('active');
+          APP.check.rescueChecks[key] = APP.check.rescueChecks[key] || {};
+          APP.check.rescueChecks[key].status = status;
+          document.getElementById('detail-' + safeKey).style.display = status === 'bad' ? 'block' : 'none';
+        }
+        updateProgress();
+      };
+    });
+    const detail = document.getElementById('detail-' + safeKey);
+    detail.querySelector('textarea').oninput = e => {
+      APP.check.rescueChecks[key] = APP.check.rescueChecks[key] || {};
+      APP.check.rescueChecks[key].notes = e.target.value;
+    };
+    detail.querySelector('[data-fixed]').onchange = e => {
+      APP.check.rescueChecks[key] = APP.check.rescueChecks[key] || {};
+      APP.check.rescueChecks[key].fixed = e.target.checked;
+      if (e.target.checked) { APP.check.rescueChecks[key].unfixed = false; const u = detail.querySelector('[data-unfixed]'); if (u) u.checked = false; }
+    };
+    const ru = detail.querySelector('[data-unfixed]');
+    if (ru) ru.onchange = e => {
+      APP.check.rescueChecks[key] = APP.check.rescueChecks[key] || {};
+      APP.check.rescueChecks[key].unfixed = e.target.checked;
+      if (e.target.checked) { APP.check.rescueChecks[key].fixed = false; const f = detail.querySelector('[data-fixed]'); if (f) f.checked = false; }
+    };
+  });
+}
+
+/* ============================================================
+   RENDERERS (ambulance form sections)
+   ============================================================ */
+function renderMetaBlock() {
+  return `
+    <div class="meta-block">
+      <div class="meta-row">
+        <label>Initials</label>
+        <input type="text" id="meta-initials" placeholder="e.g. DB" maxlength="6" />
+      </div>
+      <div class="meta-row">
+        <label>Mileage</label>
+        <input type="number" id="meta-mileage" placeholder="Starting mileage" />
+      </div>
+      <button type="button" class="comp-header-mark-btn" style="width:100%;margin-top:10px;" onclick="document.getElementById('section-comp-interior')?.scrollIntoView({behavior:'smooth'})">⤵ Jump to Interior</button>
+    </div>
+  `;
+}
+
+function renderWalkAroundSection() {
+  return `
+    <div class="section">
+      <div class="section-head">Walk-Around</div>
+      <div class="section-body">
+        <div class="check-row">
+          <textarea id="walkaround-notes" placeholder="Any damage, leaks, or hazards noted on walk-around? (Leave blank if all clear.)" style="width:100%;min-height:70px;padding:10px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:15px;background:var(--bg);"></textarea>
+          <div class="photo-input">
+            <label for="walkaround-photo">📷 Add photo (optional)</label>
+            <input type="file" id="walkaround-photo" accept="image/*" capture="environment" />
+            <div id="walkaround-photo-preview"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderMechanicalSection() {
+  let html = `<div class="section"><div class="section-head">Mechanical & Lights</div><div class="section-body">`;
+  APP.data.mechanicalChecks.forEach(item => {
+    html += renderWNLRow(item, item, 'mechanical');
+  });
+  html += `</div></div>`;
+  return html;
+}
+
+function isSealedTransmission(item) {
+  return item === 'Transmission fluid' &&
+    (APP.data.sealedTransmission || []).includes(APP.check?.unitId);
+}
+
+function renderFluidsSection() {
+  let html = `<div class="section"><div class="section-head">Fluids</div><div class="section-body">`;
+  APP.data.fluidChecks.forEach(item => {
+    if (isSealedTransmission(item)) {
+      html += `<div class="check-row" style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+        <div class="check-label" style="flex:1;">${escapeHTML(item)}</div>
+        <span style="font-size:13px;font-weight:700;color:var(--info);background:#EAF2F8;border:1px solid var(--info);border-radius:8px;padding:6px 10px;white-space:nowrap;flex-shrink:0;margin-left:auto;">Sealed — not needed</span>
+      </div>`;
+      return;
+    }
+    html += renderWNLRow(item, item, 'fluids');
+  });
+  html += `</div></div>`;
+  return html;
+}
+
+function renderWNLRow(label, key, stateBucket) {
+  const safeKey = key.replace(/[^a-zA-Z0-9]/g, '_');
+  return `
+    <div class="check-row" data-key="${key}" data-bucket="${stateBucket}">
+      <div class="check-row-main">
+        <div class="check-label">${label}</div>
+        <div class="check-buttons">
+          <button class="check-btn wnl" data-status="wnl">WNL</button>
+          <button class="check-btn bad" data-status="bad">Abnormal</button>
+        </div>
+      </div>
+      <div class="check-detail" id="detail-${safeKey}" style="display:none;">
+        <textarea placeholder="What was wrong? (notes)"></textarea>
+        <label class="fixed-check">
+          <input type="checkbox" data-fixed />
+          Fixed on the spot
+        </label>
+        <label class="unfix-check">
+          <input type="checkbox" data-unfixed />
+          Unable to fix
+        </label>
+      </div>
+    </div>
+  `;
+}
+
+function renderFuelSection() {
+  return `
+    <div class="section">
+      <div class="section-head">Fuel Level</div>
+      <div class="section-body">
+        <div class="fuel-picker" id="fuel-picker">
+          <button class="fuel-btn" data-fuel="1/4">¼<small>25%</small></button>
+          <button class="fuel-btn" data-fuel="1/2">½<small>50%</small></button>
+          <button class="fuel-btn" data-fuel="3/4">¾<small>75%</small></button>
+          <button class="fuel-btn full" data-fuel="Full">Full<small>100%</small></button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderTireSection() {
+  return `
+    <div class="section">
+      <div class="section-head">Tire Pressure</div>
+      <div class="section-body">
+        <div class="yn-row" data-tire>
+          <div class="yn-label">Is tire pressure between 75–85 PSI on all tires?</div>
+          <div class="yn-buttons">
+            <button class="yn-btn yes" data-tire-yn="yes">Yes</button>
+            <button class="yn-btn no" data-tire-yn="no">No</button>
+          </div>
+        </div>
+        <div id="tire-detail" style="display:none; margin-top:10px; padding:10px; background:var(--warn-bg); border-radius:8px; border-left:3px solid var(--warn);">
+          <textarea id="tire-notes" placeholder="Which tire(s) are out of range? Note the readings." style="width:100%;min-height:60px;padding:8px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:14px;background:var(--white);"></textarea>
+          <label class="fixed-check" style="margin-top:8px;">
+            <input type="checkbox" id="tire-fixed" />
+            Fixed on the spot
+          </label>
+          <label class="unfix-check" style="margin-top:8px;">
+            <input type="checkbox" id="tire-unfixed" />
+            Unable to fix
+          </label>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// Renders INSIDE Compartment 1, nested under the Ambulance Main O2 item
+function oxygenInlineHTML() {
+  const o = APP.data.oxygenCheck || { label: 'Is main O2 above 500 PSI?', minPsi: 500 };
+  return `
+    <div class="op-check-row" data-oxygen style="display:block;">
+      <div class="yn-row">
+        <div class="yn-label">🫁 ${escapeHTML(o.label)}</div>
+        <div class="yn-buttons">
+          <button class="yn-btn yes" data-oxygen-yn="yes">Yes</button>
+          <button class="yn-btn no" data-oxygen-yn="no">No</button>
+        </div>
+      </div>
+      <div id="oxygen-detail" style="display:none; margin-top:10px; padding:10px; background:var(--warn-bg); border-radius:8px; border-left:3px solid var(--warn);">
+        <textarea id="oxygen-notes" placeholder="Note the actual O2 reading." style="width:100%;min-height:60px;padding:8px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:14px;background:var(--white);"></textarea>
+        <label class="fixed-check" style="margin-top:8px;">
+          <input type="checkbox" id="oxygen-fixed" />
+          Swapped / Fixed on the spot
+        </label>
+        <label class="unfix-check" style="margin-top:8px;">
+          <input type="checkbox" id="oxygen-unfixed" />
+          Unable to fix
+        </label>
+      </div>
+    </div>
+  `;
+}
+
+// Renders INSIDE the Fridge compartment body
+function coolerInlineHTML() {
+  return `
+    <div class="op-check-row" data-cooler style="display:block;">
+      <div class="yn-row">
+        <div class="yn-label">🌡 Reading between 4°C and 9°C?</div>
+        <div class="yn-buttons">
+          <button class="yn-btn yes" data-cooler-yn="yes">Yes</button>
+          <button class="yn-btn no" data-cooler-yn="no">No</button>
+        </div>
+      </div>
+      <div class="cooler-detail" id="cooler-detail" style="display:none;">
+        <div style="margin-bottom:10px;padding:10px;background:#FBEAEA;border-left:3px solid var(--bad);border-radius:8px;font-weight:800;color:var(--bad);">
+          ⚠ TELL BC IMMEDIATELY — medications may have to be replaced.
+        </div>
+        <div class="meta-row">
+          <label>Reading</label>
+          <input type="number" id="cooler-reading" placeholder="°C" step="0.1" />
+        </div>
+        <div class="photo-input">
+          <label for="cooler-photo">📷 Photo of thermometer</label>
+          <input type="file" id="cooler-photo" accept="image/*" capture="environment" />
+          <div id="cooler-photo-preview"></div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderCompartmentSection(title, type, compartments) {
+  let html = `<div class="section" id="section-comp-${type}"><div class="section-head">${escapeHTML(title)} (${compartments.length})</div>`;
+  html += `<div class="compartment-list">`;
+  compartments.forEach((comp, idx) => {
+    html += renderCompartmentCard(`${type}-${idx}`, comp, type, idx);
+  });
+  html += `</div></div>`;
+  return html;
+}
+
+// True if anything in this compartment needs special attention (red tag / battery / fridge temp)
+function compNeedsStar(comp) {
+  if (comp.redTag || comp.operationalCheck) return true;
+  if (comp.name === 'Fridge') return true; // nested temp check
+  if ((comp.items || []).some(it => it.operationalCheck)) return true;
+  if ((comp.bags || []).some(bag => bag.redTag || (bag.items || []).some(it => it.operationalCheck))) return true;
+  return false;
+}
+
+function renderCompartmentCard(safeId, comp, type, idx = 0) {
+  const bags = comp.bags || [];
+  const totalItems = comp.items.length + bags.reduce((n, b) => n + b.items.length, 0);
+  const bagSummary = bags.length ? ` · ${bags.length} bag${bags.length>1?'s':''} inside` : '';
+  const hasItems = comp.items.length > 0 || (comp.bags && comp.bags.length > 0);
+  const markBtn = hasItems
+    ? `<button class="comp-header-mark-btn" type="button" data-header-mark="${escapeAttr(comp.name)}" data-header-safeid="${safeId}" title="Mark all items complete">✓ to Complete</button>`
+    : '';
+  return `
+      <div class="compartment-card" data-compartment="${escapeAttr(comp.name)}" data-type="${type}" data-idx="${idx}" id="comp-${safeId}">
+        <div class="compartment-head" data-comp-toggle="${safeId}">
+          <div class="compartment-head-left">
+            <div>
+              <div class="compartment-name">${escapeHTML(comp.name)}${compNeedsStar(comp) ? '<span class="req-star">*</span>' : ''}</div>
+              <div class="compartment-counts" id="comp-counts-${safeId}">${totalItems} item${totalItems!==1?'s':''}${bagSummary}</div>
+            </div>
+          </div>
+          ${markBtn}
+          <div class="compartment-expand">▼</div>
+        </div>
+        <div class="compartment-body" id="comp-body-${safeId}">
+          <div class="lazy-placeholder">Loading…</div>
+        </div>
+      </div>
+    `;
+}
+
+/* Lazy-render a compartment's body the first time it's opened. */
+function renderCompartmentBody(safeId, comp) {
+  const body = document.getElementById('comp-body-' + safeId);
+  if (!body || body.dataset.rendered === 'true') return;
+  body.dataset.rendered = 'true';
+
+  let html = '';
+
+  // Compartment-level operational check (e.g. Portable Suction) — at the very top
+  if (comp.operationalCheck) {
+    html += opCheckHTML(comp.name, '', '__comp_op__', comp.operationalCheck);
+  }
+
+  // ── Gurney special checks (Yes/No rows, no items) ──
+  if (comp.specialChecks && comp.specialChecks.length) {
+    html += `<div class="special-checks">`;
+    comp.specialChecks.forEach(sc => {
+      html += `
+        <div class="yn-row" data-special-comp="${escapeAttr(comp.name)}" data-special-label="${escapeAttr(sc.label)}">
+          <div class="yn-label">${escapeHTML(sc.label)}</div>
+          <div class="yn-buttons">
+            <button class="yn-btn yes" data-special-yn="yes">Yes</button>
+            <button class="yn-btn no" data-special-yn="no">No</button>
+          </div>
+        </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // ── Red tag input (for compartments flagged redTag) ──
+  if (comp.redTag) {
+    html += redTagHTML(comp.name);
+  }
+
+  // Direct items in the compartment
+  if (comp.items.length > 0) {
+    html += `<div class="item-list" data-bag-name="">`;
+    comp.items.forEach((it, itIdx) => {
+      html += itemRowHTML(it, comp.name, '', itIdx);
+      // Nest the main O2 level check under the Ambulance Main O2 item
+      if (/ambulance main\s*o?0?2/i.test(it.name)) html += oxygenInlineHTML();
+    });
+    html += `</div>`;
+  }
+
+  // Fridge gets the temp check nested at the top of its body
+  if (comp.name === 'Fridge') {
+    html = coolerInlineHTML() + html;
+  }
+
+
+  // ── Controlled meds disclaimer box (e.g. Med Vault) ──
+  if (comp.controlledDisclaimer) {
+    const ctrlNames = comp.items.filter(it => it.controlled).map(it => it.name);
+    if (ctrlNames.length) {
+      html += `
+        <div class="ctrl-box">
+          <div class="ctrl-box-title">Controlled Substances</div>
+          <div class="ctrl-box-meds">${ctrlNames.map(n => `<span class="ctrl-pill">${escapeHTML(n)}</span>`).join('')}</div>
+          <div class="ctrl-box-note">${escapeHTML(comp.controlledDisclaimer)}</div>
+        </div>`;
+    }
+  }
+
+  // Nested bags
+  if (comp.bags && comp.bags.length > 0) {
+    comp.bags.forEach((bag, bIdx) => {
+      const bagSafeId = `${safeId}-bag-${bIdx}`;
+      const bagRedTag = bag.redTag ? redTagHTML(bag.name) : '';
+      html += `
+        <div class="bag-card" id="bag-${bagSafeId}" data-bag-name="${escapeAttr(bag.name)}">
+          <div class="bag-head" data-bag-toggle="${bagSafeId}">
+            <div>
+              <div class="bag-name"><span class="bag-icon">▸</span>${escapeHTML(bag.name)}${bag.redTag ? '<span class="req-star">*</span>' : ''}</div>
+              <div class="bag-counts">${bag.items.length} items</div>
+            </div>
+            <button class="comp-header-mark-btn" type="button" data-bag-mark="${escapeAttr(bag.name)}" data-bag-mark-comp="${escapeAttr(comp.name)}" data-bag-mark-safeid="${safeId}">✓ All</button>
+            <div class="bag-expand">▼</div>
+          </div>
+          <div class="bag-body">
+            ${bagRedTag}
+            <div class="item-list" data-bag-name="${escapeAttr(bag.name)}">
+              ${bag.items.map((it, itIdx) => itemRowHTML(it, comp.name, bag.name, itIdx)).join('')}
+            </div>
+          </div>
+        </div>`;
+    });
+  }
+
+  body.innerHTML = html;
+  wireCompartmentBody(safeId, comp);
+  repaintCompartmentRestored(safeId, comp);
+}
+
+/* Repaint saved item states inside a compartment when it first renders */
+function repaintCompartmentRestored(safeId, comp) {
+  const c = APP.check;
+  const body = document.getElementById('comp-body-' + safeId);
+  if (!body) return;
+  const cs = c.compartments[comp.name];
+  // Items + bags
+  body.querySelectorAll('.item-row').forEach(row => {
+    const bagName = row.dataset.bag;
+    const itemName = row.dataset.item;
+    let st = null;
+    if (cs) {
+      if (bagName) st = cs.bags?.[bagName]?.items?.[itemName];
+      else st = cs.items?.[itemName];
+    }
+    if (st && st.status) {
+      row.querySelectorAll('.item-btn').forEach(b => b.classList.toggle('active', b.dataset.itemStatus === st.status));
+      const det = row.querySelector('.item-detail');
+      if (det) {
+        det.style.display = st.status === 'abnormal' ? 'block' : 'none';
+        const ta = det.querySelector('textarea'); if (ta) ta.value = st.notes || '';
+        const fx = det.querySelector('[data-fixed]'); if (fx) fx.checked = !!st.fixed;
+        const ufx = det.querySelector('[data-unfixed]'); if (ufx) ufx.checked = !!st.unfixed;
+      }
+    }
+  });
+  // Op checks
+  body.querySelectorAll('.op-check-row').forEach(row => {
+    if (!row.dataset.opComp) return; // skip oxygen/cooler inline rows
+    const key = `${row.dataset.opComp}||${row.dataset.opBag}||${row.dataset.opItem}`;
+    const val = c.opChecks?.[key];
+    if (val) {
+      row.querySelectorAll('[data-op-yn]').forEach(b => b.classList.toggle('active', b.dataset.opYn === val));
+      if (val === 'no') row.style.background = 'var(--warn-bg)';
+      const det = row.querySelector('.op-detail');
+      if (det) {
+        det.style.display = val === 'no' ? 'block' : 'none';
+        const ta = det.querySelector('[data-op-notes]'); if (ta) ta.value = c.opNotes?.[key] || '';
+        const fx = det.querySelector('[data-op-fixed]'); if (fx) fx.checked = !!c.opFixed?.[key];
+        const ufx = det.querySelector('[data-op-unfixed]'); if (ufx) ufx.checked = !!c.opUnfixed?.[key];
+      }
+    }
+  });
+  // Nested oxygen check (Compartment 1)
+  if (c.oxygenYN && body.querySelector('[data-oxygen-yn]')) {
+    body.querySelectorAll('[data-oxygen-yn]').forEach(b => b.classList.toggle('active', b.dataset.oxygenYn === c.oxygenYN));
+    const od = body.querySelector('#oxygen-detail');
+    if (od) od.style.display = c.oxygenYN === 'no' ? 'block' : 'none';
+    const on = body.querySelector('#oxygen-notes'); if (on) on.value = c.oxygenNotes || '';
+    const of = body.querySelector('#oxygen-fixed'); if (of) of.checked = !!c.oxygenFixed;
+    const ou = body.querySelector('#oxygen-unfixed'); if (ou) ou.checked = !!c.oxygenUnfixed;
+  }
+  // Nested cooler check (Fridge)
+  if (c.cooler?.answered && body.querySelector('[data-cooler-yn]')) {
+    body.querySelectorAll('[data-cooler-yn]').forEach(b => b.classList.toggle('active', b.dataset.coolerYn === (c.cooler.ok ? 'yes' : 'no')));
+    const cd = body.querySelector('#cooler-detail');
+    if (cd) cd.style.display = c.cooler.ok ? 'none' : 'block';
+    const cr = body.querySelector('#cooler-reading'); if (cr) cr.value = c.cooler.reading || '';
+  }
+  // Gurney special checks
+  body.querySelectorAll('[data-special-comp]').forEach(row => {
+    const label = row.dataset.specialLabel;
+    const val = c.gurney?.[label];
+    if (val) {
+      row.querySelectorAll('[data-special-yn]').forEach(b => b.classList.toggle('active', b.dataset.specialYn === val));
+      row.classList.toggle('special-bad', val === 'no');
+    }
+  });
+  // Red tags
+  body.querySelectorAll('.red-tag-input').forEach(inp => {
+    const v = c.redTags?.[inp.dataset.redtagFor];
+    if (v) { inp.value = v; setRedTagConfirmed(inp.closest('.red-tag-row'), true); }
+  });
+  updateCompartmentCounts(safeId, comp);
+}
+
+function redTagHTML(name) {
+  const unitId = APP.check?.unitId || '';
+  const remembered = getRememberedRedTag(unitId, name);
+  const current = APP.check?.redTags?.[name] || '';
+  const shown = current || remembered;
+  const confirmed = !!current;
+  // If we have a number on file for this unit+bag, show it pre-filled with a one-tap Confirm.
+  if (remembered) {
+    return `
+      <div class="red-tag-row${confirmed ? ' confirmed' : ''}" data-redtag-name="${escapeAttr(name)}">
+        <div class="red-tag-label">🔴 Red Tag # (last 4):</div>
+        <input type="text" class="red-tag-input" inputmode="numeric" maxlength="4" placeholder="0000" value="${escapeAttr(shown)}" data-redtag-for="${escapeAttr(name)}" />
+        <button type="button" class="red-tag-confirm${confirmed ? ' done' : ''}" data-redtag-confirm="${escapeAttr(name)}">${confirmed ? '✓ Confirmed' : 'Confirm'}</button>
+      </div>`;
+  }
+  // First time on this unit+bag: type it in (it gets remembered on submit).
+  return `
+    <div class="red-tag-row" data-redtag-name="${escapeAttr(name)}">
+      <div class="red-tag-label">🔴 Red Tag # (last 4):</div>
+      <input type="text" class="red-tag-input" inputmode="numeric" maxlength="4" placeholder="0000" value="${escapeAttr(shown)}" data-redtag-for="${escapeAttr(name)}" />
+    </div>`;
+}
+
+/* Remembered red tags — survive across checks so crews just confirm next time */
+const REDTAG_STORE = 'wamboapp_redtags_v1';
+function loadRedTagStore() {
+  try { return JSON.parse(localStorage.getItem(REDTAG_STORE) || '{}'); } catch (e) { return {}; }
+}
+function getRememberedRedTag(unitId, name) {
+  if (!unitId) return '';
+  return loadRedTagStore()[`${unitId}::${name}`] || '';
+}
+function persistRedTags(c) {
+  if (!c || !c.redTags) return;
+  const s = loadRedTagStore();
+  Object.entries(c.redTags).forEach(([name, val]) => {
+    if (val && val.length) s[`${c.unitId}::${name}`] = val;
+  });
+  try { localStorage.setItem(REDTAG_STORE, JSON.stringify(s)); } catch (e) {}
+}
+function setRedTagConfirmed(row, on) {
+  if (!row) return;
+  row.classList.toggle('confirmed', on);
+  const b = row.querySelector('.red-tag-confirm');
+  if (b) { b.classList.toggle('done', on); b.textContent = on ? '✓ Confirmed' : 'Confirm'; }
+}
+
+function opCheckHTML(compName, bagName, itemName, label) {
+  return `
+    <div class="op-check-row" data-op-comp="${escapeAttr(compName)}" data-op-bag="${escapeAttr(bagName)}" data-op-item="${escapeAttr(itemName)}">
+      <div class="op-check-label">🔋 ${escapeHTML(label)}</div>
+      <div class="yn-buttons">
+        <button class="yn-btn yes" data-op-yn="yes" style="min-width:60px;">Yes</button>
+        <button class="yn-btn no" data-op-yn="no" style="min-width:60px;">No</button>
+      </div>
+      <div class="op-detail" style="display:none; flex-basis:100%; margin-top:10px; padding:10px; background:var(--warn-bg); border-radius:8px; border-left:3px solid var(--warn);">
+        <textarea data-op-notes placeholder="What's wrong? (battery dead, won't turn on, etc.)" style="width:100%;min-height:60px;padding:8px;border:1px solid var(--border);border-radius:6px;font-family:inherit;font-size:14px;background:var(--white);"></textarea>
+        <label class="fixed-check" style="margin-top:8px;">
+          <input type="checkbox" data-op-fixed />
+          Swapped / Fixed on the spot
+        </label>
+        <label class="unfix-check" style="margin-top:8px;">
+          <input type="checkbox" data-op-unfixed />
+          Unable to fix
+        </label>
+      </div>
+    </div>`;
+}
+
+function itemRowHTML(it, compName, bagName, idx) {
+  // operational check (battery/power) renders BELOW the item row
+  const opCheck = it.operationalCheck ? opCheckHTML(compName, bagName, it.name, it.operationalCheck) : '';
+  return `
+    <div class="item-row" data-comp="${escapeAttr(compName)}" data-bag="${escapeAttr(bagName)}" data-item="${escapeAttr(it.name)}">
+      <div class="item-row-main">
+        <div class="item-name">
+          ${escapeHTML(it.name)}${it.operationalCheck ? '<span class="req-star">*</span>' : ''}
+          <span class="item-qty">×${it.qty}</span>
+          ${it.controlled ? '<span class="item-ctrl-badge">CTRL</span>' : ''}
+        </div>
+        <div class="item-buttons">
+          <button class="item-btn complete" type="button" data-item-status="complete">✓</button>
+          <button class="item-btn abnormal" type="button" data-item-status="abnormal">✗</button>
+        </div>
+      </div>
+      <div class="item-detail" style="display:none;">
+        <textarea placeholder="What's wrong with this item?"></textarea>
+        <label class="fixed-check">
+          <input type="checkbox" data-fixed />
+          Fixed on the spot
+        </label>
+        <label class="unfix-check">
+          <input type="checkbox" data-unfixed />
+          Unable to fix
+        </label>
+      </div>
+    </div>
+    ${opCheck}
+  `;
+}
+
+function wireCompartmentBody(safeId, comp) {
+  const body = document.getElementById('comp-body-' + safeId);
+  if (!body) return;
+
+  // Nested Oxygen check (lives under Ambulance Main O2 in Compartment 1)
+  body.querySelectorAll('[data-oxygen-yn]').forEach(btn => {
+    btn.onclick = () => {
+      const val = btn.dataset.oxygenYn;
+      const wasActive = btn.classList.contains('active');
+      body.querySelectorAll('[data-oxygen-yn]').forEach(b => b.classList.remove('active'));
+      const od = body.querySelector('#oxygen-detail');
+      if (wasActive) {
+        APP.check.oxygenYN = null;
+        if (od) od.style.display = 'none';
+      } else {
+        btn.classList.add('active');
+        APP.check.oxygenYN = val;
+        if (od) od.style.display = val === 'no' ? 'block' : 'none';
+      }
+      updateProgress(); saveAutosave();
+    };
+  });
+  const o2n = body.querySelector('#oxygen-notes');
+  const o2f = body.querySelector('#oxygen-fixed');
+  if (o2n) o2n.oninput = e => { APP.check.oxygenNotes = e.target.value; saveAutosave(); };
+  const o2u = body.querySelector('#oxygen-unfixed');
+  if (o2f) o2f.onchange = e => { APP.check.oxygenFixed = e.target.checked; if (e.target.checked && o2u) { APP.check.oxygenUnfixed = false; o2u.checked = false; } updateProgress(); saveAutosave(); };
+  if (o2u) o2u.onchange = e => { APP.check.oxygenUnfixed = e.target.checked; if (e.target.checked && o2f) { APP.check.oxygenFixed = false; o2f.checked = false; } updateProgress(); saveAutosave(); };
+
+  // Nested Cooler/Fridge temp check (lives in the Fridge compartment)
+  body.querySelectorAll('[data-cooler-yn]').forEach(btn => {
+    btn.onclick = () => {
+      const val = btn.dataset.coolerYn;
+      const wasActive = btn.classList.contains('active');
+      body.querySelectorAll('[data-cooler-yn]').forEach(b => b.classList.remove('active'));
+      const cd = body.querySelector('#cooler-detail');
+      if (wasActive) {
+        APP.check.cooler.answered = false;
+        APP.check.cooler.ok = null;
+        if (cd) cd.style.display = 'none';
+      } else {
+        btn.classList.add('active');
+        APP.check.cooler.answered = true;
+        APP.check.cooler.ok = val === 'yes';
+        if (cd) cd.style.display = val === 'no' ? 'block' : 'none';
+      }
+      updateProgress(); saveAutosave();
+    };
+  });
+  const clr = body.querySelector('#cooler-reading');
+  const clp = body.querySelector('#cooler-photo');
+  if (clr) clr.oninput = e => { APP.check.cooler.reading = e.target.value; saveAutosave(); };
+  if (clp) clp.onchange = e => handlePhoto(e, 'cooler', 'cooler-photo-preview');
+
+  // Operational check buttons (battery/power checks)
+  body.querySelectorAll('.op-check-row').forEach(row => {
+    const compName = row.dataset.opComp;
+    const bagName = row.dataset.opBag;
+    const itemName = row.dataset.opItem;
+    row.querySelectorAll('[data-op-yn]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const wasActive = btn.classList.contains('active');
+        row.querySelectorAll('[data-op-yn]').forEach(b => b.classList.remove('active'));
+        const c = APP.check;
+        c.opChecks = c.opChecks || {};
+        const key = `${compName}||${bagName}||${itemName}`;
+        const det = row.querySelector('.op-detail');
+        if (wasActive) {
+          delete c.opChecks[key];
+          row.style.background = '';
+          if (det) det.style.display = 'none';
+        } else {
+          btn.classList.add('active');
+          const val = btn.dataset.opYn;
+          c.opChecks[key] = val;
+          row.style.background = (val === 'no') ? 'var(--warn-bg)' : '';
+          if (det) det.style.display = (val === 'no') ? 'block' : 'none';
+        }
+        updateProgress(); saveAutosave();
+      });
+    });
+    // Op detail: notes + swapped/fixed
+    const opKey = `${compName}||${bagName}||${itemName}`;
+    const opNotes = row.querySelector('[data-op-notes]');
+    const opFixed = row.querySelector('[data-op-fixed]');
+    if (opNotes) opNotes.addEventListener('input', e => {
+      const c = APP.check; c.opNotes = c.opNotes || {}; c.opNotes[opKey] = e.target.value; saveAutosave();
+    });
+    const opUnfix = row.querySelector('[data-op-unfixed]');
+    if (opFixed) opFixed.addEventListener('change', e => {
+      const c = APP.check; c.opFixed = c.opFixed || {}; c.opFixed[opKey] = e.target.checked;
+      if (e.target.checked) { c.opUnfixed = c.opUnfixed || {}; c.opUnfixed[opKey] = false; if (opUnfix) opUnfix.checked = false; }
+      updateProgress(); saveAutosave();
+    });
+    if (opUnfix) opUnfix.addEventListener('change', e => {
+      const c = APP.check; c.opUnfixed = c.opUnfixed || {}; c.opUnfixed[opKey] = e.target.checked;
+      if (e.target.checked) { c.opFixed = c.opFixed || {}; c.opFixed[opKey] = false; if (opFixed) opFixed.checked = false; }
+      updateProgress(); saveAutosave();
+    });
+  });
+
+  // Gurney special checks (Yes/No)
+  body.querySelectorAll('[data-special-comp]').forEach(row => {
+    const label = row.dataset.specialLabel;
+    row.querySelectorAll('[data-special-yn]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const wasActive = btn.classList.contains('active');
+        row.querySelectorAll('[data-special-yn]').forEach(b => b.classList.remove('active'));
+        APP.check.gurney = APP.check.gurney || {};
+        if (wasActive) {
+          delete APP.check.gurney[label];
+          row.classList.remove('special-bad');
+        } else {
+          btn.classList.add('active');
+          const val = btn.dataset.specialYn;
+          APP.check.gurney[label] = val;
+          row.classList.toggle('special-bad', val === 'no');
+        }
+        updateProgress(); saveAutosave();
+      });
+    });
+  });
+
+  // Red tag inputs
+  body.querySelectorAll('.red-tag-input').forEach(inp => {
+    inp.addEventListener('input', e => {
+      const name = e.target.dataset.redtagFor;
+      e.target.value = e.target.value.replace(/[^0-9]/g, '').slice(0, 4);
+      APP.check.redTags = APP.check.redTags || {};
+      APP.check.redTags[name] = e.target.value;
+      setRedTagConfirmed(e.target.closest('.red-tag-row'), !!e.target.value);
+      saveAutosave();
+    });
+  });
+
+  // Red tag Confirm buttons (accept the remembered number with one tap)
+  body.querySelectorAll('[data-redtag-confirm]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const name = btn.dataset.redtagConfirm;
+      const row = btn.closest('.red-tag-row');
+      const inp = row.querySelector('.red-tag-input');
+      const val = (inp.value || '').replace(/[^0-9]/g, '').slice(0, 4);
+      inp.value = val;
+      APP.check.redTags = APP.check.redTags || {};
+      APP.check.redTags[name] = val;
+      setRedTagConfirmed(row, !!val);
+      saveAutosave();
+    });
+  });
+
+  // Bag-level "All Complete" buttons (in bag header)
+  body.querySelectorAll('[data-bag-mark]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation(); // don't toggle the bag open/closed
+      const bagName = btn.dataset.bagMark;
+      const compName = btn.dataset.bagMarkComp;
+      const sid = btn.dataset.bagMarkSafeid;
+      markAllItemsAsComplete(sid, compName, bagName, null);
+      btn.classList.add('done');
+      btn.textContent = '✓ Done';
+      saveAutosave();
+      promptBagSpecials(sid, compName, bagName);
+    });
+  });
+
+  // Bag expand/collapse
+  body.querySelectorAll('[data-bag-toggle]').forEach(head => {
+    head.addEventListener('click', () => {
+      const bagId = head.dataset.bagToggle;
+      document.getElementById('bag-' + bagId).classList.toggle('open');
+    });
+  });
+
+  // Item buttons (complete / abnormal)
+  body.querySelectorAll('.item-row').forEach(row => {
+    const compName = row.dataset.comp;
+    const bagName = row.dataset.bag;
+    const itemName = row.dataset.item;
+    const detail = row.querySelector('.item-detail');
+    const textarea = detail.querySelector('textarea');
+    const fixedBox = detail.querySelector('[data-fixed]');
+
+    row.querySelectorAll('.item-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const status = btn.dataset.itemStatus;
+        const wasActive = btn.classList.contains('active');
+        row.querySelectorAll('.item-btn').forEach(b => b.classList.remove('active'));
+        const state = ensureItemState(compName, bagName, itemName);
+        if (wasActive) {
+          state.status = null;
+          detail.style.display = 'none';
+        } else {
+          btn.classList.add('active');
+          state.status = status;
+          detail.style.display = (status === 'abnormal') ? 'block' : 'none';
+        }
+        updateCompartmentCounts(safeId, comp);
+        updateProgress(); saveAutosave();
+      });
+    });
+    textarea.addEventListener('input', e => {
+      const state = ensureItemState(compName, bagName, itemName);
+      state.notes = e.target.value;
+      saveAutosave();
+    });
+    const unfixBox = detail.querySelector('[data-unfixed]');
+    fixedBox.addEventListener('change', e => {
+      const state = ensureItemState(compName, bagName, itemName);
+      state.fixed = e.target.checked;
+      if (e.target.checked) { state.unfixed = false; if (unfixBox) unfixBox.checked = false; }
+      updateProgress(); saveAutosave();
+    });
+    if (unfixBox) unfixBox.addEventListener('change', e => {
+      const state = ensureItemState(compName, bagName, itemName);
+      state.unfixed = e.target.checked;
+      if (e.target.checked) { state.fixed = false; if (fixedBox) fixedBox.checked = false; }
+      updateProgress(); saveAutosave();
+    });
+  });
+}
+
+function ensureItemState(compName, bagName, itemName) {
+  const c = APP.check;
+  c.compartments[compName] = c.compartments[compName] || { items: {}, bags: {} };
+  if (bagName) {
+    c.compartments[compName].bags[bagName] = c.compartments[compName].bags[bagName] || { items: {} };
+    c.compartments[compName].bags[bagName].items[itemName] = c.compartments[compName].bags[bagName].items[itemName] || { status: null, notes: '', fixed: false };
+    return c.compartments[compName].bags[bagName].items[itemName];
+  } else {
+    c.compartments[compName].items[itemName] = c.compartments[compName].items[itemName] || { status: null, notes: '', fixed: false };
+    return c.compartments[compName].items[itemName];
+  }
+}
+
+/* After "✓ to Complete": if the compartment holds red tags, battery checks, or the fridge
+   temp check that are still unanswered, open it and ask the crew to handle them individually. */
+function revealForPrompt(el) {
+  if (!el) return;
+  const bag = el.closest('.bag-card'); if (bag) bag.classList.add('open');
+  const comp = el.closest('.compartment-card'); if (comp) comp.classList.add('open');
+}
+
+// Bag-level: opens the nest and surfaces this bag's red tag # + battery checks (optional, bypassable)
+function promptBagSpecials(safeId, compName, bagName) {
+  const c = APP.check;
+  const comp = findCompartmentByName(compName);
+  const bag = (comp && comp.bags || []).find(b => b.name === bagName);
+  const body = document.getElementById('comp-body-' + safeId);
+  if (!bag || !body) return;
+  const needs = [];
+  const redRow = [...body.querySelectorAll('.red-tag-row')].find(r => r.dataset.redtagName === bagName);
+  if (bag.redTag && !c.redTags?.[bagName] && redRow) needs.push(['Red tag # (last 4) for ' + bagName, redRow]);
+  bag.items.forEach(it => {
+    if (!it.operationalCheck) return;
+    const key = `${compName}||${bagName}||${it.name}`;
+    if (c.opChecks?.[key]) return;
+    const el = [...body.querySelectorAll('.op-check-row[data-op-comp]')].find(r =>
+      `${r.dataset.opComp}||${r.dataset.opBag}||${r.dataset.opItem}` === key);
+    if (el) needs.push([`${it.name}: ${it.operationalCheck}`, el]);
+  });
+  if (!needs.length) return;
+  needs.forEach(n => revealForPrompt(n[1]));
+  const bullet = '\n\u2022 ';
+  alert('\u26a0 ' + bagName + ' \u2014 please fill out the red tag # (last 4) / battery check:' + bullet +
+        needs.map(n => n[0]).join(bullet) + '\n\nThese are open below \u2014 fill them in or skip (not required).');
+  const t = needs[0][1];
+  t.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  t.style.outline = '3px solid var(--warn)';
+  setTimeout(() => { t.style.outline = ''; }, 2000);
+}
+
+function promptSpecialChecks(safeId, comp) {
+  const c = APP.check;
+  const body = document.getElementById('comp-body-' + safeId);
+  const card = document.getElementById('comp-' + safeId);
+  if (!body || !card) return;
+
+  const needs = [];   // [label, element]
+  const redTagEl = name => [...body.querySelectorAll('.red-tag-row')].find(r => r.dataset.redtagName === name);
+
+  // Red tags (compartment-level + bags) with no number entered
+  if (comp.redTag && !c.redTags?.[comp.name]) {
+    needs.push([`Red tag # for ${comp.name}`, redTagEl(comp.name)]);
+  }
+  (comp.bags || []).forEach(bag => {
+    if (bag.redTag && !c.redTags?.[bag.name]) {
+      needs.push([`Red tag # for ${bag.name}`, redTagEl(bag.name)]);
+    }
+  });
+  // Battery/operational checks not answered
+  const opEl = key => [...body.querySelectorAll('.op-check-row[data-op-comp]')].find(r =>
+    `${r.dataset.opComp}||${r.dataset.opBag}||${r.dataset.opItem}` === key);
+  comp.items.forEach(it => {
+    const key = `${comp.name}||${''}||${it.name}`;
+    if (it.operationalCheck && !c.opChecks?.[key]) needs.push([`${it.name}: ${it.operationalCheck}`, opEl(key)]);
+  });
+  (comp.bags || []).forEach(bag => bag.items.forEach(it => {
+    const key = `${comp.name}||${bag.name}||${it.name}`;
+    if (it.operationalCheck && !c.opChecks?.[key]) needs.push([`${it.name}: ${it.operationalCheck}`, opEl(key)]);
+  }));
+  if (comp.operationalCheck && !c.opChecks?.[`${comp.name}||${''}||__comp_op__`]) {
+    needs.push([`${comp.name}: ${comp.operationalCheck}`, opEl(`${comp.name}||${''}||__comp_op__`)]);
+  }
+  // Fridge temp
+  if (comp.name === 'Fridge' && !c.cooler?.answered) {
+    needs.push(['Fridge reading between 4–9°C? (Yes/No)', body.querySelector('[data-cooler]')]);
+  }
+
+  if (!needs.length) return;
+
+  card.classList.add('open');
+  needs.forEach(n => revealForPrompt(n[1]));
+  const bullet = '\n\u2022 ';
+  alert('\u26a0 ' + comp.name + ' \u2014 please fill out the red tag # (last 4) and battery checks below:\n' + bullet +
+        needs.map(n => n[0]).join(bullet) +
+        '\n\nThese are open for you now \u2014 fill them in or skip (not required).');
+  const target = needs[0][1];
+  if (target) {
+    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    target.style.outline = '3px solid var(--warn)';
+    setTimeout(() => { target.style.outline = ''; }, 2000);
+  }
+}
+
+function markAllCompartmentComplete(safeId, comp) {
+  // Mark direct items
+  markAllItemsAsComplete(safeId, comp.name, '', null);
+  // Mark all bag items
+  (comp.bags || []).forEach(bag => {
+    markAllItemsAsComplete(safeId, comp.name, bag.name, null);
+  });
+}
+
+function markAllItemsAsComplete(safeId, compName, bagName, btn) {
+  const body = document.getElementById('comp-body-' + safeId);
+  // Find item rows matching the bag scope
+  const selector = bagName
+    ? `.item-row[data-bag="${cssEscape(bagName)}"]`
+    : `.item-row[data-bag=""]`;
+  body.querySelectorAll(selector).forEach(row => {
+    const itemName = row.dataset.item;
+    row.querySelectorAll('.item-btn').forEach(b => b.classList.remove('active'));
+    row.querySelector('.item-btn.complete').classList.add('active');
+    row.querySelector('.item-detail').style.display = 'none';
+    const state = ensureItemState(compName, bagName, itemName);
+    state.status = 'complete';
+    state.notes = '';
+    state.fixed = false;
+    state.unfixed = false;
+    // Reset textarea + checkbox visually
+    row.querySelector('textarea').value = '';
+    row.querySelector('[data-fixed]').checked = false;
+    const _uf = row.querySelector('[data-unfixed]'); if (_uf) _uf.checked = false;
+  });
+  // Mark the button visually so the user knows it was applied
+  if (btn) {
+    btn.classList.add('active');
+    setTimeout(() => btn.classList.remove('active'), 400);
+  }
+  // Find the compartment so we can update counts
+  const card = document.getElementById('comp-' + safeId);
+  const compData = findCompartmentByName(card.dataset.compartment);
+  if (compData) updateCompartmentCounts(safeId, compData);
+  updateProgress();
+}
+
+function allComps(c) {
+  const a = [...c._comps.exterior, ...c._comps.interior];
+  if (c._cabArea) a.push(c._cabArea);
+  return a;
+}
+
+function findCompartmentByName(name) {
+  const c = APP.check;
+  if (!c || !c._comps) return null;
+  const all = allComps(c);
+  if (c._cabArea) all.push(c._cabArea);
+  return all.find(co => co.name === name);
+}
+
+function updateCompartmentCounts(safeId, comp) {
+  const counts = document.getElementById('comp-counts-' + safeId);
+  if (!counts) return;
+  const compState = APP.check.compartments[comp.name];
+  if (!compState) return;
+  // Tally direct + bag items
+  let touched = 0, complete = 0, abnormal = 0, total = comp.items.length;
+  Object.values(compState.items || {}).forEach(it => {
+    if (it.status) touched++;
+    if (it.status === 'complete') complete++;
+    if (it.status === 'abnormal') abnormal++;
+  });
+  (comp.bags || []).forEach(bag => {
+    total += bag.items.length;
+    const bagState = compState.bags?.[bag.name];
+    if (bagState) {
+      Object.values(bagState.items || {}).forEach(it => {
+        if (it.status) touched++;
+        if (it.status === 'complete') complete++;
+        if (it.status === 'abnormal') abnormal++;
+      });
+    }
+  });
+  if (touched === 0) {
+    const bagSummary = (comp.bags && comp.bags.length) ? ` · ${comp.bags.length} bag${comp.bags.length>1?'s':''} inside` : '';
+    counts.textContent = `${total} item${total!==1?'s':''}${bagSummary}`;
+  } else {
+    counts.textContent = `${complete} ✓ · ${abnormal} ✗ · ${total} total`;
+  }
+  // Card border color
+  const card = document.getElementById('comp-' + safeId);
+  card.classList.toggle('has-flag', abnormal > 0);
+  card.classList.toggle('complete', complete === total && total > 0);
+}
+
+function cssEscape(s) {
+  return String(s).replace(/(["\\])/g, '\\$1');
+}
+
+/* ============================================================
+   HANDLERS (ambulance check)
+   ============================================================ */
+function attachAmbulanceHandlers() {
+  document.getElementById('meta-initials').oninput = e => {
+    e.target.value = e.target.value.toUpperCase();
+    APP.check.initials = e.target.value;
+    updateProgress(); saveAutosave();
+  };
+  document.getElementById('meta-mileage').oninput = e => { APP.check.mileage = e.target.value; updateProgress(); saveAutosave(); };
+  document.getElementById('walkaround-notes').oninput = e => { APP.check.walkAround.notes = e.target.value; saveAutosave(); };
+  document.getElementById('walkaround-photo').onchange = e => handlePhoto(e, 'walkAround', 'walkaround-photo-preview');
+
+  // WNL rows (mechanical, fluids) - filter to only rows with data-key
+  // (walk-around uses .check-row class too but has no data-key)
+  document.querySelectorAll('.check-row[data-key]').forEach(row => {
+    const key = row.dataset.key;
+    const bucket = row.dataset.bucket;
+    const safeKey = key.replace(/[^a-zA-Z0-9]/g, '_');
+    row.querySelectorAll('.check-btn').forEach(btn => {
+      btn.onclick = () => {
+        const status = btn.dataset.status;
+        const wasActive = btn.classList.contains('active');
+        row.querySelectorAll('.check-btn').forEach(b => b.classList.remove('active'));
+        if (wasActive) {
+          if (APP.check[bucket][key]) APP.check[bucket][key].status = null;
+          document.getElementById('detail-' + safeKey).style.display = 'none';
+        } else {
+          btn.classList.add('active');
+          APP.check[bucket][key] = APP.check[bucket][key] || {};
+          APP.check[bucket][key].status = status;
+          document.getElementById('detail-' + safeKey).style.display = status === 'bad' ? 'block' : 'none';
+        }
+        updateProgress(); saveAutosave();
+      };
+    });
+    const detail = document.getElementById('detail-' + safeKey);
+    detail.querySelector('textarea').oninput = e => {
+      APP.check[bucket][key] = APP.check[bucket][key] || {};
+      APP.check[bucket][key].notes = e.target.value;
+      saveAutosave();
+    };
+    detail.querySelector('[data-fixed]').onchange = e => {
+      APP.check[bucket][key] = APP.check[bucket][key] || {};
+      APP.check[bucket][key].fixed = e.target.checked;
+      if (e.target.checked) { APP.check[bucket][key].unfixed = false; const u = detail.querySelector('[data-unfixed]'); if (u) u.checked = false; }
+      updateProgress(); saveAutosave();
+    };
+    const mfu = detail.querySelector('[data-unfixed]');
+    if (mfu) mfu.onchange = e => {
+      APP.check[bucket][key] = APP.check[bucket][key] || {};
+      APP.check[bucket][key].unfixed = e.target.checked;
+      if (e.target.checked) { APP.check[bucket][key].fixed = false; const f = detail.querySelector('[data-fixed]'); if (f) f.checked = false; }
+      updateProgress(); saveAutosave();
+    };
+  });
+
+  // Fuel
+  document.querySelectorAll('.fuel-btn').forEach(btn => {
+    btn.onclick = () => {
+      const wasActive = btn.classList.contains('active');
+      document.querySelectorAll('.fuel-btn').forEach(b => b.classList.remove('active'));
+      if (wasActive) {
+        APP.check.fuel = null;
+      } else {
+        btn.classList.add('active');
+        APP.check.fuel = btn.dataset.fuel;
+      }
+      updateProgress(); saveAutosave();
+    };
+  });
+
+  // Tires — Yes/No
+  document.querySelectorAll('[data-tire-yn]').forEach(btn => {
+    btn.onclick = () => {
+      const val = btn.dataset.tireYn;
+      const wasActive = btn.classList.contains('active');
+      document.querySelectorAll('[data-tire-yn]').forEach(b => b.classList.remove('active'));
+      if (wasActive) {
+        APP.check.tireYN = null;
+        document.getElementById('tire-detail').style.display = 'none';
+      } else {
+        btn.classList.add('active');
+        APP.check.tireYN = val;
+        document.getElementById('tire-detail').style.display = val === 'no' ? 'block' : 'none';
+      }
+      updateProgress(); saveAutosave();
+    };
+  });
+  const tireNotesEl = document.getElementById('tire-notes');
+  const tireFixedEl = document.getElementById('tire-fixed');
+  if (tireNotesEl) tireNotesEl.oninput = e => { APP.check.tireNotes = e.target.value; saveAutosave(); };
+  const tireUnfixEl = document.getElementById('tire-unfixed');
+  if (tireFixedEl) tireFixedEl.onchange = e => { APP.check.tireFixed = e.target.checked; if (e.target.checked && tireUnfixEl) { APP.check.tireUnfixed = false; tireUnfixEl.checked = false; } updateProgress(); saveAutosave(); };
+  if (tireUnfixEl) tireUnfixEl.onchange = e => { APP.check.tireUnfixed = e.target.checked; if (e.target.checked && tireFixedEl) { APP.check.tireFixed = false; tireFixedEl.checked = false; } updateProgress(); saveAutosave(); };
+
+  // Oxygen + Cooler now live inside Compartment 1 and Fridge — wired in wireCompartmentBody().
+
+  // Compartments — lazy render on first expand
+  // Also wire header-level Mark All Complete buttons (no expand needed)
+  document.querySelectorAll('[data-header-mark]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation(); // don't toggle the compartment open/closed
+      const compName = btn.dataset.headerMark;
+      const safeId = btn.dataset.headerSafeid;
+      const comp = findCompartmentByName(compName);
+      if (!comp) return;
+      // Ensure body is rendered first (lazy render)
+      renderCompartmentBody(safeId, comp);
+      // Mark everything complete
+      markAllCompartmentComplete(safeId, comp);
+      // Stay done — don't revert
+      btn.classList.add('done');
+      btn.textContent = '✓ All Done';
+      saveAutosave();
+      promptSpecialChecks(safeId, comp);
+    });
+  });
+  document.querySelectorAll('.compartment-head[data-comp-toggle]').forEach(head => {
+    head.addEventListener('click', () => {
+      const safeId = head.dataset.compToggle;
+      const card = document.getElementById('comp-' + safeId);
+      const compName = card.dataset.compartment;
+      const comp = findCompartmentByName(compName);
+      if (comp && !card.classList.contains('open')) {
+        renderCompartmentBody(safeId, comp);
+      }
+      card.classList.toggle('open');
+    });
+  });
+}
+
+function toggleCompartment(safeId) {
+  // Legacy entry point (kept for safety) — defer to the new handler
+  const card = document.getElementById('comp-' + safeId);
+  if (card) {
+    const compName = card.dataset.compartment;
+    const comp = findCompartmentByName(compName);
+    if (comp && !card.classList.contains('open')) {
+      renderCompartmentBody(safeId, comp);
+    }
+    card.classList.toggle('open');
+  }
+}
+
+/* ============================================================
+   PHOTOS — Cloudinary upload (falls back to base64 if not configured)
+   ============================================================ */
+async function uploadPhoto(file) {
+  const cfg = APP.data.cloudinary;
+  if (cfg && cfg.cloudName && cfg.cloudName !== 'YOUR_CLOUD_NAME' && cfg.uploadPreset && cfg.uploadPreset !== 'YOUR_UPLOAD_PRESET') {
+    // Upload to Cloudinary, get back a URL
+    const form = new FormData();
+    form.append('file', file);
+    form.append('upload_preset', cfg.uploadPreset);
+    const res = await fetch(`https://api.cloudinary.com/v1_1/${cfg.cloudName}/image/upload`, {
+      method: 'POST',
+      body: form,
+    });
+    if (!res.ok) throw new Error('Cloudinary upload failed: ' + res.status);
+    const data = await res.json();
+    return { url: data.secure_url, type: 'url' };
+  } else {
+    // Fallback: base64 (works but bloats email)
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = ev => resolve({ url: ev.target.result, type: 'base64' });
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+}
+
+async function handlePhoto(e, target, previewId) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const preview = document.getElementById(previewId);
+  if (preview) preview.innerHTML = `<div style="color:var(--muted);font-size:13px;padding:6px;">Uploading photo…</div>`;
+
+  try {
+    const result = await uploadPhoto(file);
+
+    if (target === 'walkAround') APP.check.walkAround.photo = result;
+    else if (target === 'cooler') APP.check.cooler.photo = result;
+
+    if (preview) {
+      if (result.type === 'url') {
+        preview.innerHTML = `<a href="${result.url}" target="_blank" style="font-size:13px;color:var(--info);">📷 Photo uploaded ↗</a><br><img class="photo-preview" src="${result.url}" style="max-width:200px;max-height:150px;border-radius:6px;border:1px solid var(--border);margin-top:4px;" />`;
+      } else {
+        preview.innerHTML = `<img class="photo-preview" src="${result.url}" style="max-width:200px;max-height:150px;border-radius:6px;border:1px solid var(--border);" /><div style="font-size:11px;color:var(--warn);margin-top:4px;">⚠ Cloudinary not configured — photo in email body (may fail on large files)</div>`;
+      }
+    }
+  } catch(err) {
+    console.error('Photo upload failed:', err);
+    if (preview) preview.innerHTML = `<div style="color:var(--bad);font-size:13px;">Photo upload failed. ${err.message}</div>`;
+  }
+}
+
+/* ============================================================
+   PROGRESS
+   ============================================================ */
+function updateProgress() {
+  const c = APP.check;
+  if (!c) return;
+  let total = 0, done = 0, flags = 0;
+
+  if (c.type === 'ambulance') {
+    // Meta
+    total += 2; if (c.initials) done++; if (c.mileage) done++;
+    // Mechanical + Fluids
+    [...APP.data.mechanicalChecks, ...APP.data.fluidChecks].forEach(item => {
+      if (isSealedTransmission(item)) return;
+      total++;
+      const bucketFor = APP.data.mechanicalChecks.includes(item) ? c.mechanical : c.fluids;
+      if (bucketFor[item]?.status) {
+        done++;
+        if (bucketFor[item].status === 'bad' && !bucketFor[item].fixed) flags++;
+      }
+    });
+    // Fuel
+    total++; if (c.fuel) { done++; if (c.fuel !== 'Full') flags++; }
+    // Tires — Yes/No
+    total++;
+    if (c.tireYN) {
+      done++;
+      if (c.tireYN === 'no' && !c.tireFixed) flags++;
+    }
+    // Oxygen — Yes/No
+    total++;
+    if (c.oxygenYN) {
+      done++;
+      if (c.oxygenYN === 'no' && !c.oxygenFixed) flags++;
+    }
+    // Cooler
+    total++; if (c.cooler.answered) { done++; if (c.cooler.ok === false) flags++; }
+    // Compartments — count total items (direct + nested bag items) + special checks
+    allComps(c).forEach(comp => {
+      // Gurney-style special checks
+      if (comp.specialChecks && comp.specialChecks.length) {
+        comp.specialChecks.forEach(sc => {
+          total++;
+          const v = c.gurney?.[sc.label];
+          if (v) { done++; if (v === 'no') flags++; }
+        });
+      }
+      const compItems = comp.items.length + (comp.bags || []).reduce((n, b) => n + b.items.length, 0);
+      total += compItems;
+      const cs = c.compartments[comp.name];
+      if (cs) {
+        Object.values(cs.items || {}).forEach(it => {
+          if (it.status) done++;
+          if (it.status === 'abnormal' && !it.fixed) flags++;
+        });
+        (comp.bags || []).forEach(bag => {
+          const bs = cs.bags?.[bag.name];
+          if (bs) {
+            Object.values(bs.items || {}).forEach(it => {
+              if (it.status) done++;
+              if (it.status === 'abnormal' && !it.fixed) flags++;
+            });
+          }
+        });
+      }
+    });
+    // Operational checks (battery/power) flag if No and not fixed
+    Object.entries(c.opChecks || {}).forEach(([k, v]) => { if (v === 'no' && !c.opFixed?.[k]) flags++; });
+  } else if (c.type === 'rescue') {
+    total += 2; // initials, mileage
+    if (c.initials) done++;
+    if (c.mileage) done++;
+    const r = APP.data.rescueRigChecks;
+    ['exterior','fluids','interior','operational','cleaning'].forEach(group => {
+      r[group].forEach(item => {
+        total++;
+        const key = `${group}::${item}`;
+        if (c.rescueChecks[key]?.status) {
+          done++;
+          if (c.rescueChecks[key].status === 'bad' && !c.rescueChecks[key].fixed) flags++;
+        }
+      });
+    });
+  }
+
+  const pct = total === 0 ? 0 : Math.round((done / total) * 100);
+  const label = c.type === 'ambulance' ? 'Ambulance check' : 'Rescue check';
+  document.getElementById('status-label').textContent = `${label} is ${pct}% complete`;
+  document.getElementById('status-flags').textContent = flags > 0
+    ? `⚠ ${flags} flagged item${flags===1?'':'s'} — click to review`
+    : '';
+  document.getElementById('status-fill').style.width = pct + '%';
+  // Flags recap next to the Submit button
+  const sf = document.getElementById('submit-flags');
+  if (sf) {
+    if (flags > 0) {
+      sf.style.display = 'block';
+      sf.textContent = `⚠ ${flags} flagged item${flags===1?'':'s'} — click to review`;
+    } else {
+      sf.style.display = 'none';
+    }
+  }
+}
+
+/* Collect every currently-flagged element on the page (abnormal/no without "fixed"). */
+function collectFlaggedEls() {
+  const els = [];
+  const root = document.getElementById('check-body');
+  if (!root) return els;
+  // WNL rows marked Abnormal, not fixed
+  root.querySelectorAll('.check-row[data-key]').forEach(row => {
+    if (row.querySelector('.check-btn.bad.active')) {
+      const fx = row.parentElement.querySelector(`#detail-${row.dataset.key.replace(/[^a-zA-Z0-9]/g,'_')} [data-fixed]`) ||
+                 row.querySelector('[data-fixed]');
+      const fixed = fx ? fx.checked : false;
+      if (!fixed) els.push(row);
+    }
+  });
+  // Item rows marked ✗, not fixed
+  root.querySelectorAll('.item-row').forEach(row => {
+    if (row.querySelector('.item-btn.abnormal.active') && !row.querySelector('[data-fixed]:checked')) els.push(row);
+  });
+  // Op checks answered No, not fixed
+  root.querySelectorAll('.op-check-row[data-op-comp]').forEach(row => {
+    if (row.querySelector('[data-op-yn="no"].active') && !row.querySelector('[data-op-fixed]:checked')) els.push(row);
+  });
+  // Oxygen / cooler / tires answered No (oxygen+tire honor their fixed boxes)
+  const oxyNo = root.querySelector('[data-oxygen-yn="no"].active');
+  if (oxyNo && !document.getElementById('oxygen-fixed')?.checked) els.push(oxyNo.closest('.op-check-row') || oxyNo);
+  const coolNo = root.querySelector('[data-cooler-yn="no"].active');
+  if (coolNo) els.push(coolNo.closest('.op-check-row') || coolNo);
+  const tireNo = root.querySelector('[data-tire-yn="no"].active');
+  if (tireNo && !document.getElementById('tire-fixed')?.checked) els.push(tireNo.closest('.yn-row') || tireNo);
+  // Low fuel
+  const fuelBtn = root.querySelector('.fuel-btn.active:not(.full)');
+  if (fuelBtn) els.push(fuelBtn.closest('.section') || fuelBtn);
+  return els;
+}
+
+/* Tap the flag text (or the submit recap) repeatedly to cycle through flagged items. */
+function cycleToNextFlag() {
+  // Render any not-yet-opened compartment bodies so their flagged rows exist in the DOM
+  document.querySelectorAll('.compartment-card').forEach(card => {
+    const body = card.querySelector('.compartment-body');
+    if (!body || body.dataset.rendered === 'true') return;
+    const comp = findCompartmentByName(card.dataset.compartment);
+    if (comp) renderCompartmentBody(body.id.replace('comp-body-', ''), comp);
+  });
+  const flagged = collectFlaggedEls();
+  if (!flagged.length) return;
+  APP.flagCycle = ((APP.flagCycle ?? -1) + 1) % flagged.length;
+  const el = flagged[APP.flagCycle];
+  // Open the compartment/bag holding it so it is actually visible, not display:none
+  revealForPrompt(el);
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  // brief highlight so the eye lands on it
+  el.style.transition = 'outline 0.2s';
+  el.style.outline = '3px solid var(--warn)';
+  setTimeout(() => { el.style.outline = ''; }, 1400);
+}
+
+/* ============================================================
+   SUBMIT MODAL
+   ============================================================ */
+function computeCompletionPct() {
+  const c = APP.check;
+  if (!c) return 0;
+  let total = 0, done = 0;
+  if (c.type === 'ambulance') {
+    total += 2; if (c.initials) done++; if (c.mileage) done++;
+    [...APP.data.mechanicalChecks, ...APP.data.fluidChecks].forEach(item => {
+      if (isSealedTransmission(item)) return;
+      total++;
+      const bucketFor = APP.data.mechanicalChecks.includes(item) ? c.mechanical : c.fluids;
+      if (bucketFor[item]?.status) done++;
+    });
+    total++; if (c.fuel) done++;
+    total++; if (c.tireYN) done++;
+    total++; if (c.oxygenYN) done++;
+    total++; if (c.cooler.answered) done++;
+    allComps(c).forEach(comp => {
+      if (comp.specialChecks && comp.specialChecks.length) {
+        comp.specialChecks.forEach(sc => { total++; if (c.gurney?.[sc.label]) done++; });
+      }
+      const compItems = comp.items.length + (comp.bags || []).reduce((n, b) => n + b.items.length, 0);
+      total += compItems;
+      const cs = c.compartments[comp.name];
+      if (cs) {
+        Object.values(cs.items || {}).forEach(it => { if (it.status) done++; });
+        (comp.bags || []).forEach(bag => {
+          const bs = cs.bags?.[bag.name];
+          if (bs) Object.values(bs.items || {}).forEach(it => { if (it.status) done++; });
+        });
+      }
+    });
+  } else {
+    total += 2; if (c.initials) done++; if (c.mileage) done++;
+    ['exterior','fluids','interior','operational','cleaning'].forEach(group => {
+      (APP.data.rescueRigChecks[group] || []).forEach(item => {
+        total++;
+        if (c.rescueChecks[`${group}::${item}`]?.status) done++;
+      });
+    });
+  }
+  return total === 0 ? 100 : Math.round((done / total) * 100);
+}
+
+function showSubmitModal() {
+  const c = APP.check;
+  if (!c) return;
+  if (!c.initials) {
+    alert('Please enter your initials before submitting.');
+    return;
+  }
+
+  const pct = computeCompletionPct();
+  const isComplete = pct === 100;
+
+  const warnEl = document.getElementById('modal-incomplete-warn');
+  if (isComplete) {
+    warnEl.style.display = 'none';
+  } else if (pct >= 90) {
+    warnEl.style.display = 'block';
+    warnEl.textContent = `⚠ This check is only ${pct}% complete. You or your partner are responsible for completing the remaining items at the earliest convenient time.`;
+  } else {
+    warnEl.style.display = 'block';
+    warnEl.textContent = `⚠ This check is only ${pct}% complete (below 90%). The report will be held and sent automatically at 5:00 PM today so you or your partner can finish first.`;
+  }
+
+  document.getElementById('submit-modal').classList.remove('hidden');
+}
+
+/* ============================================================
+   SUBMIT — sends now if ≥90% complete, otherwise holds until 5 PM
+   ============================================================ */
+const PENDING_STORE = 'wamboapp_pending_v1';
+const INITIALS_STORE = 'wamboapp_initials_v1';
+
+function loadJSON(key, fallback) {
+  try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch (e) { return fallback; }
+}
+
+// Log initials per unit+date so a second submitter shows both sets
+function logInitials(unitId, date, initials) {
+  const s = loadJSON(INITIALS_STORE, {});
+  const k = `${unitId}::${date}`;
+  s[k] = s[k] || [];
+  if (initials && !s[k].includes(initials)) s[k].push(initials);
+  try { localStorage.setItem(INITIALS_STORE, JSON.stringify(s)); } catch (e) {}
+  return s[k];
+}
+
+async function sendReport(params) {
+  await emailjs.send(APP.data.emailjs.serviceId, APP.data.emailjs.templateId, params);
+}
+
+// Send any held reports once it's 5:00 PM or later on their queue date (or any day after)
+async function flushPendingSubmissions() {
+  if (!APP.data) return; // units.json not loaded yet — interval/boot will retry
+  const pending = loadJSON(PENDING_STORE, []);
+  if (!pending.length) return;
+  const now = new Date();
+  const remaining = [];
+  for (const p of pending) {
+    const due = new Date(p.date + 'T17:00:00');
+    if (now >= due) {
+      try { await sendReport(p.params); }
+      catch (e) { console.error('Deferred send failed, keeping in queue:', e); remaining.push(p); }
+    } else {
+      remaining.push(p);
+    }
+  }
+  try { localStorage.setItem(PENDING_STORE, JSON.stringify(remaining)); } catch (e) {}
+}
+
+async function submitCheck() {
+  const c = APP.check;
+  if (!c) return;
+
+  const btn = document.querySelector('.submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+
+  try {
+    const summary = buildSummary();
+    const crew = logInitials(c.unitId, c.date, c.initials);
+    const crewLine = crew.join(' + ');
+    const params = {
+      unit_id: c.unitName,
+      check_date: c.date,
+      check_type: c.type,
+      initials: crewLine,
+      message: (crew.length > 1 ? `Submitted by: ${crewLine}\n\n` : '') + summary.plain,
+      flags_count: summary.flagCount,
+      to_email: APP.data.submissionEmail || 'd.boyce@northcountryems.org',
+    };
+
+    const pct = computeCompletionPct();
+    if (pct >= 90) {
+      await sendReport(params);
+      persistRedTags(c);
+      clearAutosave();
+      showSuccess(summary, false);
+    } else {
+      // Hold until 5 PM — replace any earlier held report for this unit+date
+      const pending = loadJSON(PENDING_STORE, []).filter(p => !(p.unitId === c.unitId && p.date === c.date));
+      pending.push({ unitId: c.unitId, date: c.date, params });
+      localStorage.setItem(PENDING_STORE, JSON.stringify(pending));
+      persistRedTags(c);
+      clearAutosave();
+      showSuccess(summary, true);
+    }
+  } catch (err) {
+    console.error('Submit failed:', err);
+    alert('Submit failed: ' + (err.text || err.message || 'unknown error') + '\n\nThe check data is still in the app — try submitting again, or take a screenshot.');
+    btn.disabled = false;
+    btn.textContent = 'Submit Check';
+  }
+}
+
+function collectUnableToFix() {
+  const c = APP.check; const out = [];
+  if (!c) return out;
+  if (c.type === 'ambulance') {
+    [...APP.data.mechanicalChecks, ...APP.data.fluidChecks].forEach(item => {
+      const b = APP.data.mechanicalChecks.includes(item) ? c.mechanical : c.fluids;
+      const v = b[item];
+      if (v && v.status === 'bad' && v.unfixed) out.push(`${item}${v.notes ? ' \u2014 ' + v.notes : ''}`);
+    });
+    if (c.tireYN === 'no' && c.tireUnfixed) out.push(`Tire pressure \u2014 out of range${c.tireNotes ? ' \u2014 ' + c.tireNotes : ''}`);
+    if (c.oxygenYN === 'no' && c.oxygenUnfixed) out.push(`Oxygen \u2014 below minimum PSI${c.oxygenNotes ? ' \u2014 ' + c.oxygenNotes : ''}`);
+    Object.entries(c.opChecks || {}).forEach(([key, val]) => {
+      if (val === 'no' && c.opUnfixed?.[key]) {
+        const [cn, bn, inm] = key.split('||');
+        const label = inm === '__comp_op__' ? cn : (bn ? `${bn} \u2192 ${inm}` : inm);
+        out.push(`${label} \u2014 operational check failed${c.opNotes?.[key] ? ' \u2014 ' + c.opNotes[key] : ''}`);
+      }
+    });
+    allComps(c).forEach(comp => {
+      const cs = c.compartments[comp.name]; if (!cs) return;
+      Object.entries(cs.items || {}).forEach(([nm, st]) => {
+        if (st.status === 'abnormal' && st.unfixed) out.push(`${comp.name} \u2014 ${nm}${st.notes ? ' \u2014 ' + st.notes : ''}`);
+      });
+      (comp.bags || []).forEach(bag => {
+        const bs = cs.bags?.[bag.name]; if (!bs) return;
+        Object.entries(bs.items || {}).forEach(([nm, st]) => {
+          if (st.status === 'abnormal' && st.unfixed) out.push(`${comp.name} \u2192 ${bag.name} \u2014 ${nm}${st.notes ? ' \u2014 ' + st.notes : ''}`);
+        });
+      });
+    });
+  } else {
+    ['exterior','fluids','interior','operational','cleaning'].forEach(group => {
+      (APP.data.rescueRigChecks[group] || []).forEach(item => {
+        const v = c.rescueChecks[`${group}::${item}`];
+        if (v && v.status === 'bad' && v.unfixed) out.push(`${item}${v.notes ? ' \u2014 ' + v.notes : ''}`);
+      });
+    });
+  }
+  return out;
+}
+
+function buildSummary() {
+  const c = APP.check;
+  const lines = [];
+  let flagCount = 0;
+
+  // ── First pass: collect all flags ──────────────────────────────────────
+  const flagLines = [];
+
+  function addFlag(line) { flagLines.push(line); flagCount++; }
+
+  if (c.type === 'ambulance') {
+    // Mechanical + Fluids
+    [...APP.data.mechanicalChecks, ...APP.data.fluidChecks].forEach(item => {
+      const bucketFor = APP.data.mechanicalChecks.includes(item) ? c.mechanical : c.fluids;
+      const v = bucketFor[item];
+      if (v?.status === 'bad' && !v.fixed) {
+        let fl = `  [ ABNORMAL ] ${item}`;
+        if (v.notes) fl += `\n    Notes: ${v.notes}`;
+        addFlag(fl);
+      }
+    });
+    // Fuel
+    if (c.fuel && c.fuel !== 'Full') addFlag(`  [ LOW FUEL ] ${c.fuel} — not Full`);
+    // Tires
+    if (c.tireYN === 'no' && !c.tireFixed) {
+      let fl = `  [ ABNORMAL ] Tire pressure — out of range`;
+      if (c.tireNotes) fl += `\n    Notes: ${c.tireNotes}`;
+      addFlag(fl);
+    }
+    // Oxygen
+    if (c.oxygenYN === 'no' && !c.oxygenFixed) {
+      let fl = `  [ ABNORMAL ] Oxygen — below minimum PSI`;
+      if (c.oxygenNotes) fl += `\n    Notes: ${c.oxygenNotes}`;
+      addFlag(fl);
+    }
+    // Gurney special checks
+    allComps(c).forEach(comp => {
+      if (!comp.specialChecks) return;
+      comp.specialChecks.forEach(sc => {
+        if (c.gurney?.[sc.label] === 'no') addFlag(`  [ ABNORMAL ] ${comp.name} — ${sc.label}: No`);
+      });
+    });
+    // Cooler
+    if (c.cooler.answered && !c.cooler.ok) {
+      let fl = `  [ ABNORMAL ] Cooler/Fridge — out of range`;
+      if (c.cooler.reading) fl += `\n    Reading: ${c.cooler.reading}°C`;
+      addFlag(fl);
+    }
+    // Operational checks
+    if (c.opChecks) {
+      Object.entries(c.opChecks).forEach(([key, val]) => {
+        if (val === 'no' && !c.opFixed?.[key]) {
+          const [compName, bagName, itemName] = key.split('||');
+          const label = itemName === '__comp_op__' ? compName : (bagName ? `${bagName} → ${itemName}` : itemName);
+          let fl = `  [ ABNORMAL ] ${label} — operational check failed`;
+          if (c.opNotes?.[key]) fl += `\n    Notes: ${c.opNotes[key]}`;
+          addFlag(fl);
+        }
+      });
+    }
+    // Compartment items
+    allComps(c).forEach(comp => {
+      const cs = c.compartments[comp.name];
+      if (!cs) return;
+      Object.entries(cs.items || {}).forEach(([itemName, st]) => {
+        if (st.status === 'abnormal' && !st.fixed) {
+          let fl = `  [ ABNORMAL ] ${comp.name} — ${itemName}`;
+          if (st.notes) fl += `\n    Notes: ${st.notes}`;
+          addFlag(fl);
+        }
+      });
+      (comp.bags || []).forEach(bag => {
+        const bs = cs.bags?.[bag.name];
+        if (!bs) return;
+        Object.entries(bs.items || {}).forEach(([itemName, st]) => {
+          if (st.status === 'abnormal' && !st.fixed) {
+            let fl = `  [ ABNORMAL ] ${comp.name} → ${bag.name} — ${itemName}`;
+            if (st.notes) fl += `\n    Notes: ${st.notes}`;
+            addFlag(fl);
+          }
+        });
+      });
+    });
+  } else {
+    // Rescue rig flags
+    ['exterior','fluids','interior','operational','cleaning'].forEach(group => {
+      (APP.data.rescueRigChecks[group] || []).forEach(item => {
+        const key = `${group}::${item}`;
+        const v = c.rescueChecks[key];
+        if (v?.status === 'bad' && !v.fixed) {
+          let fl = `  [ ABNORMAL ] ${item}`;
+          if (v.notes) fl += `\n    Notes: ${v.notes}`;
+          addFlag(fl);
+        }
+      });
+    });
+  }
+
+  // ── Build the email ─────────────────────────────────────────────────────
+  const divider = '='.repeat(42);
+  const thinline = '-'.repeat(42);
+
+  lines.push(`APPARATUS CHECK — ${c.unitName}`);
+  lines.push(`Date: ${c.date}   Crew: ${c.initials}   Type: ${c.type === 'ambulance' ? 'Ambulance' : 'Rescue Rig'}`);
+  if (c.mileage) lines.push(`Mileage: ${c.mileage}`);
+  lines.push('');
+
+  // ── UNABLE TO FIX (very top — for immediate admin review) ──────────────
+  const unfixList = collectUnableToFix();
+  if (unfixList.length) {
+    lines.push(divider);
+    lines.push(`\uD83D\uDEA8  UNABLE TO FIX \u2014 IMMEDIATE ADMIN REVIEW (${unfixList.length})  \uD83D\uDEA8`);
+    lines.push(divider);
+    unfixList.forEach(l => lines.push('  \u2022 ' + l));
+    lines.push(divider);
+    lines.push('');
+  }
+
+  // ── FLAGS BLOCK (top, eye-catching) ────────────────────────────────────
+  if (flagCount > 0) {
+    lines.push(divider);
+    lines.push(`⚠⚠⚠  ${flagCount} FLAG${flagCount === 1 ? '' : 'S'} — ACTION REQUIRED  ⚠⚠⚠`);
+    lines.push(divider);
+    flagLines.forEach(l => lines.push(l));
+    lines.push(divider);
+  } else {
+    lines.push(divider);
+    lines.push(`✅  ALL CLEAR — No flags`);
+    lines.push(divider);
+  }
+  lines.push('');
+
+  // ── DETAIL ─────────────────────────────────────────────────────────────
+  lines.push('FULL CHECK DETAIL');
+  lines.push(thinline);
+
+  if (c.type === 'ambulance') {
+    if (c.walkAround?.notes) {
+      lines.push('Walk-Around Notes:');
+      lines.push('  ' + c.walkAround.notes);
+      if (c.walkAround?.photo?.url) lines.push(`  Photo: ${c.walkAround.photo.url}`);
+      lines.push('');
+    }
+
+    // Mechanical + Fluids
+    [['Mechanical & Lights', c.mechanical, APP.data.mechanicalChecks],
+     ['Fluids', c.fluids, APP.data.fluidChecks]].forEach(([title, bucket, keys]) => {
+      const filled = keys.filter(k => bucket[k]?.status);
+      if (!filled.length) return;
+      lines.push(title + ':');
+      filled.forEach(k => {
+        const v = bucket[k];
+        let line = `  ${k}: ${v.status === 'wnl' ? 'WNL' : 'ABNORMAL'}`;
+        if (v.status === 'bad') {
+          if (v.fixed) line += ' (Fixed on the spot)';
+          else if (v.unfixed) line += ' (UNABLE TO FIX)';
+          if (v.notes) line += ` — ${v.notes}`;
+        }
+        lines.push(line);
+      });
+      lines.push('');
+    });
+
+    // Fuel
+    if (c.fuel) { lines.push(`Fuel: ${c.fuel}${c.fuel !== 'Full' ? ' ⚠' : ''}`); lines.push(''); }
+
+    // Tires
+    if (c.tireYN) {
+      let tl = `Tire Pressure (75-85 PSI): ${c.tireYN === 'yes' ? 'All within range ✓' : 'Out of range ⚠'}`;
+      if (c.tireYN === 'no') {
+        if (c.tireFixed) tl += ' (Fixed on the spot)';
+        else if (c.tireUnfixed) tl += ' (UNABLE TO FIX)';
+        if (c.tireNotes) tl += `\n  Notes: ${c.tireNotes}`;
+      }
+      lines.push(tl); lines.push('');
+    }
+
+    // Oxygen
+    if (c.oxygenYN) {
+      const minPsi = APP.data.oxygenCheck?.minPsi || 500;
+      let ol = `Oxygen (above ${minPsi} PSI): ${c.oxygenYN === 'yes' ? 'Yes ✓' : 'Below minimum ⚠'}`;
+      if (c.oxygenYN === 'no') {
+        if (c.oxygenFixed) ol += ' (Swapped/Fixed)';
+        else if (c.oxygenUnfixed) ol += ' (UNABLE TO FIX)';
+        if (c.oxygenNotes) ol += `\n  Notes: ${c.oxygenNotes}`;
+      }
+      lines.push(ol); lines.push('');
+    }
+
+    // Cooler
+    if (c.cooler.answered) {
+      let cl = `Cooler (4-9°C): ${c.cooler.ok ? 'Yes ✓' : 'Out of range ⚠'}`;
+      if (!c.cooler.ok && c.cooler.reading) cl += `  Reading: ${c.cooler.reading}°C`;
+      if (c.cooler?.photo?.url) cl += `\n  Photo: ${c.cooler.photo.url}`;
+      lines.push(cl); lines.push('');
+    }
+
+    // Gurney / special checks
+    allComps(c).forEach(comp => {
+      if (!comp.specialChecks) return;
+      const any = comp.specialChecks.some(sc => c.gurney?.[sc.label]);
+      if (!any) return;
+      lines.push(comp.name + ':');
+      comp.specialChecks.forEach(sc => {
+        const v = c.gurney?.[sc.label];
+        if (v) lines.push(`  ${sc.label}: ${v === 'yes' ? 'Yes ✓' : 'No ⚠'}`);
+      });
+      lines.push('');
+    });
+
+    // Red tags
+    const redTags = Object.entries(c.redTags || {}).filter(([, v]) => v);
+    if (redTags.length) {
+      lines.push('Red Tags (last 4):');
+      redTags.forEach(([name, num]) => lines.push(`  ${name}: #${num}`));
+      lines.push('');
+    }
+
+    // Operational checks
+    if (c.opChecks && Object.keys(c.opChecks).length) {
+      lines.push('Operational Checks:');
+      Object.entries(c.opChecks).forEach(([key, val]) => {
+        const [compName, bagName, itemName] = key.split('||');
+        const label = itemName === '__comp_op__' ? compName : (bagName ? `${bagName} → ${itemName}` : itemName);
+        lines.push(`  ${label}: ${val === 'yes' ? 'Yes ✓' : 'No ⚠'}`);
+      });
+      lines.push('');
+    }
+
+    // Compartments
+    [['Cab', c._cabArea ? [c._cabArea] : []],
+     ['Exterior Compartments', c._comps.exterior],
+     ['Interior Compartments', c._comps.interior]].forEach(([title, comps]) => {
+      const touched = comps.filter(comp => {
+        const cs = c.compartments[comp.name];
+        if (!cs) return false;
+        return Object.keys(cs.items || {}).length > 0 ||
+          (comp.bags || []).some(b => cs.bags?.[b.name] && Object.keys(cs.bags[b.name].items || {}).length > 0);
+      });
+      if (!touched.length) return;
+      lines.push(title + ':');
+      touched.forEach(comp => {
+        const cs = c.compartments[comp.name];
+        const totalItems = comp.items.length + (comp.bags || []).reduce((n, b) => n + b.items.length, 0);
+        const allStatuses = [];
+        Object.values(cs.items || {}).forEach(st => allStatuses.push(st.status));
+        (comp.bags || []).forEach(bag => {
+          Object.values(cs.bags?.[bag.name]?.items || {}).forEach(st => allStatuses.push(st.status));
+        });
+        const complete = allStatuses.filter(s => s === 'complete').length;
+        const abnormal = allStatuses.filter(s => s === 'abnormal').length;
+        const checked = allStatuses.length;
+        lines.push(`  ${comp.name}: ${complete}/${totalItems} complete${abnormal ? `, ${abnormal} abnormal ⚠` : ''}${checked < totalItems ? `, ${totalItems - checked} not checked` : ''}`);
+        // Abnormal items detail
+        Object.entries(cs.items || {}).forEach(([name, st]) => {
+          if (st.status !== 'abnormal') return;
+          lines.push(`    ⚠ ${name}${st.fixed ? ' (Fixed)' : (st.unfixed ? ' (UNABLE TO FIX)' : '')}${st.notes ? ' — ' + st.notes : ''}`);
+        });
+        (comp.bags || []).forEach(bag => {
+          Object.entries(cs.bags?.[bag.name]?.items || {}).forEach(([name, st]) => {
+            if (st.status !== 'abnormal') return;
+            lines.push(`    ⚠ ${bag.name} → ${name}${st.fixed ? ' (Fixed)' : (st.unfixed ? ' (UNABLE TO FIX)' : '')}${st.notes ? ' — ' + st.notes : ''}`);
+          });
+        });
+      });
+      lines.push('');
+    });
+
+  } else {
+    // Rescue rig detail
+    if (c.mileage) { lines.push(`Mileage: ${c.mileage}`); lines.push(''); }
+    const groupNames = { exterior:'Exterior & Lights', fluids:'Fluids & Fuel', interior:'Interior & Equipment', operational:'Operational', cleaning:'Cleaning' };
+    ['exterior','fluids','interior','operational','cleaning'].forEach(group => {
+      const items = APP.data.rescueRigChecks[group];
+      const filled = items.filter(item => c.rescueChecks[`${group}::${item}`]?.status);
+      if (!filled.length) return;
+      lines.push(groupNames[group] + ':');
+      filled.forEach(item => {
+        const v = c.rescueChecks[`${group}::${item}`];
+        let line = `  ${item}: ${v.status === 'wnl' ? 'WNL' : 'ABNORMAL'}`;
+        if (v.status === 'bad') {
+          if (v.fixed) line += ' (Fixed)';
+          else if (v.unfixed) line += ' (UNABLE TO FIX)';
+          if (v.notes) line += ` — ${v.notes}`;
+        }
+        lines.push(line);
+      });
+      lines.push('');
+    });
+    if (c.comments) { lines.push('Comments:'); lines.push(c.comments); lines.push(''); }
+  }
+
+  lines.push(thinline);
+  lines.push(`Submitted: ${new Date().toLocaleString()}`);
+  lines.push(`Flags: ${flagCount}`);
+
+  return { plain: lines.join('\n'), flagCount };
+}
+
+function showSuccess(summary, queued = false) {
+  const c = APP.check;
+  document.getElementById('success-body').innerHTML = `
+    <div class="success-icon">${queued ? '🕔' : (summary.flagCount === 0 ? '✅' : '⚠️')}</div>
+    <h2>${queued ? 'Check Saved — Sends at 5:00 PM' : 'Check Submitted'}</h2>
+    <p>${queued ? 'Below 90% complete, so the report is held and will send automatically at 5:00 PM today. Keep this app installed — it sends the next time the app is open at or after 5 PM. Submitting again before then replaces it.' : `Sent to ${APP.data.submissionEmail}.`}</p>
+    <div class="success-summary">
+      <div class="row"><span>Unit</span><strong>${c.unitName}</strong></div>
+      <div class="row"><span>Date</span><strong>${formatDate(c.date)}</strong></div>
+      <div class="row"><span>Crew</span><strong>${c.initials}</strong></div>
+      <div class="row"><span>Flags</span><strong style="color:${summary.flagCount?'var(--bad)':'var(--g-mid)'}">${summary.flagCount}</strong></div>
+    </div>
+    <p style="font-size:13px;color:var(--muted);">If your partner completes more of the check today, both submissions will arrive separately tagged with the same unit and date.</p>
+    <a class="home-link" onclick="goHome()">Back to Home</a>
+  `;
+  APP.check = null;
+  showScreen('success');
+}
+
+/* ============================================================
+   ADMIN MODE — edit inventory per ambulance, save to localStorage
+   ============================================================ */
+const ADMIN = {
+  unitId: null,        // currently edited unit
+  type: null,          // 'exterior' or 'interior'
+  compIdx: null,       // index into the chosen list
+  bagIdx: null,        // index of bag inside compartment, or null
+  draft: null,         // mutable working copy of {exterior, interior}
+};
+
+function showAdminHome() {
+  const body = document.getElementById('admin-home-body');
+  body.innerHTML = '';
+
+  const intro = document.createElement('p');
+  intro.className = 'picker-intro';
+  intro.textContent = 'Pick an ambulance to edit its inventory.';
+  body.appendChild(intro);
+
+  APP.data.ambulances.forEach(amb => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'unit-btn';
+    btn.innerHTML = `
+      <div>
+        <div>${escapeHTML(amb.name)}</div>
+        <div class="unit-meta">Edit compartments &amp; items</div>
+      </div>
+      <div class="unit-btn-arrow">→</div>
+    `;
+    btn.addEventListener('click', () => showAdminAmb(amb.id));
+    body.appendChild(btn);
+  });
+
+  // Admin actions row
+  const actions = document.createElement('div');
+  actions.className = 'admin-actions';
+  actions.style.marginTop = '24px';
+  actions.innerHTML = `
+    <label style="display:block;font-weight:800;font-size:13px;color:var(--g-deep);margin-bottom:6px;">Notes for admin (optional — sent with change requests)</label>
+    <textarea id="admin-email-notes" placeholder="Why these changes? e.g. 'New Hurst battery spare added to all rigs per Chief'" style="width:100%;min-height:70px;padding:10px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:14px;background:var(--white);margin-bottom:10px;"></textarea>
+    <button class="admin-btn" type="button" id="admin-export-btn">Download units.json</button>
+    <button class="admin-btn" type="button" id="admin-email-btn">📧 Email changes to admin</button>
+    <button class="admin-btn danger" type="button" id="admin-clear-btn">Clear all overrides</button>
+  `;
+  body.appendChild(actions);
+  document.getElementById('admin-export-btn').addEventListener('click', exportUnitsJson);
+  document.getElementById('admin-email-btn').addEventListener('click', emailOverridesDiff);
+  document.getElementById('admin-clear-btn').addEventListener('click', clearAllOverrides);
+
+  showScreen('admin-home');
+}
+
+function showAdminAmb(unitId) {
+  // Only reset the draft if we're switching to a different ambulance
+  // (so "back" from the item editor preserves in-progress edits)
+  if (ADMIN.unitId !== unitId || !ADMIN.draft) {
+    ADMIN.unitId = unitId;
+    ADMIN.draft = JSON.parse(JSON.stringify(APP.data.ambulanceCompartments[unitId]));
+  }
+
+  document.getElementById('admin-amb-title').textContent = `Edit ${unitId}`;
+  const body = document.getElementById('admin-amb-body');
+  body.innerHTML = '';
+
+  const intro = document.createElement('p');
+  intro.className = 'picker-intro';
+  intro.textContent = 'Pick a compartment to edit. Bags inside a compartment appear nested.';
+  body.appendChild(intro);
+
+  renderAdminCompartmentList(body, 'exterior', 'Exterior compartments');
+  renderAdminCompartmentList(body, 'interior', 'Interior compartments');
+
+  // Bottom save/discard
+  const actions = document.createElement('div');
+  actions.className = 'admin-actions';
+  actions.style.marginTop = '24px';
+  actions.innerHTML = `
+    <button class="admin-btn primary" type="button" id="admin-save-btn">Save changes</button>
+    <button class="admin-btn" type="button" id="admin-discard-btn">Discard</button>
+  `;
+  body.appendChild(actions);
+  document.getElementById('admin-save-btn').addEventListener('click', () => {
+    saveOverrides(ADMIN.unitId, ADMIN.draft);
+    ADMIN.draft = null;  // clear so next ambulance picks fresh
+    alert(`Saved changes to ${ADMIN.unitId}. They'll show up on this device immediately. Tap "Download units.json" on the admin home to share the changes with other devices.`);
+    showAdminHome();
+  });
+  document.getElementById('admin-discard-btn').addEventListener('click', () => {
+    if (confirm('Discard unsaved changes?')) {
+      ADMIN.draft = null;
+      showAdminHome();
+    }
+  });
+
+  showScreen('admin-amb');
+}
+
+function renderAdminCompartmentList(parent, type, title) {
+  const lbl = document.createElement('div');
+  lbl.className = 'section-label';
+  lbl.textContent = title;
+  parent.appendChild(lbl);
+
+  const list = ADMIN.draft[type];
+  list.forEach((comp, idx) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'unit-btn';
+    const bagCount = (comp.bags || []).length;
+    const totalItems = comp.items.length + (comp.bags || []).reduce((n,b) => n+b.items.length, 0);
+    btn.innerHTML = `
+      <div>
+        <div>${escapeHTML(comp.name)}</div>
+        <div class="unit-meta">${totalItems} items${bagCount ? ` · ${bagCount} bag${bagCount>1?'s':''}` : ''}</div>
+      </div>
+      <div class="unit-btn-arrow">→</div>
+    `;
+    btn.style.fontSize = '17px';
+    btn.style.padding = '14px 16px';
+    btn.style.minHeight = '52px';
+    btn.addEventListener('click', () => showAdminEdit(type, idx, null));
+    parent.appendChild(btn);
+
+    // Nested bag buttons
+    (comp.bags || []).forEach((bag, bIdx) => {
+      const bagBtn = document.createElement('button');
+      bagBtn.type = 'button';
+      bagBtn.className = 'unit-btn';
+      bagBtn.style.fontSize = '15px';
+      bagBtn.style.padding = '12px 14px 12px 36px';
+      bagBtn.style.minHeight = '48px';
+      bagBtn.innerHTML = `
+        <div>
+          <div>↳ ${escapeHTML(bag.name)}</div>
+          <div class="unit-meta">${bag.items.length} items · inside ${escapeHTML(comp.name)}</div>
+        </div>
+        <div class="unit-btn-arrow">→</div>
+      `;
+      bagBtn.addEventListener('click', () => showAdminEdit(type, idx, bIdx));
+      parent.appendChild(bagBtn);
+    });
+  });
+}
+
+function showAdminEdit(type, compIdx, bagIdx) {
+  ADMIN.type = type;
+  ADMIN.compIdx = compIdx;
+  ADMIN.bagIdx = bagIdx;
+  const comp = ADMIN.draft[type][compIdx];
+  const target = (bagIdx === null) ? comp : comp.bags[bagIdx];
+  const targetLabel = (bagIdx === null) ? comp.name : `${comp.name} → ${target.name}`;
+
+  document.getElementById('admin-edit-title').textContent = targetLabel;
+  document.getElementById('admin-edit-back').onclick = () => showAdminAmb(ADMIN.unitId);
+
+  renderAdminEditBody(target, targetLabel);
+  showScreen('admin-edit');
+}
+
+function renderAdminEditBody(target, label) {
+  const body = document.getElementById('admin-edit-body');
+  body.innerHTML = '';
+
+  // Rename row
+  const renameBlock = document.createElement('div');
+  renameBlock.className = 'meta-block';
+  renameBlock.innerHTML = `
+    <div class="meta-row">
+      <label>Name</label>
+      <input type="text" id="admin-rename" value="${escapeAttr(target.name)}" />
+    </div>
+  `;
+  body.appendChild(renameBlock);
+  document.getElementById('admin-rename').addEventListener('input', e => {
+    target.name = e.target.value;
+  });
+
+  // Items section
+  const section = document.createElement('div');
+  section.className = 'section';
+  section.innerHTML = `<div class="section-head">Items (${target.items.length})</div>`;
+  const sectionBody = document.createElement('div');
+  sectionBody.style.padding = '12px 14px';
+  sectionBody.id = 'admin-items-body';
+  section.appendChild(sectionBody);
+  body.appendChild(section);
+
+  function renderItems() {
+    sectionBody.innerHTML = '';
+    target.items.forEach((it, idx) => {
+      const row = document.createElement('div');
+      row.className = 'edit-item-row';
+      row.innerHTML = `
+        <input type="text" placeholder="Item name" value="${escapeAttr(it.name)}" data-field="name" />
+        <input type="number" min="1" placeholder="Qty" value="${it.qty}" data-field="qty" />
+        <button type="button" class="remove-item" data-action="remove">✗</button>
+      `;
+      row.querySelector('[data-field="name"]').addEventListener('input', e => { it.name = e.target.value; });
+      row.querySelector('[data-field="qty"]').addEventListener('input', e => { it.qty = parseInt(e.target.value) || 1; });
+      row.querySelector('[data-action="remove"]').addEventListener('click', () => {
+        if (confirm(`Remove "${it.name}"?`)) {
+          target.items.splice(idx, 1);
+          renderItems();
+          // Update header count
+          section.querySelector('.section-head').textContent = `Items (${target.items.length})`;
+        }
+      });
+      sectionBody.appendChild(row);
+    });
+    const addBtn = document.createElement('button');
+    addBtn.type = 'button';
+    addBtn.className = 'add-item-btn';
+    addBtn.textContent = '+ Add Item';
+    addBtn.addEventListener('click', () => {
+      target.items.push({ name: 'New item', qty: 1, ctrl: false });
+      renderItems();
+      section.querySelector('.section-head').textContent = `Items (${target.items.length})`;
+    });
+    sectionBody.appendChild(addBtn);
+  }
+  renderItems();
+
+  const doneBlock = document.createElement('div');
+  doneBlock.className = 'submit-wrap';
+  doneBlock.innerHTML = `<button class="submit-btn" type="button" id="admin-edit-done">Done editing this section</button>`;
+  body.appendChild(doneBlock);
+  document.getElementById('admin-edit-done').addEventListener('click', () => showAdminAmb(ADMIN.unitId));
+}
+
+function exportUnitsJson() {
+  // Build a fresh units.json combining the original + any overrides currently active
+  const exportData = JSON.parse(JSON.stringify(APP.data));
+  exportData._note = "Generated from admin mode on " + new Date().toISOString();
+  const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'units.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  setTimeout(() => alert('Downloaded units.json. Upload this to the GitHub repo to share these changes with the whole crew.'), 50);
+}
+
+/* ============================================================
+   UTILS
+   ============================================================ */
+function formatDate(iso) {
+  const [y,m,d] = iso.split('-');
+  return `${m}/${d}/${y.slice(2)}`;
+}
+function escapeHTML(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function escapeAttr(s) {
+  return escapeHTML(s);
+}
+</script>
+</body>
+</html>
