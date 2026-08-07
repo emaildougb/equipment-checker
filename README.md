@@ -4,8 +4,8 @@
 
 Daily apparatus check app for **North Country EMS / Clark Fire District 13**. Replaces Vector Solutions Check It. Single-file HTML + JSON, no build step, hosted on GitHub Pages. Built field-first: big tap targets, gloved-hand friendly, forest green throughout.
 
-- Live: [https://ncemsderek.github.io/WAMBOchecker/](https://ncemsderek.github.io/WAMBOchecker/)
-- Repo: [https://github.com/ncemsderek/WAMBOchecker](https://github.com/ncemsderek/WAMBOchecker)
+- Live: [https://emaildougb.github.io/WAMBOchecker/](https://emaildougb.github.io/WAMBOchecker/)
+- Repo: [https://github.com/emaildougb/WAMBOchecker](https://github.com/emaildougb/WAMBOchecker)
 
 ---
 
@@ -66,7 +66,7 @@ Tap the home-screen logo — it flips to an admin login. Admins can rename/add/r
 
 ## Deploying changes
 
-1. Upload `index.html` / `units.json` to the repo root: [https://github.com/ncemsderek/WAMBOchecker/upload/main](https://github.com/ncemsderek/WAMBOchecker/upload/main)
+1. Upload `index.html` / `units.json` to the repo root: [https://github.com/emaildougb/WAMBOchecker/upload/main](https://github.com/emaildougb/WAMBOchecker/upload/main)
 2. GitHub Pages redeploys automatically (give it a minute).
 3. **iOS caches hard** — crews must delete the home-screen app and re-add it to pick up the new version. A normal reload is not enough. The current version shows in the home-screen footer.
 
