@@ -9,7 +9,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="theme-color" content="#1C3A1C" />
-  <title>NCEMS Equipment Checker</title>
+  <title>NCEMS EP Checker</title>
   <link rel="icon" type="image/png" href="./logo.png" />
   <link rel="apple-touch-icon" href="./logo.png" />
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
@@ -1647,7 +1647,7 @@ async function emailOverridesDiff() {
     }
 
     const message =
-      `ADMIN CHANGE REQUEST — Equipment Checker\n` +
+      `ADMIN CHANGE REQUEST — Equipment and Property Checker\n` +
       `From device, ${new Date().toLocaleString()}\n\n` +
       (senderNotes ? `NOTES FROM SENDER:\n${senderNotes}\n\n` : '') +
       `Apply these inventory changes to units.json in the repo:\n\n` +

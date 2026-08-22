@@ -1,4 +1,4 @@
-# NCEMS Equipment Checker (formerly WAMBOchecker)
+# NCEMS Equipment and Property Checker — "EP Checker" (formerly WAMBOchecker)
 
 **Version 2.13.2 · 2026-08-07**
 
