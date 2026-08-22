@@ -9,7 +9,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="theme-color" content="#1C3A1C" />
-  <title>NCEMS Apparatus Check</title>
+  <title>NCEMS Equipment Checker</title>
   <link rel="icon" type="image/png" href="./logo.png" />
   <link rel="apple-touch-icon" href="./logo.png" />
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
@@ -1446,7 +1446,7 @@
    APP STATE
    ============================================================ */
 const APP = {
-  version: '2.13.1',
+  version: '2.13.2',
   data: null,        // loaded units.json
   screen: 'home',
   check: null,       // current in-progress check
@@ -1533,7 +1533,7 @@ async function boot() {
 
 function applyOverrides() {
   try {
-    const raw = localStorage.getItem('wamboapp_overrides_v1');
+    const raw = localStorage.getItem('equipcheck_overrides_v1');
     if (!raw) return;
     const overrides = JSON.parse(raw);
     if (overrides.ambulanceCompartments) {
@@ -1551,19 +1551,19 @@ function applyOverrides() {
 function saveOverrides(unitId, compartments) {
   let overrides = {};
   try {
-    const raw = localStorage.getItem('wamboapp_overrides_v1');
+    const raw = localStorage.getItem('equipcheck_overrides_v1');
     if (raw) overrides = JSON.parse(raw);
   } catch (e) {}
   overrides.ambulanceCompartments = overrides.ambulanceCompartments || {};
   overrides.ambulanceCompartments[unitId] = compartments;
-  localStorage.setItem('wamboapp_overrides_v1', JSON.stringify(overrides));
+  localStorage.setItem('equipcheck_overrides_v1', JSON.stringify(overrides));
   // Update in-memory copy too
   APP.data.ambulanceCompartments[unitId] = compartments;
 }
 
 function clearAllOverrides() {
   if (!confirm('Clear ALL admin edits on this device? Inventory will reset to whatever is in units.json on the server. This cannot be undone.')) return;
-  localStorage.removeItem('wamboapp_overrides_v1');
+  localStorage.removeItem('equipcheck_overrides_v1');
   alert('Cleared. Reload the page to see the original inventory.');
 }
 
@@ -1572,7 +1572,7 @@ function clearAllOverrides() {
    so the email shows exactly what needs changing in the repo. */
 async function emailOverridesDiff() {
   let overrides;
-  try { overrides = JSON.parse(localStorage.getItem('wamboapp_overrides_v1') || 'null'); } catch (e) {}
+  try { overrides = JSON.parse(localStorage.getItem('equipcheck_overrides_v1') || 'null'); } catch (e) {}
   if (!overrides || !overrides.ambulanceCompartments || !Object.keys(overrides.ambulanceCompartments).length) {
     alert('No admin edits on this device — nothing to email.');
     return;
@@ -1647,7 +1647,7 @@ async function emailOverridesDiff() {
     }
 
     const message =
-      `ADMIN CHANGE REQUEST — WAMBOchecker\n` +
+      `ADMIN CHANGE REQUEST — Equipment Checker\n` +
       `From device, ${new Date().toLocaleString()}\n\n` +
       (senderNotes ? `NOTES FROM SENDER:\n${senderNotes}\n\n` : '') +
       `Apply these inventory changes to units.json in the repo:\n\n` +
@@ -1893,7 +1893,7 @@ function showRescuePicker() {
    AUTOSAVE — persist in-progress check to localStorage
    Keyed by unit + date so a bump-out restores same-day work.
    ============================================================ */
-const AUTOSAVE_PREFIX = 'wamboapp_autosave_v1::';
+const AUTOSAVE_PREFIX = 'equipcheck_autosave_v1::';
 
 function autosaveKey(c) {
   const id = c.unitId || c.unitName || 'unit';
@@ -2641,7 +2641,7 @@ function redTagHTML(name) {
 }
 
 /* Remembered red tags — survive across checks so crews just confirm next time */
-const REDTAG_STORE = 'wamboapp_redtags_v1';
+const REDTAG_STORE = 'equipcheck_redtags_v1';
 function loadRedTagStore() {
   try { return JSON.parse(localStorage.getItem(REDTAG_STORE) || '{}'); } catch (e) { return {}; }
 }
@@ -3571,8 +3571,8 @@ function showSubmitModal() {
 /* ============================================================
    SUBMIT — sends now if ≥90% complete, otherwise holds until 5 PM
    ============================================================ */
-const PENDING_STORE = 'wamboapp_pending_v1';
-const INITIALS_STORE = 'wamboapp_initials_v1';
+const PENDING_STORE = 'equipcheck_pending_v1';
+const INITIALS_STORE = 'equipcheck_initials_v1';
 
 function loadJSON(key, fallback) {
   try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch (e) { return fallback; }

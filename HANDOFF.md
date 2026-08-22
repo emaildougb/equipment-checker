@@ -1,8 +1,8 @@
-# HANDOFF — WAMBOchecker
+# HANDOFF — Equipment Checker (formerly WAMBOchecker)
 
 ## What it does
 
-Daily apparatus/rig check app for North Country EMS / Clark Fire District 13, replacing Vector Solutions "Check It." Crews pick a unit (ambulances M25A, M25B, M19, M18, M14; M12 is retired; "Other Units" covers the rescue-rig rotation), enter initials + mileage, then walk through mechanical/fluids/tires, exterior compartments 1–7, and interior areas (Med Vault, Fridge, Action Area, Gurney, Bench Seat, Compartments A–F, Lifepak 35, Medication Kit, Airway Bag, Med Shelf, IV Tray, Pediatric I-Gels, Portable Suction) in a fixed walk order.
+Daily apparatus/rig check app for North Country EMS / Clark Fire District 13, replacing Vector Solutions "Check It." Fully renamed from WAMBOchecker to **Equipment Checker** in v2.13.2 (2026-08-07) — display name, repo (`equipment-checker`), live URL, and localStorage keys (`equipcheck_*`) all changed. This was safe because the app hadn't been officially rolled out yet; any per-device autosaves and red tag memory from testing were abandoned by the key rename. Crews pick a unit (ambulances M25A, M25B, M19, M18, M14; M12 is retired; "Other Units" covers the rescue-rig rotation), enter initials + mileage, then walk through mechanical/fluids/tires, exterior compartments 1–7, and interior areas (Med Vault, Fridge, Action Area, Gurney, Bench Seat, Compartments A–F, Lifepak 35, Medication Kit, Airway Bag, Med Shelf, IV Tray, Pediatric I-Gels, Portable Suction) in a fixed walk order.
 
 Two-state checks throughout: mechanical/fluid items are WNL/Abnormal, inventory items are Complete/Abnormal. Anything flagged Abnormal expands into "Fixed on the spot" or "Unable to fix" — the latter both keeps the flag and gets surfaced in an "UNABLE TO FIX — IMMEDIATE ADMIN REVIEW" block at the top of the report email. Reports at ≥90% complete send immediately; below 90%, they're held and auto-sent at 5 PM the same day (only fires if the app happens to be open on some device at/after 5 PM — no backend cron).
 

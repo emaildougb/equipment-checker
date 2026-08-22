@@ -1,11 +1,11 @@
-# NCEMS Apparatus Check App (WAMBOchecker)
+# NCEMS Equipment Checker (formerly WAMBOchecker)
 
-**Version 2.13.1 · 2026-06-11**
+**Version 2.13.2 · 2026-08-07**
 
 Daily apparatus check app for **North Country EMS / Clark Fire District 13**. Replaces Vector Solutions Check It. Single-file HTML + JSON, no build step, hosted on GitHub Pages. Built field-first: big tap targets, gloved-hand friendly, forest green throughout.
 
-- Live: [https://emaildougb.github.io/WAMBOchecker/](https://emaildougb.github.io/WAMBOchecker/)
-- Repo: [https://github.com/emaildougb/WAMBOchecker](https://github.com/emaildougb/WAMBOchecker)
+- Live: [https://emaildougb.github.io/equipment-checker/](https://emaildougb.github.io/equipment-checker/)
+- Repo: [https://github.com/emaildougb/equipment-checker](https://github.com/emaildougb/equipment-checker)
 
 ---
 
@@ -66,7 +66,7 @@ Tap the home-screen logo — it flips to an admin login. Admins can rename/add/r
 
 ## Deploying changes
 
-1. Upload `index.html` / `units.json` to the repo root: [https://github.com/emaildougb/WAMBOchecker/upload/main](https://github.com/emaildougb/WAMBOchecker/upload/main)
+1. Upload `index.html` / `units.json` to the repo root: [https://github.com/emaildougb/equipment-checker/upload/main](https://github.com/emaildougb/equipment-checker/upload/main)
 2. GitHub Pages redeploys automatically (give it a minute).
 3. **iOS caches hard** — crews must delete the home-screen app and re-add it to pick up the new version. A normal reload is not enough. The current version shows in the home-screen footer.
 
