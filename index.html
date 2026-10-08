@@ -1412,7 +1412,8 @@
   </div>
   <div class="password-prompt" id="admin-msal-panel">
     <h2>Admin Access</h2>
-    <p style="color:var(--text-muted);font-size:14px;margin-bottom:20px;line-height:1.5;">Sign in with your North Country EMS Microsoft account to access admin features.</p>
+    <p style="color:var(--text-muted);font-size:14px;margin-bottom:8px;line-height:1.5;">Sign in with your North Country EMS Microsoft account.</p>
+    <p style="color:var(--text-muted);font-size:12px;margin-bottom:20px;line-height:1.6;">Authorized: Battalion Chiefs (Boyce, Langdon, Madler), Chief Shirley, L. Malone, S. Schutts, and J. Robertson.</p>
     <button class="big-btn" id="admin-signin-btn" onclick="msalSignIn()">Sign in with Microsoft</button>
     <div class="err-box" id="admin-signin-err" style="display:none;color:var(--bad);font-size:13px;margin-top:10px;"></div>
     <div style="font-size:12px;color:var(--text-muted);margin-top:12px;">Uses the same login as Outlook and Teams.</div>
@@ -1492,6 +1493,24 @@ const MSAL_CONFIG = {
   clientId: 'f3d031a6-3fc4-42df-8f01-d3c3d28ae9a5',
   tenantId: '153dc089-095e-4a20-8d10-39321a0aca09'  // North Country EMS
 };
+
+// Authorized admin accounts — Battalion Chiefs and Chief only
+const ADMIN_EMAILS = [
+  'd.boyce@northcountryems.org',    // Doug Boyce, BC/Training
+  'd.langdon@northcountryems.org',  // Derek Langdon, BC/Operations
+  'd.madler@northcountryems.org',   // Dennis Madler, BC/Logistics
+  'b.shirley@northcountryems.org',  // Bryce Shirley, Chief
+  'l.malone@northcountryems.org',   // Lindsay Malone
+  's.schutts@northcountryems.org',  // Stephen Schutts
+  'j.robertson@northcountryems.org', // J. Robertson
+];
+
+function isAuthorizedAdmin(account) {
+  if (!account) return false;
+  const email = (account.username || '').toLowerCase().trim();
+  return ADMIN_EMAILS.some(a => a.toLowerCase() === email);
+}
+
 let msalApp = null, msalAccount = null;
 
 function getSavedInitials() {
@@ -1504,28 +1523,60 @@ function saveInitialsFromAccount(account) {
   try { localStorage.setItem('ncems_ep_initials', fullName); } catch(e) {}
 }
 
-async function initMsal() {
+async function initMsal(goToAdmin) {
   if (typeof msal === 'undefined') throw new Error('Could not load Microsoft sign-in. Check internet and reopen.');
-  msalApp = new msal.PublicClientApplication({
-    auth: {
-      clientId: MSAL_CONFIG.clientId,
-      authority: 'https://login.microsoftonline.com/' + MSAL_CONFIG.tenantId,
-      redirectUri: location.origin + location.pathname.replace(/index\.html$/, ''),
-      navigateToLoginRequestUrl: false
-    },
-    cache: { cacheLocation: 'localStorage', storeAuthStateInCookie: true }
-  });
-  await msalApp.initialize();
+  if (!msalApp) {
+    msalApp = new msal.PublicClientApplication({
+      auth: {
+        clientId: MSAL_CONFIG.clientId,
+        authority: 'https://login.microsoftonline.com/' + MSAL_CONFIG.tenantId,
+        redirectUri: location.origin + location.pathname.replace(/index\.html$/, ''),
+        navigateToLoginRequestUrl: false
+      },
+      cache: { cacheLocation: 'localStorage', storeAuthStateInCookie: true }
+    });
+    await msalApp.initialize();
+  }
   const res = await msalApp.handleRedirectPromise();
   if (res && res.account) {
     msalAccount = res.account;
     saveInitialsFromAccount(msalAccount);
-    showAdminHome();
+    if (goToAdmin) {
+      if (isAuthorizedAdmin(msalAccount)) {
+        showAdminHome();
+      } else {
+        showAdminDenied(msalAccount.username);
+      }
+    }
   } else {
     msalAccount = msalApp.getActiveAccount() || msalApp.getAllAccounts()[0] || null;
-    if (msalAccount) { saveInitialsFromAccount(msalAccount); showAdminHome(); }
-    else showScreen('admin-login');
+    if (msalAccount) {
+      saveInitialsFromAccount(msalAccount);
+      if (goToAdmin) {
+        if (isAuthorizedAdmin(msalAccount)) {
+          showAdminHome();
+        } else {
+          showAdminDenied(msalAccount.username);
+        }
+      }
+    } else {
+      if (goToAdmin) showScreen('admin-login');
+    }
   }
+}
+
+function showAdminDenied(email) {
+  const panel = document.getElementById('admin-msal-panel');
+  panel.innerHTML = `
+    <h2 style="color:var(--bad);">Access Denied</h2>
+    <p style="color:var(--text-muted);font-size:14px;line-height:1.6;margin-bottom:16px;">
+      <strong>${email}</strong> is not authorized for admin access.<br><br>
+      Admin access is limited to Battalion Chiefs and the Chief. Contact Doug Boyce to request access.
+    </p>
+    <button class="big-btn" onclick="msalSignOut()">Sign out</button>
+    <button class="big-btn" style="margin-top:10px;background:var(--g-mid);color:var(--white);" onclick="goHome()">Back to Home</button>
+  `;
+  showScreen('admin-login');
 }
 
 function msalSignIn() {
@@ -1548,7 +1599,7 @@ window.addEventListener('DOMContentLoaded', boot);
 async function boot() {
   // Handle MSAL redirect return first — catches ?code=/?state= on page load
   if (MSAL_CONFIG && MSAL_CONFIG.clientId) {
-    initMsal().catch(function(){});
+    initMsal(false).catch(function(){});
   }
 
   document.getElementById('today-date').textContent =
@@ -1818,7 +1869,7 @@ async function tryUnlockAdmin() {
   const errEl = document.getElementById('admin-signin-err');
   errEl.style.display = 'none';
   try {
-    await initMsal();
+    await initMsal(true);
   } catch(e) {
     errEl.textContent = e.message || String(e);
     errEl.style.display = 'block';
@@ -4113,6 +4164,14 @@ const ADMIN = {
 function showAdminHome() {
   const body = document.getElementById('admin-home-body');
   body.innerHTML = '';
+
+  if (msalAccount) {
+    const who = document.createElement('p');
+    who.style.cssText = 'font-size:12px;color:var(--text-muted);margin-bottom:4px;';
+    const name = msalAccount.name || msalAccount.username;
+    who.textContent = `Signed in as ${name}`;
+    body.appendChild(who);
+  }
 
   const intro = document.createElement('p');
   intro.className = 'picker-intro';
