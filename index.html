@@ -1499,10 +1499,9 @@ function getSavedInitials() {
 }
 function saveInitialsFromAccount(account) {
   if (!account || !account.name) return;
-  // Derive initials from display name e.g. "Doug Boyce" → "DB"
-  const parts = account.name.trim().split(/\s+/);
-  const initials = parts.map(p => p[0]).join('').toUpperCase().slice(0, 4);
-  try { localStorage.setItem('ncems_ep_initials', initials); } catch(e) {}
+  // Save full display name e.g. "Doug Boyce"
+  const fullName = account.name.trim();
+  try { localStorage.setItem('ncems_ep_initials', fullName); } catch(e) {}
 }
 
 async function initMsal() {
@@ -1547,6 +1546,11 @@ const DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','
 window.addEventListener('DOMContentLoaded', boot);
 
 async function boot() {
+  // Handle MSAL redirect return first — catches ?code=/?state= on page load
+  if (MSAL_CONFIG && MSAL_CONFIG.clientId) {
+    initMsal().catch(function(){});
+  }
+
   document.getElementById('today-date').textContent =
     new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
 
@@ -2204,8 +2208,8 @@ function renderRescueCheck() {
   body.innerHTML = `
     <div class="meta-block">
       <div class="meta-row">
-        <label>Initials</label>
-        <input type="text" id="rescue-initials" placeholder="e.g. DB" maxlength="6" />
+        <label>Name</label>
+        <input type="text" id="rescue-initials" placeholder="e.g. Doug Boyce" maxlength="40" />
       </div>
       <div class="meta-row">
         <label>Mileage</label>
@@ -2243,7 +2247,7 @@ function renderRescueGroup(title, group, items) {
 function attachRescueHandlers() {
   const rIniEl = document.getElementById('rescue-initials');
   if (rIniEl && APP.check.initials) rIniEl.value = APP.check.initials;
-  document.getElementById('rescue-initials').oninput = e => { e.target.value = e.target.value.toUpperCase(); APP.check.initials = e.target.value; updateProgress(); saveAutosave(); };
+  document.getElementById('rescue-initials').oninput = e => { APP.check.initials = e.target.value; updateProgress(); saveAutosave(); };
   document.getElementById('rescue-mileage').oninput = e => { APP.check.mileage = e.target.value; updateProgress(); };
   document.getElementById('rescue-comments').oninput = e => { APP.check.comments = e.target.value; };
 
@@ -2294,8 +2298,8 @@ function renderMetaBlock() {
   return `
     <div class="meta-block">
       <div class="meta-row">
-        <label>Initials</label>
-        <input type="text" id="meta-initials" placeholder="e.g. DB" maxlength="6" />
+        <label>Name</label>
+        <input type="text" id="meta-initials" placeholder="e.g. Doug Boyce" maxlength="40" />
       </div>
       <div class="meta-row">
         <label>Mileage</label>
@@ -3223,7 +3227,6 @@ function attachAmbulanceHandlers() {
   const iniEl = document.getElementById('meta-initials');
   if (iniEl && APP.check.initials) iniEl.value = APP.check.initials;
   document.getElementById('meta-initials').oninput = e => {
-    e.target.value = e.target.value.toUpperCase();
     APP.check.initials = e.target.value;
     updateProgress(); saveAutosave();
   };
@@ -3628,7 +3631,7 @@ function showSubmitModal() {
   const c = APP.check;
   if (!c) return;
   if (!c.initials) {
-    alert('Please enter your initials before submitting.');
+    alert('Please enter your name before submitting.');
     return;
   }
 
