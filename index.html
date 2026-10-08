@@ -113,11 +113,14 @@
     }
     .logo-face-front {
       background: transparent;
+      border-radius: 50%;
+      overflow: hidden;
     }
     .logo-face-front img {
       width: 100%;
       height: 100%;
-      object-fit: contain;
+      object-fit: cover;
+      border-radius: 50%;
       background: transparent;
     }
     .logo-face-back {
@@ -1491,6 +1494,17 @@ const MSAL_CONFIG = {
 };
 let msalApp = null, msalAccount = null;
 
+function getSavedInitials() {
+  try { return localStorage.getItem('ncems_ep_initials') || ''; } catch(e) { return ''; }
+}
+function saveInitialsFromAccount(account) {
+  if (!account || !account.name) return;
+  // Derive initials from display name e.g. "Doug Boyce" → "DB"
+  const parts = account.name.trim().split(/\s+/);
+  const initials = parts.map(p => p[0]).join('').toUpperCase().slice(0, 4);
+  try { localStorage.setItem('ncems_ep_initials', initials); } catch(e) {}
+}
+
 async function initMsal() {
   if (typeof msal === 'undefined') throw new Error('Could not load Microsoft sign-in. Check internet and reopen.');
   msalApp = new msal.PublicClientApplication({
@@ -1506,11 +1520,12 @@ async function initMsal() {
   const res = await msalApp.handleRedirectPromise();
   if (res && res.account) {
     msalAccount = res.account;
+    saveInitialsFromAccount(msalAccount);
     showAdminHome();
   } else {
     msalAccount = msalApp.getActiveAccount() || msalApp.getAllAccounts()[0] || null;
-    if (msalAccount) showAdminHome();
-    else showScreen('screen-admin-login');
+    if (msalAccount) { saveInitialsFromAccount(msalAccount); showAdminHome(); }
+    else showScreen('admin-login');
   }
 }
 
@@ -1783,7 +1798,7 @@ function setupLogoAdminTrigger() {
 
   function tryLogoLogin() {
     flipLogoBack();
-    showScreen('screen-admin-login');
+    showScreen('admin-login');
     tryUnlockAdmin();
   }
 
@@ -2085,7 +2100,7 @@ function startAmbulanceCheck(unitId) {
     unitId,
     unitName: amb.name,
     date: new Date().toISOString().slice(0,10),
-    initials: '',
+    initials: getSavedInitials(),
     mileage: '',
     walkAround: { notes: '', photo: null },
     mechanical: {},
@@ -2169,7 +2184,7 @@ function startRescueCheck(unitName) {
     unitId: unitName,
     unitName: unitName,
     date: new Date().toISOString().slice(0,10),
-    initials: '',
+    initials: getSavedInitials(),
     mileage: '',
     rescueChecks: {},
     comments: '',
@@ -2226,6 +2241,8 @@ function renderRescueGroup(title, group, items) {
 }
 
 function attachRescueHandlers() {
+  const rIniEl = document.getElementById('rescue-initials');
+  if (rIniEl && APP.check.initials) rIniEl.value = APP.check.initials;
   document.getElementById('rescue-initials').oninput = e => { e.target.value = e.target.value.toUpperCase(); APP.check.initials = e.target.value; updateProgress(); saveAutosave(); };
   document.getElementById('rescue-mileage').oninput = e => { APP.check.mileage = e.target.value; updateProgress(); };
   document.getElementById('rescue-comments').oninput = e => { APP.check.comments = e.target.value; };
@@ -3203,6 +3220,8 @@ function cssEscape(s) {
    HANDLERS (ambulance check)
    ============================================================ */
 function attachAmbulanceHandlers() {
+  const iniEl = document.getElementById('meta-initials');
+  if (iniEl && APP.check.initials) iniEl.value = APP.check.initials;
   document.getElementById('meta-initials').oninput = e => {
     e.target.value = e.target.value.toUpperCase();
     APP.check.initials = e.target.value;
