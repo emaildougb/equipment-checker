@@ -12,7 +12,9 @@
   <title>NCEMS EP Checker</title>
   <link rel="icon" type="image/png" href="./logo.png" />
   <link rel="apple-touch-icon" href="./logo.png" />
+  <link rel="manifest" href="./manifest.json" />
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@3.30.0/lib/msal-browser.min.js"></script>
   <style>
     :root {
       --g-deep: #1C3A1C;
@@ -28,6 +30,7 @@
       --info:    #1F5C8B;
       --text:    #1A2B1A;
       --muted:   #6B7B6B;
+      --text-muted: #6B7B6B;
       --bg:      #F7FAF7;
       --white:   #FFFFFF;
       --border:  #D8E6D8;
@@ -1306,6 +1309,29 @@
       letter-spacing: 0.04em;
       text-transform: uppercase;
     }
+    .big-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--g-deep);
+      color: var(--white);
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      min-height: 48px;
+    }
+    .big-btn:active { background: var(--g-mid); }
+    .err-box {
+      background: var(--bad-bg);
+      border: 1px solid var(--bad);
+      border-radius: 8px;
+      padding: 10px 12px;
+      color: var(--bad);
+      font-size: 13px;
+    }
   </style>
 </head>
 <body>
@@ -1320,9 +1346,8 @@
       </div>
       <!-- BACK: admin login -->
       <div class="logo-face logo-face-back">
-        <div class="logo-back-title">⚙ Admin Login</div>
-        <input type="password" id="logo-admin-pw" inputmode="numeric" autocomplete="off" maxlength="20" placeholder="••••" class="logo-back-input" />
-        <button class="logo-back-btn" id="logo-admin-submit">Unlock</button>
+        <div class="logo-back-title">⚙ Admin</div>
+        <button class="logo-back-btn" id="logo-admin-submit">Open Admin Login</button>
         <div class="logo-back-err" id="logo-admin-err"></div>
       </div>
     </div>
@@ -1382,11 +1407,16 @@
     <button class="back-btn" onclick="goHome()">← Back</button>
     <div class="header-title">Admin Login</div>
   </div>
-  <div class="password-prompt">
-    <h2>Enter admin password</h2>
-    <input type="password" id="admin-pw" inputmode="numeric" autocomplete="off" maxlength="20" />
-    <button id="admin-pw-submit" type="button">Unlock</button>
-    <p id="admin-pw-error" style="color:var(--bad);font-size:13px;margin-top:10px;display:none;">Wrong password.</p>
+  <div class="password-prompt" id="admin-msal-panel">
+    <h2>Admin Access</h2>
+    <p style="color:var(--text-muted);font-size:14px;margin-bottom:20px;line-height:1.5;">Sign in with your North Country EMS Microsoft account to access admin features.</p>
+    <button class="big-btn" id="admin-signin-btn" onclick="msalSignIn()">Sign in with Microsoft</button>
+    <div class="err-box" id="admin-signin-err" style="display:none;color:var(--bad);font-size:13px;margin-top:10px;"></div>
+    <div style="font-size:12px;color:var(--text-muted);margin-top:12px;">Uses the same login as Outlook and Teams.</div>
+  </div>
+  <div class="password-prompt" id="admin-setup-panel" style="display:none;">
+    <h2>Setup needed</h2>
+    <p style="color:var(--text-muted);font-size:14px;line-height:1.5;">This app needs its Microsoft app registration Client ID before anyone can sign in. Ask your IT admin to paste it into MSAL_CONFIG.clientId in index.html.</p>
   </div>
 </div>
 
@@ -1452,6 +1482,48 @@ const APP = {
   check: null,       // current in-progress check
 };
 
+/* ============================================================
+   MSAL CONFIG — Microsoft sign-in for admin
+   ============================================================ */
+const MSAL_CONFIG = {
+  clientId: '',  // paste Application (client) ID from Azure Entra here
+  tenantId: '153dc089-095e-4a20-8d10-39321a0aca09'  // North Country EMS
+};
+let msalApp = null, msalAccount = null;
+
+async function initMsal() {
+  if (typeof msal === 'undefined') throw new Error('Could not load Microsoft sign-in. Check internet and reopen.');
+  msalApp = new msal.PublicClientApplication({
+    auth: {
+      clientId: MSAL_CONFIG.clientId,
+      authority: 'https://login.microsoftonline.com/' + MSAL_CONFIG.tenantId,
+      redirectUri: location.origin + location.pathname.replace(/index\.html$/, ''),
+      navigateToLoginRequestUrl: false
+    },
+    cache: { cacheLocation: 'localStorage', storeAuthStateInCookie: true }
+  });
+  await msalApp.initialize();
+  const res = await msalApp.handleRedirectPromise();
+  if (res && res.account) {
+    msalAccount = res.account;
+    showAdminHome();
+  } else {
+    msalAccount = msalApp.getActiveAccount() || msalApp.getAllAccounts()[0] || null;
+    if (msalAccount) showAdminHome();
+    else showScreen('screen-admin-login');
+  }
+}
+
+function msalSignIn() {
+  msalApp.loginRedirect({ scopes: ['User.Read'], prompt: 'select_account' });
+}
+
+function msalSignOut() {
+  msalAccount = null;
+  if (msalApp) msalApp.logoutRedirect();
+  else goHome();
+}
+
 const DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 
 /* ============================================================
@@ -1493,11 +1565,7 @@ async function boot() {
   // Wire up the logo: click triggers admin spin + entry
   setupLogoAdminTrigger();
 
-  // Wire up admin password submit
-  document.getElementById('admin-pw-submit').addEventListener('click', tryUnlockAdmin);
-  document.getElementById('admin-pw').addEventListener('keydown', e => {
-    if (e.key === 'Enter') tryUnlockAdmin();
-  });
+  // Admin login is handled via MSAL (Microsoft sign-in); see tryUnlockAdmin()
 
   // Wire up submit modal
   document.getElementById('modal-cancel-btn').addEventListener('click', () => {
@@ -1680,23 +1748,21 @@ async function emailOverridesDiff() {
 function setupLogoAdminTrigger() {
   const wrap = document.getElementById('logo-flip-wrap');
   const inner = document.getElementById('logo-flip-inner');
-  const pw    = document.getElementById('logo-admin-pw');
   const btn   = document.getElementById('logo-admin-submit');
   const err   = document.getElementById('logo-admin-err');
   const hint  = document.getElementById('logo-flip-hint');
   if (!wrap) return;
 
-  // Flip on logo tap (front face click; ignore clicks on the back input/button)
+  // Flip on logo tap (front face click; ignore clicks on the back button)
   wrap.addEventListener('click', e => {
     const isFlipped = wrap.classList.contains('flipped');
     // If showing front, flip to back
     if (!isFlipped) {
       wrap.classList.add('flipped');
       hint.textContent = 'Tap outside to close';
-      setTimeout(() => { if (pw) pw.focus(); }, 680);
       return;
     }
-    // If showing back and they clicked the card background (not input/btn), flip back
+    // If showing back and they clicked the card background (not btn), flip back
     if (e.target === wrap || e.target === inner || e.target.classList.contains('logo-face-back') || e.target.classList.contains('logo-back-title') || e.target.classList.contains('logo-back-err')) {
       flipLogoBack();
     }
@@ -1712,35 +1778,31 @@ function setupLogoAdminTrigger() {
   function flipLogoBack() {
     wrap.classList.remove('flipped');
     hint.textContent = 'Tap logo to flip';
-    if (pw) pw.value = '';
     if (err) err.textContent = '';
   }
 
   function tryLogoLogin() {
-    if (!pw) return;
-    if (pw.value.trim() === '4321') {
-      flipLogoBack();
-      showAdminHome();
-    } else {
-      err.textContent = 'Wrong password.';
-      pw.value = '';
-      pw.focus();
-    }
+    flipLogoBack();
+    showScreen('screen-admin-login');
+    tryUnlockAdmin();
   }
 
   btn.addEventListener('click', tryLogoLogin);
-  pw.addEventListener('keydown', e => {
-    if (e.key === 'Enter') { e.preventDefault(); tryLogoLogin(); }
-  });
 }
 
-function tryUnlockAdmin() {
-  const pw = document.getElementById('admin-pw').value.trim();
-  if (pw === '4321') {
-    document.getElementById('admin-pw').value = '';
-    showAdminHome();
-  } else {
-    document.getElementById('admin-pw-error').style.display = 'block';
+async function tryUnlockAdmin() {
+  if (!MSAL_CONFIG.clientId) {
+    document.getElementById('admin-msal-panel').style.display = 'none';
+    document.getElementById('admin-setup-panel').style.display = 'block';
+    return;
+  }
+  const errEl = document.getElementById('admin-signin-err');
+  errEl.style.display = 'none';
+  try {
+    await initMsal();
+  } catch(e) {
+    errEl.textContent = e.message || String(e);
+    errEl.style.display = 'block';
   }
 }
 
