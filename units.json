@@ -1,5 +1,5 @@
 {
-  "version": "2.14.1",
+  "version": "2.15",
   "submissionEmail": "d.boyce@northcountryems.org",
   "emailjs": {
     "serviceId": "service_uqfd3sj",
@@ -84,8 +84,7 @@
     "Power steering fluid",
     "Brake fluid",
     "Transmission fluid",
-    "Windshield washer fluid",
-    "DEF (if equipped)"
+    "Windshield washer fluid"
   ],
   "tirePositions": [
     {
@@ -448,37 +447,73 @@
               ]
             },
             {
-              "name": "Orange C-collar bag",
+              "name": "Orange C-collar Bag 1",
               "redTag": true,
               "items": [
                 {
                   "name": "2\" Tape",
-                  "qty": 2,
+                  "qty": 1,
                   "ctrl": false
                 },
                 {
                   "name": "Back Raft with Pump",
-                  "qty": 2,
+                  "qty": 1,
                   "ctrl": false
                 },
                 {
                   "name": "Cervical Collar adjustable",
-                  "qty": 2,
+                  "qty": 1,
                   "ctrl": false
                 },
                 {
                   "name": "Cervical collar-pediatric",
-                  "qty": 2,
+                  "qty": 1,
                   "ctrl": false
                 },
                 {
                   "name": "Headbed",
-                  "qty": 2,
+                  "qty": 1,
                   "ctrl": false
                 },
                 {
                   "name": "Spider Strap",
-                  "qty": 2,
+                  "qty": 1,
+                  "ctrl": false
+                }
+              ]
+            },
+            {
+              "name": "Orange C-collar Bag 2",
+              "redTag": true,
+              "items": [
+                {
+                  "name": "2\" Tape",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Back Raft with Pump",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Cervical Collar adjustable",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Cervical collar-pediatric",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Headbed",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Spider Strap",
+                  "qty": 1,
                   "ctrl": false
                 }
               ]
@@ -763,10 +798,42 @@
           "name": "Compartment 7",
           "items": [
             {
-              "name": "Lucas",
+              "name": "LUCAS",
               "qty": 1,
-              "ctrl": false,
-              "operationalCheck": "Turns on and battery is full"
+              "ctrl": false
+            }
+          ],
+          "bags": [
+            {
+              "name": "LUCAS",
+              "items": [
+                {
+                  "name": "LUCAS device",
+                  "qty": 1,
+                  "ctrl": false,
+                  "operationalCheck": "Turns on and battery is full"
+                },
+                {
+                  "name": "Shoulder strap",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Extra battery",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Scissors",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Backplate",
+                  "qty": 1,
+                  "ctrl": false
+                }
+              ]
             }
           ]
         }
@@ -804,19 +871,22 @@
               "name": "Fentanyl",
               "qty": 8,
               "ctrl": true,
-              "controlled": true
+              "controlled": true,
+              "count": true
             },
             {
               "name": "Ketamine",
               "qty": 2,
               "ctrl": true,
-              "controlled": true
+              "controlled": true,
+              "count": true
             },
             {
-              "name": "Midazolam",
+              "name": "Midazolam (Versed)",
               "qty": 5,
               "ctrl": true,
-              "controlled": true
+              "controlled": true,
+              "count": true
             },
             {
               "name": "Sodium Thiosulfate",
@@ -930,6 +1000,11 @@
           "name": "Bench Seat",
           "items": [
             {
+              "name": "Nitrous Kit",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
               "name": "Adult Hare",
               "qty": 1,
               "ctrl": false
@@ -970,11 +1045,6 @@
               "ctrl": false
             },
             {
-              "name": "Nitrous Oxide",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
               "name": "Nitrous Spare Bottle",
               "qty": 1,
               "ctrl": false
@@ -993,6 +1063,28 @@
               "name": "Spare O2 Cylinder Sealed",
               "qty": 3,
               "ctrl": false
+            }
+          ],
+          "bags": [
+            {
+              "name": "Nitrous Kit",
+              "items": [
+                {
+                  "name": "Mixer",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Nitrous tank",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Masks",
+                  "qty": 2,
+                  "ctrl": false
+                }
+              ]
             }
           ]
         },
@@ -1564,79 +1656,15 @@
               "qty": 2,
               "ctrl": false
             }
-          ]
+          ],
+          "operationalCheck": "Daily internal self test passed (readiness indicator OK, no service message)"
         },
         {
           "name": "Medication Kit",
           "items": [
             {
-              "name": "1'' IV Tape",
+              "name": "Ondansetron",
               "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "10 gtt set",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "16g IV",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "18g IV",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "20g IV",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "22g IV",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "24g IV",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "250cc Normal Saline",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "3-Way Stop Cock",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "4x4 dressing",
-              "qty": 5,
-              "ctrl": false
-            },
-            {
-              "name": "60 gtt set",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Adenosine 6mg/2mL",
-              "qty": 5,
-              "ctrl": false
-            },
-            {
-              "name": "Albuterol Sulfate",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "Alcohol wipes",
-              "qty": 20,
               "ctrl": false
             },
             {
@@ -1645,62 +1673,12 @@
               "ctrl": false
             },
             {
-              "name": "APAP 120mg",
-              "qty": 3,
-              "ctrl": false
-            },
-            {
-              "name": "APAP 1G IV",
+              "name": "Sterile Water",
               "qty": 1,
               "ctrl": false
             },
             {
-              "name": "APAP 325mg",
-              "qty": 3,
-              "ctrl": false
-            },
-            {
-              "name": "APAP 325mg PO",
-              "qty": 3,
-              "ctrl": false
-            },
-            {
-              "name": "Arm board",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Aspirin",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Atropine",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "BP Cuff Large",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Calcium Gluconate",
-              "qty": 3,
-              "ctrl": false
-            },
-            {
-              "name": "Coban Dressing",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "D10",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Dexamethasone",
+              "name": "Magnesium Sulfate",
               "qty": 1,
               "ctrl": false
             },
@@ -1710,8 +1688,8 @@
               "ctrl": false
             },
             {
-              "name": "Droperidol",
-              "qty": 2,
+              "name": "Albuterol Sulfate",
+              "qty": 4,
               "ctrl": false
             },
             {
@@ -1720,113 +1698,13 @@
               "ctrl": false
             },
             {
-              "name": "Emesis Bag",
+              "name": "Solumedrol",
               "qty": 1,
               "ctrl": false
             },
             {
-              "name": "Epi 1:1 1ml",
-              "qty": 5,
-              "ctrl": false
-            },
-            {
-              "name": "Epi 1:10",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "Glucagon",
+              "name": "Dexamethasone",
               "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Glucometer",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Glucose",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Glucose strips",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "H Clamp",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "Haldol",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "Iodine Wipes",
-              "qty": 20,
-              "ctrl": false
-            },
-            {
-              "name": "IV Tourniquet",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "Lactated Ringers 1000ml",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Lever Lock",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "Lidocaine",
-              "qty": 3,
-              "ctrl": false
-            },
-            {
-              "name": "Magnesium Sulfate",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Medication ID Stickers",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Naloxone",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "Nasal Atomizer",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Needle 18g",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "Needle 23g",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "Needle 25g",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "Needle Twin Pack",
-              "qty": 4,
               "ctrl": false
             },
             {
@@ -1835,27 +1713,57 @@
               "ctrl": false
             },
             {
-              "name": "Norepinephrine",
+              "name": "Adenosine 6mg/2mL",
+              "qty": 5,
+              "ctrl": false
+            },
+            {
+              "name": "APAP 325mg",
+              "qty": 3,
+              "ctrl": false
+            },
+            {
+              "name": "APAP 120mg",
+              "qty": 3,
+              "ctrl": false
+            },
+            {
+              "name": "APAP 325mg PO",
+              "qty": 3,
+              "ctrl": false
+            },
+            {
+              "name": "APAP 1G IV",
               "qty": 1,
               "ctrl": false
             },
             {
-              "name": "Normal Saline 10ml flush",
-              "qty": 6,
-              "ctrl": false
-            },
-            {
-              "name": "Normal Saline 50ml",
+              "name": "Toradol",
               "qty": 1,
               "ctrl": false
             },
             {
-              "name": "Ondansetron",
+              "name": "Tape Measure",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Droperidol",
               "qty": 2,
               "ctrl": false
             },
             {
-              "name": "Pediatric Guide",
+              "name": "Epi 1:1 1ml",
+              "qty": 5,
+              "ctrl": false
+            },
+            {
+              "name": "Haldol",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "Norepinephrine",
               "qty": 1,
               "ctrl": false
             },
@@ -1865,13 +1773,168 @@
               "ctrl": false
             },
             {
-              "name": "Refusal Forms",
+              "name": "Glucose",
               "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Coban Dressing",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "1'' IV Tape",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "Alcohol wipes",
+              "qty": 20,
+              "ctrl": false
+            },
+            {
+              "name": "Iodine Wipes",
+              "qty": 20,
+              "ctrl": false
+            },
+            {
+              "name": "Normal Saline 10ml flush",
+              "qty": 6,
               "ctrl": false
             },
             {
               "name": "Saline Lock",
               "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "24g IV",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "22g IV",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "20g IV",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "18g IV",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "16g IV",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "Syringe 1cc",
+              "qty": 6,
+              "ctrl": false
+            },
+            {
+              "name": "Syringe 3cc",
+              "qty": 6,
+              "ctrl": false
+            },
+            {
+              "name": "Syringe 10cc",
+              "qty": 6,
+              "ctrl": false
+            },
+            {
+              "name": "Syringe 20cc",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Syringe 60 cc",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Needle 25g",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "Needle 23g",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "Needle 18g",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "Needle Twin Pack",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "Lever Lock",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "3-Way Stop Cock",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "Tegaderm",
+              "qty": 10,
+              "ctrl": false
+            },
+            {
+              "name": "Epi 1:10",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "Atropine",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "Calcium Gluconate",
+              "qty": 3,
+              "ctrl": false
+            },
+            {
+              "name": "Lidocaine",
+              "qty": 3,
+              "ctrl": false
+            },
+            {
+              "name": "Naloxone",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "Aspirin",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Glucagon",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Zofran PO",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "Stethoscope",
+              "qty": 1,
               "ctrl": false
             },
             {
@@ -1885,63 +1948,98 @@
               "ctrl": false
             },
             {
-              "name": "Solumedrol",
+              "name": "D10",
               "qty": 1,
               "ctrl": false
             },
             {
-              "name": "Sterile Water",
+              "name": "250cc Normal Saline",
               "qty": 1,
               "ctrl": false
             },
             {
-              "name": "Stethoscope",
+              "name": "Normal Saline 50ml",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Lactated Ringers 1000ml",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "10 gtt set",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "60 gtt set",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Glucometer",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Glucose strips",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "4x4 dressing",
+              "qty": 5,
+              "ctrl": false
+            },
+            {
+              "name": "Arm board",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "BP Cuff Large",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Emesis Bag",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "H Clamp",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "IV Tourniquet",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "Medication ID Stickers",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Nasal Atomizer",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Pediatric Guide",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Refusal Forms",
               "qty": 1,
               "ctrl": false
             },
             {
               "name": "Surgical Lube",
               "qty": 3,
-              "ctrl": false
-            },
-            {
-              "name": "Syringe 10cc",
-              "qty": 6,
-              "ctrl": false
-            },
-            {
-              "name": "Syringe 1cc",
-              "qty": 6,
-              "ctrl": false
-            },
-            {
-              "name": "Syringe 20cc",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Syringe 3cc",
-              "qty": 6,
-              "ctrl": false
-            },
-            {
-              "name": "Syringe 60 cc",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Tape Measure",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Tegaderm",
-              "qty": 10,
-              "ctrl": false
-            },
-            {
-              "name": "Toradol",
-              "qty": 1,
               "ctrl": false
             },
             {
@@ -1953,13 +2051,9 @@
               "name": "Visual Language Translator",
               "qty": 1,
               "ctrl": false
-            },
-            {
-              "name": "Zofran PO",
-              "qty": 2,
-              "ctrl": false
             }
-          ]
+          ],
+          "sortable": true
         },
         {
           "name": "Airway Bag",
@@ -2462,27 +2556,7 @@
           "name": "IV Tray",
           "items": [
             {
-              "name": "1'' IV Tape",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "16g IV",
-              "qty": 5,
-              "ctrl": false
-            },
-            {
-              "name": "18g IV",
-              "qty": 5,
-              "ctrl": false
-            },
-            {
-              "name": "2'' Tape",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "20g IV",
+              "name": "24g IV",
               "qty": 5,
               "ctrl": false
             },
@@ -2492,8 +2566,68 @@
               "ctrl": false
             },
             {
-              "name": "24g IV",
+              "name": "20g IV",
               "qty": 5,
+              "ctrl": false
+            },
+            {
+              "name": "18g IV",
+              "qty": 5,
+              "ctrl": false
+            },
+            {
+              "name": "16g IV",
+              "qty": 5,
+              "ctrl": false
+            },
+            {
+              "name": "1'' IV Tape",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "2'' Tape",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Syringe 1cc",
+              "qty": 6,
+              "ctrl": false
+            },
+            {
+              "name": "Syringe 3cc",
+              "qty": 6,
+              "ctrl": false
+            },
+            {
+              "name": "Syringe 10cc",
+              "qty": 6,
+              "ctrl": false
+            },
+            {
+              "name": "Syringe 20cc",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Needle 25g",
+              "qty": 5,
+              "ctrl": false
+            },
+            {
+              "name": "Needle 23g",
+              "qty": 5,
+              "ctrl": false
+            },
+            {
+              "name": "Needle 18g",
+              "qty": 5,
+              "ctrl": false
+            },
+            {
+              "name": "Needle Twin Pack",
+              "qty": 8,
               "ctrl": false
             },
             {
@@ -2552,26 +2686,6 @@
               "ctrl": false
             },
             {
-              "name": "Needle 18g",
-              "qty": 5,
-              "ctrl": false
-            },
-            {
-              "name": "Needle 23g",
-              "qty": 5,
-              "ctrl": false
-            },
-            {
-              "name": "Needle 25g",
-              "qty": 5,
-              "ctrl": false
-            },
-            {
-              "name": "Needle Twin Pack",
-              "qty": 8,
-              "ctrl": false
-            },
-            {
               "name": "Normal Saline 10ml flush",
               "qty": 8,
               "ctrl": false
@@ -2579,26 +2693,6 @@
             {
               "name": "Saline Lock",
               "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "Syringe 10cc",
-              "qty": 6,
-              "ctrl": false
-            },
-            {
-              "name": "Syringe 1cc",
-              "qty": 6,
-              "ctrl": false
-            },
-            {
-              "name": "Syringe 20cc",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Syringe 3cc",
-              "qty": 6,
               "ctrl": false
             },
             {
@@ -3007,37 +3101,73 @@
               ]
             },
             {
-              "name": "Orange C-collar bag",
+              "name": "Orange C-collar Bag 1",
               "redTag": true,
               "items": [
                 {
                   "name": "2\" Tape",
-                  "qty": 2,
+                  "qty": 1,
                   "ctrl": false
                 },
                 {
                   "name": "Back Raft with Pump",
-                  "qty": 2,
+                  "qty": 1,
                   "ctrl": false
                 },
                 {
                   "name": "Cervical Collar adjustable",
-                  "qty": 2,
+                  "qty": 1,
                   "ctrl": false
                 },
                 {
                   "name": "Cervical collar-pediatric",
-                  "qty": 2,
+                  "qty": 1,
                   "ctrl": false
                 },
                 {
                   "name": "Headbed",
-                  "qty": 2,
+                  "qty": 1,
                   "ctrl": false
                 },
                 {
                   "name": "Spider Strap",
-                  "qty": 2,
+                  "qty": 1,
+                  "ctrl": false
+                }
+              ]
+            },
+            {
+              "name": "Orange C-collar Bag 2",
+              "redTag": true,
+              "items": [
+                {
+                  "name": "2\" Tape",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Back Raft with Pump",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Cervical Collar adjustable",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Cervical collar-pediatric",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Headbed",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Spider Strap",
+                  "qty": 1,
                   "ctrl": false
                 }
               ]
@@ -3322,10 +3452,42 @@
           "name": "Compartment 7",
           "items": [
             {
-              "name": "Lucas",
+              "name": "LUCAS",
               "qty": 1,
-              "ctrl": false,
-              "operationalCheck": "Turns on and battery is full"
+              "ctrl": false
+            }
+          ],
+          "bags": [
+            {
+              "name": "LUCAS",
+              "items": [
+                {
+                  "name": "LUCAS device",
+                  "qty": 1,
+                  "ctrl": false,
+                  "operationalCheck": "Turns on and battery is full"
+                },
+                {
+                  "name": "Shoulder strap",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Extra battery",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Scissors",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Backplate",
+                  "qty": 1,
+                  "ctrl": false
+                }
+              ]
             }
           ]
         }
@@ -3363,19 +3525,22 @@
               "name": "Fentanyl",
               "qty": 8,
               "ctrl": true,
-              "controlled": true
+              "controlled": true,
+              "count": true
             },
             {
               "name": "Ketamine",
               "qty": 2,
               "ctrl": true,
-              "controlled": true
+              "controlled": true,
+              "count": true
             },
             {
-              "name": "Midazolam",
+              "name": "Midazolam (Versed)",
               "qty": 5,
               "ctrl": true,
-              "controlled": true
+              "controlled": true,
+              "count": true
             },
             {
               "name": "Sodium Thiosulfate",
@@ -3489,6 +3654,11 @@
           "name": "Bench Seat",
           "items": [
             {
+              "name": "Nitrous Kit",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
               "name": "Adult Hare",
               "qty": 1,
               "ctrl": false
@@ -3529,11 +3699,6 @@
               "ctrl": false
             },
             {
-              "name": "Nitrous Oxide",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
               "name": "Nitrous Spare Bottle",
               "qty": 1,
               "ctrl": false
@@ -3552,6 +3717,28 @@
               "name": "Spare O2 Cylinder Sealed",
               "qty": 3,
               "ctrl": false
+            }
+          ],
+          "bags": [
+            {
+              "name": "Nitrous Kit",
+              "items": [
+                {
+                  "name": "Mixer",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Nitrous tank",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Masks",
+                  "qty": 2,
+                  "ctrl": false
+                }
+              ]
             }
           ]
         },
@@ -4123,79 +4310,15 @@
               "qty": 2,
               "ctrl": false
             }
-          ]
+          ],
+          "operationalCheck": "Daily internal self test passed (readiness indicator OK, no service message)"
         },
         {
           "name": "Medication Kit",
           "items": [
             {
-              "name": "1'' IV Tape",
+              "name": "Ondansetron",
               "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "10 gtt set",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "16g IV",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "18g IV",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "20g IV",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "22g IV",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "24g IV",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "250cc Normal Saline",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "3-Way Stop Cock",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "4x4 dressing",
-              "qty": 5,
-              "ctrl": false
-            },
-            {
-              "name": "60 gtt set",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Adenosine 6mg/2mL",
-              "qty": 5,
-              "ctrl": false
-            },
-            {
-              "name": "Albuterol Sulfate",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "Alcohol wipes",
-              "qty": 20,
               "ctrl": false
             },
             {
@@ -4204,62 +4327,12 @@
               "ctrl": false
             },
             {
-              "name": "APAP 120mg",
-              "qty": 3,
-              "ctrl": false
-            },
-            {
-              "name": "APAP 1G IV",
+              "name": "Sterile Water",
               "qty": 1,
               "ctrl": false
             },
             {
-              "name": "APAP 325mg",
-              "qty": 3,
-              "ctrl": false
-            },
-            {
-              "name": "APAP 325mg PO",
-              "qty": 3,
-              "ctrl": false
-            },
-            {
-              "name": "Arm board",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Aspirin",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Atropine",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "BP Cuff Large",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Calcium Gluconate",
-              "qty": 3,
-              "ctrl": false
-            },
-            {
-              "name": "Coban Dressing",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "D10",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Dexamethasone",
+              "name": "Magnesium Sulfate",
               "qty": 1,
               "ctrl": false
             },
@@ -4269,8 +4342,8 @@
               "ctrl": false
             },
             {
-              "name": "Droperidol",
-              "qty": 2,
+              "name": "Albuterol Sulfate",
+              "qty": 4,
               "ctrl": false
             },
             {
@@ -4279,113 +4352,13 @@
               "ctrl": false
             },
             {
-              "name": "Emesis Bag",
+              "name": "Solumedrol",
               "qty": 1,
               "ctrl": false
             },
             {
-              "name": "Epi 1:1 1ml",
-              "qty": 5,
-              "ctrl": false
-            },
-            {
-              "name": "Epi 1:10",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "Glucagon",
+              "name": "Dexamethasone",
               "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Glucometer",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Glucose",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Glucose strips",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "H Clamp",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "Haldol",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "Iodine Wipes",
-              "qty": 20,
-              "ctrl": false
-            },
-            {
-              "name": "IV Tourniquet",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "Lactated Ringers 1000ml",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Lever Lock",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "Lidocaine",
-              "qty": 3,
-              "ctrl": false
-            },
-            {
-              "name": "Magnesium Sulfate",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Medication ID Stickers",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Naloxone",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "Nasal Atomizer",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Needle 18g",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "Needle 23g",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "Needle 25g",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "Needle Twin Pack",
-              "qty": 4,
               "ctrl": false
             },
             {
@@ -4394,27 +4367,57 @@
               "ctrl": false
             },
             {
-              "name": "Norepinephrine",
+              "name": "Adenosine 6mg/2mL",
+              "qty": 5,
+              "ctrl": false
+            },
+            {
+              "name": "APAP 325mg",
+              "qty": 3,
+              "ctrl": false
+            },
+            {
+              "name": "APAP 120mg",
+              "qty": 3,
+              "ctrl": false
+            },
+            {
+              "name": "APAP 325mg PO",
+              "qty": 3,
+              "ctrl": false
+            },
+            {
+              "name": "APAP 1G IV",
               "qty": 1,
               "ctrl": false
             },
             {
-              "name": "Normal Saline 10ml flush",
-              "qty": 6,
-              "ctrl": false
-            },
-            {
-              "name": "Normal Saline 50ml",
+              "name": "Toradol",
               "qty": 1,
               "ctrl": false
             },
             {
-              "name": "Ondansetron",
+              "name": "Tape Measure",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Droperidol",
               "qty": 2,
               "ctrl": false
             },
             {
-              "name": "Pediatric Guide",
+              "name": "Epi 1:1 1ml",
+              "qty": 5,
+              "ctrl": false
+            },
+            {
+              "name": "Haldol",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "Norepinephrine",
               "qty": 1,
               "ctrl": false
             },
@@ -4424,13 +4427,168 @@
               "ctrl": false
             },
             {
-              "name": "Refusal Forms",
+              "name": "Glucose",
               "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Coban Dressing",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "1'' IV Tape",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "Alcohol wipes",
+              "qty": 20,
+              "ctrl": false
+            },
+            {
+              "name": "Iodine Wipes",
+              "qty": 20,
+              "ctrl": false
+            },
+            {
+              "name": "Normal Saline 10ml flush",
+              "qty": 6,
               "ctrl": false
             },
             {
               "name": "Saline Lock",
               "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "24g IV",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "22g IV",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "20g IV",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "18g IV",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "16g IV",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "Syringe 1cc",
+              "qty": 6,
+              "ctrl": false
+            },
+            {
+              "name": "Syringe 3cc",
+              "qty": 6,
+              "ctrl": false
+            },
+            {
+              "name": "Syringe 10cc",
+              "qty": 6,
+              "ctrl": false
+            },
+            {
+              "name": "Syringe 20cc",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Syringe 60 cc",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Needle 25g",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "Needle 23g",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "Needle 18g",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "Needle Twin Pack",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "Lever Lock",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "3-Way Stop Cock",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "Tegaderm",
+              "qty": 10,
+              "ctrl": false
+            },
+            {
+              "name": "Epi 1:10",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "Atropine",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "Calcium Gluconate",
+              "qty": 3,
+              "ctrl": false
+            },
+            {
+              "name": "Lidocaine",
+              "qty": 3,
+              "ctrl": false
+            },
+            {
+              "name": "Naloxone",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "Aspirin",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Glucagon",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Zofran PO",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "Stethoscope",
+              "qty": 1,
               "ctrl": false
             },
             {
@@ -4444,63 +4602,98 @@
               "ctrl": false
             },
             {
-              "name": "Solumedrol",
+              "name": "D10",
               "qty": 1,
               "ctrl": false
             },
             {
-              "name": "Sterile Water",
+              "name": "250cc Normal Saline",
               "qty": 1,
               "ctrl": false
             },
             {
-              "name": "Stethoscope",
+              "name": "Normal Saline 50ml",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Lactated Ringers 1000ml",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "10 gtt set",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "60 gtt set",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Glucometer",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Glucose strips",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "4x4 dressing",
+              "qty": 5,
+              "ctrl": false
+            },
+            {
+              "name": "Arm board",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "BP Cuff Large",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Emesis Bag",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "H Clamp",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "IV Tourniquet",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "Medication ID Stickers",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Nasal Atomizer",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Pediatric Guide",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Refusal Forms",
               "qty": 1,
               "ctrl": false
             },
             {
               "name": "Surgical Lube",
               "qty": 3,
-              "ctrl": false
-            },
-            {
-              "name": "Syringe 10cc",
-              "qty": 6,
-              "ctrl": false
-            },
-            {
-              "name": "Syringe 1cc",
-              "qty": 6,
-              "ctrl": false
-            },
-            {
-              "name": "Syringe 20cc",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Syringe 3cc",
-              "qty": 6,
-              "ctrl": false
-            },
-            {
-              "name": "Syringe 60 cc",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Tape Measure",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Tegaderm",
-              "qty": 10,
-              "ctrl": false
-            },
-            {
-              "name": "Toradol",
-              "qty": 1,
               "ctrl": false
             },
             {
@@ -4512,13 +4705,9 @@
               "name": "Visual Language Translator",
               "qty": 1,
               "ctrl": false
-            },
-            {
-              "name": "Zofran PO",
-              "qty": 2,
-              "ctrl": false
             }
-          ]
+          ],
+          "sortable": true
         },
         {
           "name": "Airway Bag",
@@ -5021,27 +5210,7 @@
           "name": "IV Tray",
           "items": [
             {
-              "name": "1'' IV Tape",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "16g IV",
-              "qty": 5,
-              "ctrl": false
-            },
-            {
-              "name": "18g IV",
-              "qty": 5,
-              "ctrl": false
-            },
-            {
-              "name": "2'' Tape",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "20g IV",
+              "name": "24g IV",
               "qty": 5,
               "ctrl": false
             },
@@ -5051,8 +5220,68 @@
               "ctrl": false
             },
             {
-              "name": "24g IV",
+              "name": "20g IV",
               "qty": 5,
+              "ctrl": false
+            },
+            {
+              "name": "18g IV",
+              "qty": 5,
+              "ctrl": false
+            },
+            {
+              "name": "16g IV",
+              "qty": 5,
+              "ctrl": false
+            },
+            {
+              "name": "1'' IV Tape",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "2'' Tape",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Syringe 1cc",
+              "qty": 6,
+              "ctrl": false
+            },
+            {
+              "name": "Syringe 3cc",
+              "qty": 6,
+              "ctrl": false
+            },
+            {
+              "name": "Syringe 10cc",
+              "qty": 6,
+              "ctrl": false
+            },
+            {
+              "name": "Syringe 20cc",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Needle 25g",
+              "qty": 5,
+              "ctrl": false
+            },
+            {
+              "name": "Needle 23g",
+              "qty": 5,
+              "ctrl": false
+            },
+            {
+              "name": "Needle 18g",
+              "qty": 5,
+              "ctrl": false
+            },
+            {
+              "name": "Needle Twin Pack",
+              "qty": 8,
               "ctrl": false
             },
             {
@@ -5111,26 +5340,6 @@
               "ctrl": false
             },
             {
-              "name": "Needle 18g",
-              "qty": 5,
-              "ctrl": false
-            },
-            {
-              "name": "Needle 23g",
-              "qty": 5,
-              "ctrl": false
-            },
-            {
-              "name": "Needle 25g",
-              "qty": 5,
-              "ctrl": false
-            },
-            {
-              "name": "Needle Twin Pack",
-              "qty": 8,
-              "ctrl": false
-            },
-            {
               "name": "Normal Saline 10ml flush",
               "qty": 8,
               "ctrl": false
@@ -5138,26 +5347,6 @@
             {
               "name": "Saline Lock",
               "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "Syringe 10cc",
-              "qty": 6,
-              "ctrl": false
-            },
-            {
-              "name": "Syringe 1cc",
-              "qty": 6,
-              "ctrl": false
-            },
-            {
-              "name": "Syringe 20cc",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Syringe 3cc",
-              "qty": 6,
               "ctrl": false
             },
             {
@@ -5344,6 +5533,11 @@
           "name": "Compartment 2",
           "items": [
             {
+              "name": "LUCAS",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
               "name": "Hurst Battery",
               "qty": 1,
               "ctrl": false
@@ -5365,6 +5559,37 @@
             }
           ],
           "bags": [
+            {
+              "name": "LUCAS",
+              "items": [
+                {
+                  "name": "LUCAS device",
+                  "qty": 1,
+                  "ctrl": false,
+                  "operationalCheck": "Turns on and battery is full"
+                },
+                {
+                  "name": "Shoulder strap",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Extra battery",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Scissors",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Backplate",
+                  "qty": 1,
+                  "ctrl": false
+                }
+              ]
+            },
             {
               "name": "Rope Bag",
               "items": [
@@ -5486,6 +5711,11 @@
               "name": "Crowbar",
               "qty": 1,
               "ctrl": false
+            },
+            {
+              "name": "Dry Chemical Extinguisher",
+              "qty": 1,
+              "ctrl": false
             }
           ]
         },
@@ -5591,37 +5821,99 @@
               ]
             },
             {
-              "name": "Orange C-collar bag",
+              "name": "Orange C-collar Bag 1",
               "redTag": true,
               "items": [
                 {
                   "name": "2\" Tape",
-                  "qty": 2,
+                  "qty": 1,
                   "ctrl": false
                 },
                 {
                   "name": "Back Raft with Pump",
-                  "qty": 2,
+                  "qty": 1,
                   "ctrl": false
                 },
                 {
                   "name": "Cervical Collar adjustable",
-                  "qty": 2,
+                  "qty": 1,
                   "ctrl": false
                 },
                 {
                   "name": "Cervical collar-pediatric",
-                  "qty": 2,
+                  "qty": 1,
                   "ctrl": false
                 },
                 {
                   "name": "Headbed",
-                  "qty": 2,
+                  "qty": 1,
                   "ctrl": false
                 },
                 {
                   "name": "Spider Strap",
-                  "qty": 2,
+                  "qty": 1,
+                  "ctrl": false
+                }
+              ]
+            },
+            {
+              "name": "Orange C-collar Bag 2",
+              "redTag": true,
+              "items": [
+                {
+                  "name": "2\" Tape",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Back Raft with Pump",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Cervical Collar adjustable",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Cervical collar-pediatric",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Headbed",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Spider Strap",
+                  "qty": 1,
+                  "ctrl": false
+                }
+              ]
+            },
+            {
+              "name": "Vacuum Splint Bag",
+              "redTag": true,
+              "items": [
+                {
+                  "name": "large vacuum splint",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "medium vacuum splint",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "small vacuum splint",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "vacuum pump",
+                  "qty": 1,
                   "ctrl": false
                 }
               ]
@@ -5905,31 +6197,22 @@
               "name": "Fentanyl",
               "qty": 8,
               "ctrl": true,
-              "controlled": true
-            },
-            {
-              "name": "Fentanyl",
-              "qty": 8,
-              "ctrl": true,
-              "controlled": true
+              "controlled": true,
+              "count": true
             },
             {
               "name": "Ketamine",
               "qty": 2,
               "ctrl": true,
-              "controlled": true
+              "controlled": true,
+              "count": true
             },
             {
-              "name": "Midazolam",
+              "name": "Midazolam (Versed)",
               "qty": 5,
               "ctrl": true,
-              "controlled": true
-            },
-            {
-              "name": "Midazolam",
-              "qty": 5,
-              "ctrl": true,
-              "controlled": true
+              "controlled": true,
+              "count": true
             },
             {
               "name": "Sodium Thiosulfate",
@@ -6002,6 +6285,16 @@
         {
           "name": "Bench Seat",
           "items": [
+            {
+              "name": "Nitrous Spare Bottle (under bench seat)",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Nitrous Kit",
+              "qty": 1,
+              "ctrl": false
+            },
             {
               "name": "Binder Lift",
               "qty": 1,
@@ -6087,6 +6380,28 @@
               "qty": 1,
               "ctrl": false
             }
+          ],
+          "bags": [
+            {
+              "name": "Nitrous Kit",
+              "items": [
+                {
+                  "name": "Mixer",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Nitrous tank",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Masks",
+                  "qty": 2,
+                  "ctrl": false
+                }
+              ]
+            }
           ]
         },
         {
@@ -6103,6 +6418,11 @@
               "ctrl": false
             },
             {
+              "name": "Non Re-breather Ped",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
               "name": "Nebulizer Adult Mask",
               "qty": 4,
               "ctrl": false
@@ -6113,22 +6433,7 @@
               "ctrl": false
             },
             {
-              "name": "ETCO2 Inline",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "ETCO2 Adult NC",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
               "name": "Non Re-breather Adult",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "Non Re-breather Ped",
               "qty": 4,
               "ctrl": false
             },
@@ -6138,18 +6443,13 @@
               "ctrl": false
             },
             {
-              "name": "BVM Adult",
-              "qty": 1,
+              "name": "ETCO2 Adult NC",
+              "qty": 4,
               "ctrl": false
             },
             {
-              "name": "BVM Ped",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "CPAP",
-              "qty": 2,
+              "name": "ETCO2 Inline",
+              "qty": 4,
               "ctrl": false
             },
             {
@@ -6159,16 +6459,6 @@
             },
             {
               "name": "Pediatric tube holder",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Ventilator Circuit",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Vent",
               "qty": 1,
               "ctrl": false
             },
@@ -6203,13 +6493,43 @@
               "ctrl": false
             },
             {
+              "name": "Suction Canister",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
               "name": "NG tubes assorted",
               "qty": 1,
               "ctrl": false
             },
             {
-              "name": "Suction Canister",
+              "name": "Vent",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Ventilator Circuit",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "CPAP",
               "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "BVM Adult",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "BVM Ped",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "IV Pump with drip set",
+              "qty": 1,
               "ctrl": false
             }
           ]
@@ -6217,26 +6537,6 @@
         {
           "name": "Compartment B",
           "items": [
-            {
-              "name": "OB Kit",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "NeoNatal BVM",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Chux",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "Emesis Bag",
-              "qty": 4,
-              "ctrl": false
-            },
             {
               "name": "Hot pack",
               "qty": 4,
@@ -6248,8 +6548,58 @@
               "ctrl": false
             },
             {
-              "name": "Lactated Ringers 1000ml",
+              "name": "OB Kit",
               "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "NeoNatal BVM",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Emesis Bag",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "Chux",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "Saline Irrigation 1000ml",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "2\" kling",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "4\" Kling",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "4x4 dressing",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "5x9 Dressing",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "Tape",
+              "qty": 8,
+              "ctrl": false
+            },
+            {
+              "name": "Petrolatum Gauze",
+              "qty": 4,
               "ctrl": false
             },
             {
@@ -6258,13 +6608,33 @@
               "ctrl": false
             },
             {
-              "name": "10 gtt set",
+              "name": "Normal Saline 50ml",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "Emergency Trauma Dressing",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "Coban Dressing",
               "qty": 4,
               "ctrl": false
             },
             {
               "name": "60 gtt set",
               "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "10 gtt set",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "Lactated Ringers 1000ml",
+              "qty": 2,
               "ctrl": false
             },
             {
@@ -6290,56 +6660,6 @@
             {
               "name": "+Esmark bandage",
               "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "2\" kling",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "4\" Kling",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "4x4 dressing",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "5x9 Dressing",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "Coban Dressing",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "Emergency Trauma Dressing",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "Normal Saline 50ml",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "Petrolatum Gauze",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "Saline Irrigation 1000ml",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Tape",
-              "qty": 8,
               "ctrl": false
             },
             {
@@ -6454,6 +6774,11 @@
             },
             {
               "name": "Spare 12 Lead/4 Lead Cables for LP type on ambulance",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Stethoscope",
               "qty": 1,
               "ctrl": false
             }
@@ -6742,79 +7067,15 @@
               "qty": 2,
               "ctrl": false
             }
-          ]
+          ],
+          "operationalCheck": "Daily internal self test passed (readiness indicator OK, no service message)"
         },
         {
           "name": "Medication Kit",
           "items": [
             {
-              "name": "1'' IV Tape",
+              "name": "Ondansetron",
               "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "10 gtt set",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "16g IV",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "18g IV",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "20g IV",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "22g IV",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "24g IV",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "250cc Normal Saline",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "3-Way Stop Cock",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "4x4 dressing",
-              "qty": 5,
-              "ctrl": false
-            },
-            {
-              "name": "60 gtt set",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Adenosine 6mg/2mL",
-              "qty": 5,
-              "ctrl": false
-            },
-            {
-              "name": "Albuterol Sulfate",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "Alcohol wipes",
-              "qty": 20,
               "ctrl": false
             },
             {
@@ -6823,62 +7084,12 @@
               "ctrl": false
             },
             {
-              "name": "APAP 120mg",
-              "qty": 3,
-              "ctrl": false
-            },
-            {
-              "name": "APAP 1G IV",
+              "name": "Sterile Water",
               "qty": 1,
               "ctrl": false
             },
             {
-              "name": "APAP 325mg",
-              "qty": 3,
-              "ctrl": false
-            },
-            {
-              "name": "APAP 325mg PO",
-              "qty": 3,
-              "ctrl": false
-            },
-            {
-              "name": "Arm board",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Aspirin",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Atropine",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "BP Cuff Large",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Calcium Gluconate",
-              "qty": 3,
-              "ctrl": false
-            },
-            {
-              "name": "Coban Dressing",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "D10",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Dexamethasone",
+              "name": "Magnesium Sulfate",
               "qty": 1,
               "ctrl": false
             },
@@ -6888,8 +7099,8 @@
               "ctrl": false
             },
             {
-              "name": "Droperidol",
-              "qty": 2,
+              "name": "Albuterol Sulfate",
+              "qty": 4,
               "ctrl": false
             },
             {
@@ -6898,113 +7109,13 @@
               "ctrl": false
             },
             {
-              "name": "Emesis Bag",
+              "name": "Solumedrol",
               "qty": 1,
               "ctrl": false
             },
             {
-              "name": "Epi 1:1 1ml",
-              "qty": 5,
-              "ctrl": false
-            },
-            {
-              "name": "Epi 1:10",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "Glucagon",
+              "name": "Dexamethasone",
               "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Glucometer",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Glucose",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Glucose strips",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "H Clamp",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "Haldol",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "Iodine Wipes",
-              "qty": 20,
-              "ctrl": false
-            },
-            {
-              "name": "IV Tourniquet",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "Lactated Ringers 1000ml",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Lever Lock",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "Lidocaine",
-              "qty": 3,
-              "ctrl": false
-            },
-            {
-              "name": "Magnesium Sulfate",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Medication ID Stickers",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Naloxone",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "Nasal Atomizer",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Needle 18g",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "Needle 23g",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "Needle 25g",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "Needle Twin Pack",
-              "qty": 4,
               "ctrl": false
             },
             {
@@ -7013,27 +7124,57 @@
               "ctrl": false
             },
             {
-              "name": "Norepinephrine",
+              "name": "Adenosine 6mg/2mL",
+              "qty": 5,
+              "ctrl": false
+            },
+            {
+              "name": "APAP 325mg",
+              "qty": 3,
+              "ctrl": false
+            },
+            {
+              "name": "APAP 120mg",
+              "qty": 3,
+              "ctrl": false
+            },
+            {
+              "name": "APAP 325mg PO",
+              "qty": 3,
+              "ctrl": false
+            },
+            {
+              "name": "APAP 1G IV",
               "qty": 1,
               "ctrl": false
             },
             {
-              "name": "Normal Saline 10ml flush",
-              "qty": 6,
-              "ctrl": false
-            },
-            {
-              "name": "Normal Saline 50ml",
+              "name": "Toradol",
               "qty": 1,
               "ctrl": false
             },
             {
-              "name": "Ondansetron",
+              "name": "Tape Measure",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Droperidol",
               "qty": 2,
               "ctrl": false
             },
             {
-              "name": "Pediatric Guide",
+              "name": "Epi 1:1 1ml",
+              "qty": 5,
+              "ctrl": false
+            },
+            {
+              "name": "Haldol",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "Norepinephrine",
               "qty": 1,
               "ctrl": false
             },
@@ -7043,13 +7184,168 @@
               "ctrl": false
             },
             {
-              "name": "Refusal Forms",
+              "name": "Glucose",
               "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Coban Dressing",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "1'' IV Tape",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "Alcohol wipes",
+              "qty": 20,
+              "ctrl": false
+            },
+            {
+              "name": "Iodine Wipes",
+              "qty": 20,
+              "ctrl": false
+            },
+            {
+              "name": "Normal Saline 10ml flush",
+              "qty": 6,
               "ctrl": false
             },
             {
               "name": "Saline Lock",
               "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "24g IV",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "22g IV",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "20g IV",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "18g IV",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "16g IV",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "Syringe 1cc",
+              "qty": 6,
+              "ctrl": false
+            },
+            {
+              "name": "Syringe 3cc",
+              "qty": 6,
+              "ctrl": false
+            },
+            {
+              "name": "Syringe 10cc",
+              "qty": 6,
+              "ctrl": false
+            },
+            {
+              "name": "Syringe 20cc",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Syringe 60 cc",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Needle 25g",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "Needle 23g",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "Needle 18g",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "Needle Twin Pack",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "Lever Lock",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "3-Way Stop Cock",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "Tegaderm",
+              "qty": 10,
+              "ctrl": false
+            },
+            {
+              "name": "Epi 1:10",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "Atropine",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "Calcium Gluconate",
+              "qty": 3,
+              "ctrl": false
+            },
+            {
+              "name": "Lidocaine",
+              "qty": 3,
+              "ctrl": false
+            },
+            {
+              "name": "Naloxone",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "Aspirin",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Glucagon",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Zofran PO",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "Stethoscope",
+              "qty": 1,
               "ctrl": false
             },
             {
@@ -7063,63 +7359,98 @@
               "ctrl": false
             },
             {
-              "name": "Solumedrol",
+              "name": "D10",
               "qty": 1,
               "ctrl": false
             },
             {
-              "name": "Sterile Water",
+              "name": "250cc Normal Saline",
               "qty": 1,
               "ctrl": false
             },
             {
-              "name": "Stethoscope",
+              "name": "Normal Saline 50ml",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Lactated Ringers 1000ml",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "10 gtt set",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "60 gtt set",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Glucometer",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Glucose strips",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "4x4 dressing",
+              "qty": 5,
+              "ctrl": false
+            },
+            {
+              "name": "Arm board",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "BP Cuff Large",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Emesis Bag",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "H Clamp",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "IV Tourniquet",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "Medication ID Stickers",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Nasal Atomizer",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Pediatric Guide",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Refusal Forms",
               "qty": 1,
               "ctrl": false
             },
             {
               "name": "Surgical Lube",
               "qty": 3,
-              "ctrl": false
-            },
-            {
-              "name": "Syringe 10cc",
-              "qty": 6,
-              "ctrl": false
-            },
-            {
-              "name": "Syringe 1cc",
-              "qty": 6,
-              "ctrl": false
-            },
-            {
-              "name": "Syringe 20cc",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Syringe 3cc",
-              "qty": 6,
-              "ctrl": false
-            },
-            {
-              "name": "Syringe 60 cc",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Tape Measure",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Tegaderm",
-              "qty": 10,
-              "ctrl": false
-            },
-            {
-              "name": "Toradol",
-              "qty": 1,
               "ctrl": false
             },
             {
@@ -7131,13 +7462,9 @@
               "name": "Visual Language Translator",
               "qty": 1,
               "ctrl": false
-            },
-            {
-              "name": "Zofran PO",
-              "qty": 2,
-              "ctrl": false
             }
-          ]
+          ],
+          "sortable": true
         },
         {
           "name": "Airway Bag",
@@ -7447,186 +7774,6 @@
           ]
         },
         {
-          "name": "IV Tray Area",
-          "items": [
-            {
-              "name": "IV Tray",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Tissues",
-              "qty": 1,
-              "ctrl": false
-            }
-          ]
-        },
-        {
-          "name": "IV Tray",
-          "items": [
-            {
-              "name": "1'' IV Tape",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "16g IV",
-              "qty": 5,
-              "ctrl": false
-            },
-            {
-              "name": "18g IV",
-              "qty": 5,
-              "ctrl": false
-            },
-            {
-              "name": "2'' Tape",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "20g IV",
-              "qty": 5,
-              "ctrl": false
-            },
-            {
-              "name": "22g IV",
-              "qty": 5,
-              "ctrl": false
-            },
-            {
-              "name": "24g IV",
-              "qty": 5,
-              "ctrl": false
-            },
-            {
-              "name": "4x4 dressing",
-              "qty": 6,
-              "ctrl": false
-            },
-            {
-              "name": "Alcohol wipes",
-              "qty": 15,
-              "ctrl": false
-            },
-            {
-              "name": "Arm board",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Coban Dressing",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Glucometer",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "H Clamp",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "Iodine Wipes",
-              "qty": 15,
-              "ctrl": false
-            },
-            {
-              "name": "IV Tourniquet",
-              "qty": 5,
-              "ctrl": false
-            },
-            {
-              "name": "Lever Lock",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "Medication ID Stickers",
-              "qty": 5,
-              "ctrl": false
-            },
-            {
-              "name": "Nasal Atomizer",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "Needle 18g",
-              "qty": 5,
-              "ctrl": false
-            },
-            {
-              "name": "Needle 23g",
-              "qty": 5,
-              "ctrl": false
-            },
-            {
-              "name": "Needle 25g",
-              "qty": 5,
-              "ctrl": false
-            },
-            {
-              "name": "Needle Twin Pack",
-              "qty": 8,
-              "ctrl": false
-            },
-            {
-              "name": "Normal Saline 10ml flush",
-              "qty": 8,
-              "ctrl": false
-            },
-            {
-              "name": "Saline Lock",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "Syringe 10cc",
-              "qty": 6,
-              "ctrl": false
-            },
-            {
-              "name": "Syringe 1cc",
-              "qty": 6,
-              "ctrl": false
-            },
-            {
-              "name": "Syringe 20cc",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Syringe 3cc",
-              "qty": 6,
-              "ctrl": false
-            },
-            {
-              "name": "Tegaderm",
-              "qty": 8,
-              "ctrl": false
-            },
-            {
-              "name": "Three Way Stopcock",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "Tongue Depressor",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "Trauma Sheers",
-              "qty": 1,
-              "ctrl": false
-            }
-          ]
-        },
-        {
           "name": "Pediatric I-Gels",
           "items": [
             {
@@ -7684,47 +7831,21 @@
           "operationalCheck": "Turns on and has suction when not plugged in"
         },
         {
-          "name": "Other Equipment",
+          "name": "Pass-Through",
           "items": [
-            {
-              "name": "Dry Chemical Extinguisher",
-              "qty": 1,
-              "ctrl": false
-            },
             {
               "name": "Flash Light",
               "qty": 2,
               "ctrl": false
             },
             {
-              "name": "IV Pump with drip set",
+              "name": "Rechargeable Flashlight",
               "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Lucas",
-              "qty": 1,
-              "ctrl": false,
-              "operationalCheck": "Turns on and battery is full"
-            },
-            {
-              "name": "Nitrous Oxide",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Radio",
-              "qty": 2,
               "ctrl": false
             },
             {
               "name": "Spare O2 Cylinder Sealed",
               "qty": 3,
-              "ctrl": false
-            },
-            {
-              "name": "Stethoscope",
-              "qty": 1,
               "ctrl": false
             }
           ]
@@ -7781,6 +7902,11 @@
           {
             "name": "Time/Mileage Sheet With Clipboard",
             "qty": 1,
+            "ctrl": false
+          },
+          {
+            "name": "Radio",
+            "qty": 2,
             "ctrl": false
           }
         ]
@@ -8071,37 +8197,73 @@
               ]
             },
             {
-              "name": "Orange C-collar bag",
+              "name": "Orange C-collar Bag 1",
               "redTag": true,
               "items": [
                 {
                   "name": "2\" Tape",
-                  "qty": 2,
+                  "qty": 1,
                   "ctrl": false
                 },
                 {
                   "name": "Back Raft with Pump",
-                  "qty": 2,
+                  "qty": 1,
                   "ctrl": false
                 },
                 {
                   "name": "Cervical Collar adjustable",
-                  "qty": 2,
+                  "qty": 1,
                   "ctrl": false
                 },
                 {
                   "name": "Cervical collar-pediatric",
-                  "qty": 2,
+                  "qty": 1,
                   "ctrl": false
                 },
                 {
                   "name": "Headbed",
-                  "qty": 2,
+                  "qty": 1,
                   "ctrl": false
                 },
                 {
                   "name": "Spider Strap",
-                  "qty": 2,
+                  "qty": 1,
+                  "ctrl": false
+                }
+              ]
+            },
+            {
+              "name": "Orange C-collar Bag 2",
+              "redTag": true,
+              "items": [
+                {
+                  "name": "2\" Tape",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Back Raft with Pump",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Cervical Collar adjustable",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Cervical collar-pediatric",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Headbed",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Spider Strap",
+                  "qty": 1,
                   "ctrl": false
                 }
               ]
@@ -8411,25 +8573,22 @@
               "name": "Fentanyl",
               "qty": 8,
               "ctrl": true,
-              "controlled": true
+              "controlled": true,
+              "count": true
             },
             {
               "name": "Ketamine",
               "qty": 2,
               "ctrl": true,
-              "controlled": true
+              "controlled": true,
+              "count": true
             },
             {
-              "name": "Midazolam",
+              "name": "Midazolam (Versed)",
               "qty": 5,
               "ctrl": true,
-              "controlled": true
-            },
-            {
-              "name": "Midazolam",
-              "qty": 5,
-              "ctrl": true,
-              "controlled": true
+              "controlled": true,
+              "count": true
             },
             {
               "name": "Sodium Thiosulfate",
@@ -9167,79 +9326,15 @@
               "qty": 2,
               "ctrl": false
             }
-          ]
+          ],
+          "operationalCheck": "Daily internal self test passed (readiness indicator OK, no service message)"
         },
         {
           "name": "Medication Kit",
           "items": [
             {
-              "name": "1'' IV Tape",
+              "name": "Ondansetron",
               "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "10 gtt set",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "16g IV",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "18g IV",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "20g IV",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "22g IV",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "24g IV",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "250cc Normal Saline",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "3-Way Stop Cock",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "4x4 dressing",
-              "qty": 5,
-              "ctrl": false
-            },
-            {
-              "name": "60 gtt set",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Adenosine 6mg/2mL",
-              "qty": 5,
-              "ctrl": false
-            },
-            {
-              "name": "Albuterol Sulfate",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "Alcohol wipes",
-              "qty": 20,
               "ctrl": false
             },
             {
@@ -9248,62 +9343,12 @@
               "ctrl": false
             },
             {
-              "name": "APAP 120mg",
-              "qty": 3,
-              "ctrl": false
-            },
-            {
-              "name": "APAP 1G IV",
+              "name": "Sterile Water",
               "qty": 1,
               "ctrl": false
             },
             {
-              "name": "APAP 325mg",
-              "qty": 3,
-              "ctrl": false
-            },
-            {
-              "name": "APAP 325mg PO",
-              "qty": 3,
-              "ctrl": false
-            },
-            {
-              "name": "Arm board",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Aspirin",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Atropine",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "BP Cuff Large",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Calcium Gluconate",
-              "qty": 3,
-              "ctrl": false
-            },
-            {
-              "name": "Coban Dressing",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "D10",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Dexamethasone",
+              "name": "Magnesium Sulfate",
               "qty": 1,
               "ctrl": false
             },
@@ -9313,8 +9358,8 @@
               "ctrl": false
             },
             {
-              "name": "Droperidol",
-              "qty": 2,
+              "name": "Albuterol Sulfate",
+              "qty": 4,
               "ctrl": false
             },
             {
@@ -9323,113 +9368,13 @@
               "ctrl": false
             },
             {
-              "name": "Emesis Bag",
+              "name": "Solumedrol",
               "qty": 1,
               "ctrl": false
             },
             {
-              "name": "Epi 1:1 1ml",
-              "qty": 5,
-              "ctrl": false
-            },
-            {
-              "name": "Epi 1:10",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "Glucagon",
+              "name": "Dexamethasone",
               "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Glucometer",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Glucose",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Glucose strips",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "H Clamp",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "Haldol",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "Iodine Wipes",
-              "qty": 20,
-              "ctrl": false
-            },
-            {
-              "name": "IV Tourniquet",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "Lactated Ringers 1000ml",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Lever Lock",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "Lidocaine",
-              "qty": 3,
-              "ctrl": false
-            },
-            {
-              "name": "Magnesium Sulfate",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Medication ID Stickers",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Naloxone",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "Nasal Atomizer",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Needle 18g",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "Needle 23g",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "Needle 25g",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "Needle Twin Pack",
-              "qty": 4,
               "ctrl": false
             },
             {
@@ -9438,27 +9383,57 @@
               "ctrl": false
             },
             {
-              "name": "Norepinephrine",
+              "name": "Adenosine 6mg/2mL",
+              "qty": 5,
+              "ctrl": false
+            },
+            {
+              "name": "APAP 325mg",
+              "qty": 3,
+              "ctrl": false
+            },
+            {
+              "name": "APAP 120mg",
+              "qty": 3,
+              "ctrl": false
+            },
+            {
+              "name": "APAP 325mg PO",
+              "qty": 3,
+              "ctrl": false
+            },
+            {
+              "name": "APAP 1G IV",
               "qty": 1,
               "ctrl": false
             },
             {
-              "name": "Normal Saline 10ml flush",
-              "qty": 6,
-              "ctrl": false
-            },
-            {
-              "name": "Normal Saline 50ml",
+              "name": "Toradol",
               "qty": 1,
               "ctrl": false
             },
             {
-              "name": "Ondansetron",
+              "name": "Tape Measure",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Droperidol",
               "qty": 2,
               "ctrl": false
             },
             {
-              "name": "Pediatric Guide",
+              "name": "Epi 1:1 1ml",
+              "qty": 5,
+              "ctrl": false
+            },
+            {
+              "name": "Haldol",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "Norepinephrine",
               "qty": 1,
               "ctrl": false
             },
@@ -9468,13 +9443,168 @@
               "ctrl": false
             },
             {
-              "name": "Refusal Forms",
+              "name": "Glucose",
               "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Coban Dressing",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "1'' IV Tape",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "Alcohol wipes",
+              "qty": 20,
+              "ctrl": false
+            },
+            {
+              "name": "Iodine Wipes",
+              "qty": 20,
+              "ctrl": false
+            },
+            {
+              "name": "Normal Saline 10ml flush",
+              "qty": 6,
               "ctrl": false
             },
             {
               "name": "Saline Lock",
               "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "24g IV",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "22g IV",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "20g IV",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "18g IV",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "16g IV",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "Syringe 1cc",
+              "qty": 6,
+              "ctrl": false
+            },
+            {
+              "name": "Syringe 3cc",
+              "qty": 6,
+              "ctrl": false
+            },
+            {
+              "name": "Syringe 10cc",
+              "qty": 6,
+              "ctrl": false
+            },
+            {
+              "name": "Syringe 20cc",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Syringe 60 cc",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Needle 25g",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "Needle 23g",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "Needle 18g",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "Needle Twin Pack",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "Lever Lock",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "3-Way Stop Cock",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "Tegaderm",
+              "qty": 10,
+              "ctrl": false
+            },
+            {
+              "name": "Epi 1:10",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "Atropine",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "Calcium Gluconate",
+              "qty": 3,
+              "ctrl": false
+            },
+            {
+              "name": "Lidocaine",
+              "qty": 3,
+              "ctrl": false
+            },
+            {
+              "name": "Naloxone",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "Aspirin",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Glucagon",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Zofran PO",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "Stethoscope",
+              "qty": 1,
               "ctrl": false
             },
             {
@@ -9488,63 +9618,98 @@
               "ctrl": false
             },
             {
-              "name": "Solumedrol",
+              "name": "D10",
               "qty": 1,
               "ctrl": false
             },
             {
-              "name": "Sterile Water",
+              "name": "250cc Normal Saline",
               "qty": 1,
               "ctrl": false
             },
             {
-              "name": "Stethoscope",
+              "name": "Normal Saline 50ml",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Lactated Ringers 1000ml",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "10 gtt set",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "60 gtt set",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Glucometer",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Glucose strips",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "4x4 dressing",
+              "qty": 5,
+              "ctrl": false
+            },
+            {
+              "name": "Arm board",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "BP Cuff Large",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Emesis Bag",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "H Clamp",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "IV Tourniquet",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "Medication ID Stickers",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Nasal Atomizer",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Pediatric Guide",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Refusal Forms",
               "qty": 1,
               "ctrl": false
             },
             {
               "name": "Surgical Lube",
               "qty": 3,
-              "ctrl": false
-            },
-            {
-              "name": "Syringe 10cc",
-              "qty": 6,
-              "ctrl": false
-            },
-            {
-              "name": "Syringe 1cc",
-              "qty": 6,
-              "ctrl": false
-            },
-            {
-              "name": "Syringe 20cc",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Syringe 3cc",
-              "qty": 6,
-              "ctrl": false
-            },
-            {
-              "name": "Syringe 60 cc",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Tape Measure",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Tegaderm",
-              "qty": 10,
-              "ctrl": false
-            },
-            {
-              "name": "Toradol",
-              "qty": 1,
               "ctrl": false
             },
             {
@@ -9556,13 +9721,9 @@
               "name": "Visual Language Translator",
               "qty": 1,
               "ctrl": false
-            },
-            {
-              "name": "Zofran PO",
-              "qty": 2,
-              "ctrl": false
             }
-          ]
+          ],
+          "sortable": true
         },
         {
           "name": "Airway Bag",
@@ -9932,6 +10093,21 @@
           "name": "Random Items",
           "items": [
             {
+              "name": "Nitrous Kit",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Nitrous Spare Bottle",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "LUCAS",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
               "name": "Dry Chemical Extinguisher",
               "qty": 1,
               "ctrl": false
@@ -9947,17 +10123,6 @@
               "ctrl": false
             },
             {
-              "name": "Lucas",
-              "qty": 1,
-              "ctrl": false,
-              "operationalCheck": "Turns on and battery is full"
-            },
-            {
-              "name": "Nitrous Oxide",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
               "name": "Portable O2",
               "qty": 3,
               "ctrl": false
@@ -9966,6 +10131,59 @@
               "name": "Wall BP Cuffs",
               "qty": 1,
               "ctrl": false
+            }
+          ],
+          "bags": [
+            {
+              "name": "LUCAS",
+              "items": [
+                {
+                  "name": "LUCAS device",
+                  "qty": 1,
+                  "ctrl": false,
+                  "operationalCheck": "Turns on and battery is full"
+                },
+                {
+                  "name": "Shoulder strap",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Extra battery",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Scissors",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Backplate",
+                  "qty": 1,
+                  "ctrl": false
+                }
+              ]
+            },
+            {
+              "name": "Nitrous Kit",
+              "items": [
+                {
+                  "name": "Mixer",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Nitrous tank",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Masks",
+                  "qty": 2,
+                  "ctrl": false
+                }
+              ]
             }
           ]
         },
@@ -10726,19 +10944,22 @@
               "name": "Fentanyl",
               "qty": 8,
               "ctrl": true,
-              "controlled": true
+              "controlled": true,
+              "count": true
             },
             {
               "name": "Ketamine",
               "qty": 2,
               "ctrl": true,
-              "controlled": true
+              "controlled": true,
+              "count": true
             },
             {
-              "name": "Midazolam",
+              "name": "Midazolam (Versed)",
               "qty": 5,
               "ctrl": true,
-              "controlled": true
+              "controlled": true,
+              "count": true
             },
             {
               "name": "Sodium Thiosulfate",
@@ -10847,6 +11068,11 @@
           "name": "Bench Seat",
           "items": [
             {
+              "name": "Nitrous Kit",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
               "name": "Adult Hare",
               "qty": 1,
               "ctrl": false
@@ -10878,11 +11104,6 @@
             },
             {
               "name": "Heater Hose",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Nitrous Oxide",
               "qty": 1,
               "ctrl": false
             },
@@ -10920,6 +11141,28 @@
               "name": "Vacuum Splint Bag",
               "qty": 1,
               "ctrl": false
+            }
+          ],
+          "bags": [
+            {
+              "name": "Nitrous Kit",
+              "items": [
+                {
+                  "name": "Mixer",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Nitrous tank",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Masks",
+                  "qty": 2,
+                  "ctrl": false
+                }
+              ]
             }
           ]
         },
@@ -11391,79 +11634,15 @@
               "qty": 2,
               "ctrl": false
             }
-          ]
+          ],
+          "operationalCheck": "Daily internal self test passed (readiness indicator OK, no service message)"
         },
         {
           "name": "Medication Kit",
           "items": [
             {
-              "name": "1'' IV Tape",
+              "name": "Ondansetron",
               "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "10 gtt set",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "16g IV",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "18g IV",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "20g IV",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "22g IV",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "24g IV",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "250cc Normal Saline",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "3-Way Stop Cock",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "4x4 dressing",
-              "qty": 5,
-              "ctrl": false
-            },
-            {
-              "name": "60 gtt set",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Adenosine 6mg/2mL",
-              "qty": 5,
-              "ctrl": false
-            },
-            {
-              "name": "Albuterol Sulfate",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "Alcohol wipes",
-              "qty": 20,
               "ctrl": false
             },
             {
@@ -11472,62 +11651,12 @@
               "ctrl": false
             },
             {
-              "name": "APAP 120mg",
-              "qty": 3,
-              "ctrl": false
-            },
-            {
-              "name": "APAP 1G IV",
+              "name": "Sterile Water",
               "qty": 1,
               "ctrl": false
             },
             {
-              "name": "APAP 325mg",
-              "qty": 3,
-              "ctrl": false
-            },
-            {
-              "name": "APAP 325mg PO",
-              "qty": 3,
-              "ctrl": false
-            },
-            {
-              "name": "Arm board",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Aspirin",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Atropine",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "BP Cuff Large",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Calcium Gluconate",
-              "qty": 3,
-              "ctrl": false
-            },
-            {
-              "name": "Coban Dressing",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "D10",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Dexamethasone",
+              "name": "Magnesium Sulfate",
               "qty": 1,
               "ctrl": false
             },
@@ -11537,8 +11666,8 @@
               "ctrl": false
             },
             {
-              "name": "Droperidol",
-              "qty": 2,
+              "name": "Albuterol Sulfate",
+              "qty": 4,
               "ctrl": false
             },
             {
@@ -11547,113 +11676,13 @@
               "ctrl": false
             },
             {
-              "name": "Emesis Bag",
+              "name": "Solumedrol",
               "qty": 1,
               "ctrl": false
             },
             {
-              "name": "Epi 1:1 1ml",
-              "qty": 5,
-              "ctrl": false
-            },
-            {
-              "name": "Epi 1:10",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "Glucagon",
+              "name": "Dexamethasone",
               "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Glucometer",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Glucose",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Glucose strips",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "H Clamp",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "Haldol",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "Iodine Wipes",
-              "qty": 20,
-              "ctrl": false
-            },
-            {
-              "name": "IV Tourniquet",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "Lactated Ringers 1000ml",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Lever Lock",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "Lidocaine",
-              "qty": 3,
-              "ctrl": false
-            },
-            {
-              "name": "Magnesium Sulfate",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Medication ID Stickers",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Naloxone",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "Nasal Atomizer",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Needle 18g",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "Needle 23g",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "Needle 25g",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "Needle Twin Pack",
-              "qty": 4,
               "ctrl": false
             },
             {
@@ -11662,27 +11691,57 @@
               "ctrl": false
             },
             {
-              "name": "Norepinephrine",
+              "name": "Adenosine 6mg/2mL",
+              "qty": 5,
+              "ctrl": false
+            },
+            {
+              "name": "APAP 325mg",
+              "qty": 3,
+              "ctrl": false
+            },
+            {
+              "name": "APAP 120mg",
+              "qty": 3,
+              "ctrl": false
+            },
+            {
+              "name": "APAP 325mg PO",
+              "qty": 3,
+              "ctrl": false
+            },
+            {
+              "name": "APAP 1G IV",
               "qty": 1,
               "ctrl": false
             },
             {
-              "name": "Normal Saline 10ml flush",
-              "qty": 6,
-              "ctrl": false
-            },
-            {
-              "name": "Normal Saline 50ml",
+              "name": "Toradol",
               "qty": 1,
               "ctrl": false
             },
             {
-              "name": "Ondansetron",
+              "name": "Tape Measure",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Droperidol",
               "qty": 2,
               "ctrl": false
             },
             {
-              "name": "Pediatric Guide",
+              "name": "Epi 1:1 1ml",
+              "qty": 5,
+              "ctrl": false
+            },
+            {
+              "name": "Haldol",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "Norepinephrine",
               "qty": 1,
               "ctrl": false
             },
@@ -11692,13 +11751,168 @@
               "ctrl": false
             },
             {
-              "name": "Refusal Forms",
+              "name": "Glucose",
               "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Coban Dressing",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "1'' IV Tape",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "Alcohol wipes",
+              "qty": 20,
+              "ctrl": false
+            },
+            {
+              "name": "Iodine Wipes",
+              "qty": 20,
+              "ctrl": false
+            },
+            {
+              "name": "Normal Saline 10ml flush",
+              "qty": 6,
               "ctrl": false
             },
             {
               "name": "Saline Lock",
               "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "24g IV",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "22g IV",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "20g IV",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "18g IV",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "16g IV",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "Syringe 1cc",
+              "qty": 6,
+              "ctrl": false
+            },
+            {
+              "name": "Syringe 3cc",
+              "qty": 6,
+              "ctrl": false
+            },
+            {
+              "name": "Syringe 10cc",
+              "qty": 6,
+              "ctrl": false
+            },
+            {
+              "name": "Syringe 20cc",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Syringe 60 cc",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Needle 25g",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "Needle 23g",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "Needle 18g",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "Needle Twin Pack",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "Lever Lock",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "3-Way Stop Cock",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "Tegaderm",
+              "qty": 10,
+              "ctrl": false
+            },
+            {
+              "name": "Epi 1:10",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "Atropine",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "Calcium Gluconate",
+              "qty": 3,
+              "ctrl": false
+            },
+            {
+              "name": "Lidocaine",
+              "qty": 3,
+              "ctrl": false
+            },
+            {
+              "name": "Naloxone",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "Aspirin",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Glucagon",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Zofran PO",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "Stethoscope",
+              "qty": 1,
               "ctrl": false
             },
             {
@@ -11712,63 +11926,98 @@
               "ctrl": false
             },
             {
-              "name": "Solumedrol",
+              "name": "D10",
               "qty": 1,
               "ctrl": false
             },
             {
-              "name": "Sterile Water",
+              "name": "250cc Normal Saline",
               "qty": 1,
               "ctrl": false
             },
             {
-              "name": "Stethoscope",
+              "name": "Normal Saline 50ml",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Lactated Ringers 1000ml",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "10 gtt set",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "60 gtt set",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Glucometer",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Glucose strips",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "4x4 dressing",
+              "qty": 5,
+              "ctrl": false
+            },
+            {
+              "name": "Arm board",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "BP Cuff Large",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Emesis Bag",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "H Clamp",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "IV Tourniquet",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "Medication ID Stickers",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Nasal Atomizer",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Pediatric Guide",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Refusal Forms",
               "qty": 1,
               "ctrl": false
             },
             {
               "name": "Surgical Lube",
               "qty": 3,
-              "ctrl": false
-            },
-            {
-              "name": "Syringe 10cc",
-              "qty": 6,
-              "ctrl": false
-            },
-            {
-              "name": "Syringe 1cc",
-              "qty": 6,
-              "ctrl": false
-            },
-            {
-              "name": "Syringe 20cc",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Syringe 3cc",
-              "qty": 6,
-              "ctrl": false
-            },
-            {
-              "name": "Syringe 60 cc",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Tape Measure",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Tegaderm",
-              "qty": 10,
-              "ctrl": false
-            },
-            {
-              "name": "Toradol",
-              "qty": 1,
               "ctrl": false
             },
             {
@@ -11780,13 +12029,9 @@
               "name": "Visual Language Translator",
               "qty": 1,
               "ctrl": false
-            },
-            {
-              "name": "Zofran PO",
-              "qty": 2,
-              "ctrl": false
             }
-          ]
+          ],
+          "sortable": true
         },
         {
           "name": "Airway Bag",
@@ -12381,6 +12626,11 @@
           "name": "Other Equipment",
           "items": [
             {
+              "name": "LUCAS",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
               "name": "Flash Light",
               "qty": 2,
               "ctrl": false
@@ -12391,12 +12641,6 @@
               "ctrl": false
             },
             {
-              "name": "Lucas",
-              "qty": 1,
-              "ctrl": false,
-              "operationalCheck": "Turns on and battery is full"
-            },
-            {
               "name": "Portable O2",
               "qty": 2,
               "ctrl": false
@@ -12405,6 +12649,39 @@
               "name": "Radio",
               "qty": 2,
               "ctrl": false
+            }
+          ],
+          "bags": [
+            {
+              "name": "LUCAS",
+              "items": [
+                {
+                  "name": "LUCAS device",
+                  "qty": 1,
+                  "ctrl": false,
+                  "operationalCheck": "Turns on and battery is full"
+                },
+                {
+                  "name": "Shoulder strap",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Extra battery",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Scissors",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Backplate",
+                  "qty": 1,
+                  "ctrl": false
+                }
+              ]
             }
           ]
         },
@@ -12536,24 +12813,24 @@
     "uploadPreset": "vehiclecheck"
   },
   "oxygenCheck": {
-    "label": "Is main O2 above 500 PSI?",
+    "label": "Main O2 gauge reading (PSI)",
     "minPsi": 500
   },
   "unitNotices": {
     "M25A": {
-      "text": "\u26a0 M25A: Must activate engine brake every time you drive",
+      "text": "⚠ M25A: Must activate engine brake every time you drive",
       "style": "warn"
     },
     "M25B": {
-      "text": "\u26a0 M25B: Must activate engine brake every time you drive",
+      "text": "⚠ M25B: Must activate engine brake every time you drive",
       "style": "warn"
     },
     "M19": {
-      "text": "\u26a0 M19: Must activate engine brake every time you drive",
+      "text": "⚠ M19: Must activate engine brake every time you drive",
       "style": "warn"
     },
     "M14": {
-      "text": "\u26a0 M14: Must activate engine brake every time you drive",
+      "text": "⚠ M14: Must activate engine brake every time you drive",
       "style": "warn"
     },
     "M18": {
@@ -12564,5 +12841,23 @@
   "sealedTransmission": [
     "M25A",
     "M25B"
-  ]
+  ],
+  "underHoodChecks": [
+    "Belts (look for cracks, fraying, looseness)",
+    "Fan (blades intact, nothing loose)",
+    "Battery (terminals clean and tight, no corrosion)"
+  ],
+  "textFluids": [
+    "Engine oil",
+    "Transmission fluid"
+  ],
+  "sendRule": {
+    "minPct": 75,
+    "holdUntil": "11:00"
+  },
+  "narcPars": {
+    "Fentanyl": 8,
+    "Midazolam (Versed)": 5,
+    "Ketamine": 2
+  }
 }
