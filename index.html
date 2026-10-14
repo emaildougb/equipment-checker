@@ -1480,7 +1480,7 @@
    APP STATE
    ============================================================ */
 const APP = {
-  version: '2.13.2',
+  version: '2.14.1',
   data: null,        // loaded units.json
   screen: 'home',
   check: null,       // current in-progress check
@@ -3729,7 +3729,8 @@ async function sendReport(params) {
 
 // Send any held reports once it's 5:00 PM or later on their queue date (or any day after)
 async function flushPendingSubmissions() {
-  if (!APP.data) return; // units.json not loaded yet — interval/boot will retry
+  if (!APP.data) return;
+  flushCheckLogQueue(); // units.json not loaded yet — interval/boot will retry
   const pending = loadJSON(PENDING_STORE, []);
   if (!pending.length) return;
   const now = new Date();
@@ -3769,6 +3770,7 @@ async function submitCheck() {
     };
 
     const pct = computeCompletionPct();
+    logCheckToBoard(buildCheckLogRecord(c, crewLine, pct));  // fire and forget
     if (pct >= 90) {
       await sendReport(params);
       persistRedTags(c);
@@ -3830,6 +3832,128 @@ function collectUnableToFix() {
     });
   }
   return out;
+}
+
+/* ============================================================
+   CHECK LOG: every submitted check also lands on the CG Staff
+   Vehicle Checks board. Stored in Firebase (project ncems-hub-9111d,
+   same as the hub), collection "vehicleChecks", one doc per check.
+   Never blocks the crew: failures queue and retry every minute.
+   ============================================================ */
+const CHECKLOG_DEFAULTS = {
+  collection: 'vehicleChecks',
+  firebase: {
+    apiKey: 'AIzaSyCBSmzaXRU6TV1Jen5z4xHKZfG28UHXlkY',
+    authDomain: 'ncems-hub-9111d.firebaseapp.com',
+    projectId: 'ncems-hub-9111d',
+    storageBucket: 'ncems-hub-9111d.firebasestorage.app',
+    messagingSenderId: '282446545601',
+    appId: '1:282446545601:web:41f89407c2a1a348f24a40'
+  }
+};
+const CHECKLOG_QUEUE = 'equipcheck_log_queue_v1';
+function checkLogCfg() { return Object.assign({}, CHECKLOG_DEFAULTS, (APP.data && APP.data.checkLog) || {}); }
+let fbDb = null, fbFs = null;
+async function fbReady() {
+  if (fbDb) return fbDb;
+  const cfg = checkLogCfg();
+  const fb = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+  fbFs = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+  const app = (fb.getApps && fb.getApps().length) ? fb.getApps()[0] : fb.initializeApp(cfg.firebase);
+  fbDb = fbFs.getFirestore(app);
+  return fbDb;
+}
+
+// Walk every abnormal item and tag it: fixed (crew fixed it on the spot),
+// unfixed (crew could not fix), open (left abnormal, no fix box checked)
+function collectIssueLog() {
+  const c = APP.check; const out = [];
+  if (!c) return out;
+  const push = (label, notes, fixed, unfixed) =>
+    out.push({ label, notes: notes || '', state: fixed ? 'fixed' : (unfixed ? 'unfixed' : 'open') });
+  if (c.type === 'ambulance') {
+    APP.data.mechanicalChecks.forEach(i => { const v = c.mechanical[i]; if (v && v.status === 'bad') push(i, v.notes, v.fixed, v.unfixed); });
+    APP.data.fluidChecks.forEach(i => { const v = c.fluids[i]; if (v && v.status === 'bad') push(i, v.notes, v.fixed, v.unfixed); });
+    if (c.fuel && c.fuel !== 'Full') push('Fuel ' + c.fuel, '', false, false);
+    if (c.tireYN === 'no') push('Tire pressure out of range', c.tireNotes, c.tireFixed, c.tireUnfixed);
+    if (c.oxygenYN === 'no') push('Main O2 below minimum PSI', c.oxygenNotes, c.oxygenFixed, c.oxygenUnfixed);
+    if (c.cooler && c.cooler.answered && !c.cooler.ok) push('Cooler/Fridge out of range', c.cooler.reading ? c.cooler.reading + '°C' : '', false, false);
+    allComps(c).forEach(comp => {
+      (comp.specialChecks || []).forEach(sc => { if (c.gurney?.[sc.label] === 'no') push(`${comp.name}: ${sc.label}`, '', false, false); });
+    });
+    Object.entries(c.opChecks || {}).forEach(([key, val]) => {
+      if (val !== 'no') return;
+      const [cn, bn, inm] = key.split('||');
+      const label = inm === '__comp_op__' ? cn : (bn ? `${bn} → ${inm}` : inm);
+      push(label + ' (operational check)', c.opNotes?.[key], c.opFixed?.[key], c.opUnfixed?.[key]);
+    });
+    allComps(c).forEach(comp => {
+      const cs = c.compartments[comp.name]; if (!cs) return;
+      Object.entries(cs.items || {}).forEach(([nm, st]) => { if (st.status === 'abnormal') push(`${comp.name}: ${nm}`, st.notes, st.fixed, st.unfixed); });
+      (comp.bags || []).forEach(bag => {
+        const bs = cs.bags?.[bag.name]; if (!bs) return;
+        Object.entries(bs.items || {}).forEach(([nm, st]) => { if (st.status === 'abnormal') push(`${comp.name} → ${bag.name}: ${nm}`, st.notes, st.fixed, st.unfixed); });
+      });
+    });
+  } else {
+    ['exterior','fluids','interior','operational','cleaning'].forEach(group => {
+      (APP.data.rescueRigChecks[group] || []).forEach(item => {
+        const v = c.rescueChecks[`${group}::${item}`];
+        if (v && v.status === 'bad') push(item, v.notes, v.fixed, v.unfixed);
+      });
+    });
+  }
+  return out;
+}
+
+function buildCheckLogRecord(c, crewLine, pct) {
+  return {
+    id: `${c.unitId || c.unitName}-${c.date}-${Date.now().toString(36)}`,
+    unit: c.unitId || c.unitName,
+    unitName: c.unitName,
+    type: c.type,
+    date: c.date,
+    at: new Date().toISOString(),
+    atMs: Date.now(),
+    crew: crewLine || c.initials || '',
+    pct: pct,
+    held: pct < 90,
+    mileage: c.mileage || '',
+    fuel: c.fuel || '',
+    issues: collectIssueLog(),
+    app: APP.version
+  };
+}
+
+async function pushCheckLog(records) {
+  if (!records.length) return true;
+  const db = await fbReady(), col = checkLogCfg().collection;
+  // doc id = record id, so a retry never makes a duplicate
+  for (const r of records) await fbFs.setDoc(fbFs.doc(db, col, r.id), r);
+  return true;
+}
+
+async function logCheckToBoard(record) {
+  const q = loadJSON(CHECKLOG_QUEUE, []);
+  q.push(record);
+  try { localStorage.setItem(CHECKLOG_QUEUE, JSON.stringify(q)); } catch (e) {}
+  return flushCheckLogQueue();
+}
+
+let checkLogBusy = false;
+async function flushCheckLogQueue() {
+  if (checkLogBusy || !APP.data) return;
+  const q = loadJSON(CHECKLOG_QUEUE, []);
+  if (!q.length) return;
+  checkLogBusy = true;
+  try {
+    await pushCheckLog(q);
+    const sent = new Set(q.map(x => x.id));
+    const left = loadJSON(CHECKLOG_QUEUE, []).filter(x => !sent.has(x.id));
+    try { localStorage.setItem(CHECKLOG_QUEUE, JSON.stringify(left)); } catch (e) {}
+  } catch (e) {
+    console.warn('Check log not sent yet, will retry:', e);
+  } finally { checkLogBusy = false; }
 }
 
 function buildSummary() {
