@@ -2,7 +2,7 @@
 
 Equipment and property check submission tool for North Country EMS crews.
 
-**Version 2.16**
+**Version 2.17**
 
 ## Links
 
@@ -40,7 +40,7 @@ Every submitted check also saves a short record to Firebase (project `ncems-hub-
 
 ## Live share (two people, one rig)
 
-When two crew members check the same ambulance on the same day, each phone shows the other person's marks as they go, tagged with their first name, plus a "Live with ..." banner at the top. Stored in Firebase collection `liveChecks`, one doc per unit per day (`M19_2026-10-14`). Since 2.16 an issue beats Normal: if either person marks something ✗ (Abnormal, Overfilled, No), it stays that way no matter who tapped last, and the other phone shows "Flagged by" with their name. Only the person who flagged it can switch it back, or anyone can check Fixed on the spot. Two issues on the same item keep both people's notes. For O2, fuel, DEF and narc counts, the lower number wins. Each person still submits their own check. If Firebase can't be reached, the check works exactly like before, just without the sharing. Needs the `liveChecks` line in the Firebase rules:
+When two crew members check the same ambulance on the same day, each phone shows the other person's checkmarks as they go. Since 2.17 there are no names, no "Live with" banner and no flashing rows, just the marks. Stored in Firebase collection `liveChecks`, one doc per unit per day (`M19_2026-10-15`, local date). An issue beats Normal: if either phone marks something ✗ (Abnormal, Overfilled, No), it stays that way until the phone that flagged it (or the same initials on another screen) switches it back, or someone checks Fixed on the spot. Two issues on the same item keep both notes. For O2, fuel, DEF and narc counts, the lower number wins. Each person still submits their own check. If Firebase can't be reached, the check works exactly like before, just without the sharing. Needs the `liveChecks` line in the Firebase rules:
 
 ```
 rules_version = '2';
@@ -69,6 +69,17 @@ When a crew opens a check, the app looks up every problem reported on earlier ch
 - These live in `units.json` under `sendRule` (`minPct`, `holdUntil`)
 
 ## Changelog
+
+### v2.17
+- Live share simplified: no names, no "Live with" banner, no flashing rows. Only the checkmarks sync. Fixes the banner saying you were live with yourself after deleting and re-adding the icon or opening the rig on a second screen
+- Your own flag from another screen or an older session no longer locks you out of switching it back
+- Known problems box only redraws when something in it changed, so the page stops jumping
+- Check date now uses Pacific time. Before, anything after 5 PM saved under tomorrow's date and its marks carried into the next morning's check
+- Every section on the check folds up. Tap a header to open or close it. Closed sections show how many are done or a ✓. Compartment groups start open since their compartments already fold. Anything that jumps to a row opens its section first
+- Anything mandatory and not done yet (red tags, battery checks, main O2 PSI, fridge temp, narc counts, portable O2 PSI) has a light red box around it, and so do the compartment, bag or closed section it sits in
+- Fridge reading in °F (39 to 48°F is good)
+- New item option `"psi": true` in units.json: the item gets a PSI box instead of buttons. Under the oxygenCheck minPsi (500), it's an issue
+- units.json 2.17, M25A (Joseph's notes 10/15): electronic stethoscope split out in Action Area, Emesis Bag and Chux on the gurney, Suction Cup in the LUCAS bag, MDC (working and functional) in the Cab, gloves off the Med Shelf, surgical lube out of the Med Kit, portable O2 PSI in the Middle Airway Bag, Compartments A, B and C in cabinet order (top left to bottom right)
 
 ### v2.16
 - Known problems: anything reported on an earlier check and not fixed yet shows at the top of the next check, with the latest note from the chiefs. Still broken or Now fixed, plus Go to it

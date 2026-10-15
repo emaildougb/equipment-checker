@@ -1,5 +1,5 @@
 {
-  "version": "2.16",
+  "version": "2.17",
   "submissionEmail": "d.boyce@northcountryems.org",
   "emailjs": {
     "serviceId": "service_uqfd3sj",
@@ -814,6 +814,11 @@
                   "operationalCheck": "Turns on and battery is full"
                 },
                 {
+                  "name": "Suction Cup",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
                   "name": "Shoulder strap",
                   "qty": 1,
                   "ctrl": false
@@ -930,7 +935,7 @@
           "name": "Action Area",
           "items": [
             {
-              "name": "IPad, Phone, Tuff Book, Chargers, electric stethoscope",
+              "name": "iPad, Phone, Toughbook, Chargers",
               "qty": 1,
               "ctrl": false
             },
@@ -941,6 +946,11 @@
             },
             {
               "name": "Stethoscope",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Electronic Stethoscope",
               "qty": 1,
               "ctrl": false
             },
@@ -991,6 +1001,16 @@
             },
             {
               "name": "Fast Stretcher (Tarp)",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Emesis Bag",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Chux",
               "qty": 1,
               "ctrl": false
             }
@@ -1102,7 +1122,7 @@
               "ctrl": false
             },
             {
-              "name": "Nebulizer Adult Mask",
+              "name": "Non Re-breather Ped",
               "qty": 4,
               "ctrl": false
             },
@@ -1117,17 +1137,12 @@
               "ctrl": false
             },
             {
-              "name": "ETCO2 Adult NC",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
               "name": "Non Re-breather Adult",
               "qty": 4,
               "ctrl": false
             },
             {
-              "name": "Non Re-breather Ped",
+              "name": "Nebulizer Adult Mask",
               "qty": 4,
               "ctrl": false
             },
@@ -1137,42 +1152,27 @@
               "ctrl": false
             },
             {
-              "name": "IV Pump with drip set",
+              "name": "ETCO2 Adult NC",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "Suction Catheters 6Fr - 18Fr",
               "qty": 1,
               "ctrl": false
             },
             {
-              "name": "BVM Adult",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "BVM Ped",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "CPAP",
+              "name": "Suction Tubing",
               "qty": 2,
               "ctrl": false
             },
             {
-              "name": "Adult tube holder",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Pediatric tube holder",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Ventilator Circuit",
+              "name": "Yankauer suction tip",
               "qty": 2,
               "ctrl": false
             },
             {
-              "name": "Vent",
+              "name": "NG 8-16",
               "qty": 1,
               "ctrl": false
             },
@@ -1192,23 +1192,43 @@
               "ctrl": false
             },
             {
-              "name": "NG 8-16",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Suction Catheters 6Fr - 18Fr",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Suction Tubing",
+              "name": "Ventilator Circuit",
               "qty": 2,
               "ctrl": false
             },
             {
-              "name": "Yankauer suction tip",
+              "name": "Adult tube holder",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Pediatric tube holder",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "CPAP",
               "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "BVM Adult",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "BVM Ped",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "IV Pump with drip set",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Vent",
+              "qty": 1,
               "ctrl": false
             },
             {
@@ -1287,23 +1307,8 @@
           "name": "Compartment B",
           "items": [
             {
-              "name": "OB Kit",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "NeoNatal BVM",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Chux",
-              "qty": 5,
-              "ctrl": false
-            },
-            {
-              "name": "Emesis Bag",
-              "qty": 5,
+              "name": "Cold Pack",
+              "qty": 4,
               "ctrl": false
             },
             {
@@ -1312,42 +1317,22 @@
               "ctrl": false
             },
             {
-              "name": "Cold Pack",
-              "qty": 4,
+              "name": "Emesis Bag",
+              "qty": 5,
               "ctrl": false
             },
             {
-              "name": "Lactated Ringers 1000ml",
-              "qty": 2,
+              "name": "Chux",
+              "qty": 5,
               "ctrl": false
             },
             {
-              "name": "250cc Normal Saline",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "Normal Saline 100ml",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "10 gtt set",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "60 gtt set",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "Pressure Bag",
+              "name": "NeoNatal BVM",
               "qty": 1,
               "ctrl": false
             },
             {
-              "name": "Spit Hood",
+              "name": "OB Kit",
               "qty": 2,
               "ctrl": false
             },
@@ -1362,8 +1347,43 @@
               "ctrl": false
             },
             {
+              "name": "Pressure Bag",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Spit Hood",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
               "name": "+Esmark bandage",
               "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "60 gtt set",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "10 gtt set",
+              "qty": 4,
+              "ctrl": false
+            },
+            {
+              "name": "250cc Normal Saline",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "Normal Saline 100ml",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
+              "name": "Lactated Ringers 1000ml",
+              "qty": 2,
               "ctrl": false
             }
           ]
@@ -1371,26 +1391,6 @@
         {
           "name": "Compartment C",
           "items": [
-            {
-              "name": "Petrolatum Gauze",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Triangle Bandage",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "4x4 dressing",
-              "qty": 5,
-              "ctrl": false
-            },
-            {
-              "name": "Non-sterile 4 x 4",
-              "qty": 1,
-              "ctrl": false
-            },
             {
               "name": "1'' IV Tape",
               "qty": 2,
@@ -1417,12 +1417,27 @@
               "ctrl": false
             },
             {
-              "name": "SAM Splint",
+              "name": "12x30 trauma dressing",
               "qty": 2,
               "ctrl": false
             },
             {
-              "name": "Saline Irrigation 1000ml",
+              "name": "4x4 dressing",
+              "qty": 5,
+              "ctrl": false
+            },
+            {
+              "name": "Non-sterile 4 x 4",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Triangle Bandage",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Petrolatum Gauze",
               "qty": 1,
               "ctrl": false
             },
@@ -1432,13 +1447,18 @@
               "ctrl": false
             },
             {
+              "name": "SAM Splint",
+              "qty": 2,
+              "ctrl": false
+            },
+            {
               "name": "Emergency Blanket",
               "qty": 1,
               "ctrl": false
             },
             {
-              "name": "12x30 trauma dressing",
-              "qty": 2,
+              "name": "Saline Irrigation 1000ml",
+              "qty": 1,
               "ctrl": false
             }
           ]
@@ -2038,11 +2058,6 @@
               "ctrl": false
             },
             {
-              "name": "Surgical Lube",
-              "qty": 3,
-              "ctrl": false
-            },
-            {
               "name": "Triangle Bandage",
               "qty": 2,
               "ctrl": false
@@ -2240,8 +2255,9 @@
                 },
                 {
                   "name": "Portable O2 With Quick Connect And Regulator",
-                  "qty": 1,
-                  "ctrl": false
+                  "ctrl": false,
+                  "psi": true,
+                  "qty": 1
                 },
                 {
                   "name": "S Guide Adult/Ped",
@@ -2442,11 +2458,6 @@
             },
             {
               "name": "Etomidate",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Gloves (S,M,L)",
               "qty": 1,
               "ctrl": false
             },
@@ -2817,6 +2828,12 @@
             "name": "Silver Clip Board",
             "qty": 1,
             "ctrl": false
+          },
+          {
+            "name": "MDC",
+            "qty": 1,
+            "ctrl": false,
+            "operationalCheck": "Working and functional"
           }
         ]
       }

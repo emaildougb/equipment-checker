@@ -486,6 +486,18 @@
       margin-bottom: 16px;
       overflow: hidden;
     }
+    /* 2.17: anything mandatory and not done yet gets a light red box */
+    .req-pending { box-shadow: 0 0 0 2px #E9A3A3 inset !important; background-color: #FDF0F0 !important; border-radius: 10px; }
+    .compartment-card.req-wrap, .bag-card.req-wrap { box-shadow: 0 0 0 2px #E9A3A3 !important; background-color: #FFF7F7; }
+    .section.collapsible.collapsed.req-sec > .section-head { box-shadow: 0 0 0 2px #E9A3A3 inset; background: #FDF0F0; }
+    .section.collapsible > .section-head { cursor: pointer; user-select: none; -webkit-user-select: none; }
+    .section.collapsible > .section-head .sec-right { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+    .section.collapsible > .section-head .sec-badge { font-size: 11px; font-weight: 800; letter-spacing: 0; text-transform: none; color: var(--muted); }
+    .section.collapsible > .section-head .sec-badge.done { color: var(--g-accent, #2E7D32); }
+    .section.collapsible > .section-head .sec-chev { transition: transform .15s; font-size: 12px; }
+    .section.collapsible.collapsed > .section-head { border-bottom: 0; }
+    .section.collapsible.collapsed > .section-head .sec-chev { transform: rotate(-90deg); }
+    .section.collapsible.collapsed > :not(.section-head) { display: none !important; }
     .section-head {
       background: var(--g-pale);
       padding: 12px 14px;
@@ -1566,7 +1578,7 @@
    APP STATE
    ============================================================ */
 const APP = {
-  version: '2.16',
+  version: '2.17',
   data: null,        // loaded units.json
   screen: 'home',
   check: null,       // current in-progress check
@@ -1599,6 +1611,7 @@ function isAuthorizedAdmin(account) {
 
 let msalApp = null, msalAccount = null;
 
+function localDateStr(d) { const x = d || new Date(); return x.getFullYear() + '-' + String(x.getMonth() + 1).padStart(2, '0') + '-' + String(x.getDate()).padStart(2, '0'); }
 function getSavedInitials() {
   try { return localStorage.getItem('ncems_ep_initials') || ''; } catch(e) { return ''; }
 }
@@ -1678,7 +1691,11 @@ function msalSignOut() {
 function showAppInfo() { showWhatsNew(true); }
 const WHATS_NEW = [
   ['Known problems', 'If something on your rig was reported on an earlier check and nobody has fixed it yet, it shows at the top of your check with the latest note from the chiefs. Tap Still broken or Now fixed. No need to write it up again.'],
-  ['Checking with a partner', 'Your partner\'s marks show up on your phone as they go. If either of you marks something ✗, it stays ✗. Only the person who flagged it can switch it back, or check Fixed on the spot.'],
+  ['Checking with a partner, simpler', 'Your partner\'s checkmarks still show up on your phone as they go. No more names, banner or flashing. If either phone marks something ✗, it stays ✗ until it\'s fixed.'],
+  ['Fridge in °F', 'The fridge thermometer reading is now in Fahrenheit. Good is 39 to 48°F.'],
+  ['Portable O2 PSI', 'The portable O2 in the middle airway bag gets its own PSI box. Under 500 PSI, swap the cylinder.'],
+  ['Everything folds up', 'Every section on the check now folds. Tap a header to open or close it. Closed sections show how many are done, or a ✓ when finished.'],
+  ['Evening checks', 'Checks done after 5 PM now save under the right date.'],
   ['The lower number wins', 'If you and your partner put in different O2, fuel, DEF or narc numbers, the lower one is kept.'],
   ['From 2.15', 'O2 is the actual PSI (under 500, exchange it). Oil and transmission have Overfilled and a describe it box. DEF gauge. Belts, fan and battery. Narc counts with pars. Other notes box everywhere. ABC button on the med kit.']
 ];
@@ -1915,7 +1932,7 @@ async function emailOverridesDiff() {
 
     await emailjs.send(APP.data.emailjs.serviceId, APP.data.emailjs.templateId, {
       unit_id: 'ADMIN CHANGES',
-      check_date: new Date().toISOString().slice(0, 10),
+      check_date: localDateStr(),
       check_type: 'admin',
       initials: 'ADMIN',
       message,
@@ -2199,7 +2216,7 @@ function clearAutosave() {
 
 /* Mark which units have an in-progress autosave for today (for button tint) */
 function unitsWithProgressToday() {
-  const today = new Date().toISOString().slice(0,10);
+  const today = localDateStr();
   const out = {};
   try {
     for (let i = 0; i < localStorage.length; i++) {
@@ -2280,7 +2297,7 @@ function startAmbulanceCheck(unitId) {
     type: 'ambulance',
     unitId,
     unitName: amb.name,
-    date: new Date().toISOString().slice(0,10),
+    date: localDateStr(),
     initials: getSavedInitials(),
     mileage: '',
     walkAround: { notes: '', photo: null },
@@ -2348,6 +2365,7 @@ function renderAmbulanceCheck() {
     </div>
   `;
   attachAmbulanceHandlers();
+  makeSectionsCollapsible();
   if (typeof livePaintBanner === 'function' && live.docId) { livePaintBanner(); }
 }
 
@@ -2380,7 +2398,7 @@ function startRescueCheck(unitName) {
     type: 'rescue',
     unitId: unitName,
     unitName: unitName,
-    date: new Date().toISOString().slice(0,10),
+    date: localDateStr(),
     initials: getSavedInitials(),
     mileage: '',
     rescueChecks: {},
@@ -2425,6 +2443,7 @@ function renderRescueCheck() {
     </div>
   `;
   attachRescueHandlers();
+  makeSectionsCollapsible();
 }
 
 function renderRescueGroup(title, group, items) {
@@ -2724,7 +2743,7 @@ function coolerInlineHTML() {
   return `
     <div class="op-check-row" data-cooler style="display:block;">
       <div class="yn-row">
-        <div class="yn-label">🌡 Reading between 4°C and 9°C?</div>
+        <div class="yn-label">🌡 Reading between 39°F and 48°F?</div>
         <div class="yn-buttons">
           <button class="yn-btn yes" data-cooler-yn="yes">Yes</button>
           <button class="yn-btn no" data-cooler-yn="no">No</button>
@@ -2736,7 +2755,7 @@ function coolerInlineHTML() {
         </div>
         <div class="meta-row">
           <label>Reading</label>
-          <input type="number" id="cooler-reading" placeholder="°C" step="0.1" />
+          <input type="number" id="cooler-reading" placeholder="°F" step="0.1" />
         </div>
         <div class="photo-input">
           <label for="cooler-photo">📷 Photo of thermometer</label>
@@ -2801,6 +2820,7 @@ function renderCompartmentBody(safeId, comp) {
   const body = document.getElementById('comp-body-' + safeId);
   if (!body || body.dataset.rendered === 'true') return;
   body.dataset.rendered = 'true';
+  setTimeout(paintRequired, 0);
 
   let html = '';
 
@@ -3068,6 +3088,24 @@ function narcStatusText(count, par) {
 function itemRowHTML(it, compName, bagName, idx) {
   // operational check (battery/power) renders BELOW the item row
   const opCheck = it.operationalCheck ? opCheckHTML(compName, bagName, it.name, it.operationalCheck) : '';
+  if (it.psi) {
+    return `
+    <div class="item-row narc-row psi-row" data-comp="${escapeAttr(compName)}" data-bag="${escapeAttr(bagName)}" data-item="${escapeAttr(it.name)}" data-psi="${oxygenMin()}">
+      <div class="item-row-main" style="flex-wrap:wrap;">
+        <div class="item-name">${escapeHTML(it.name)}</div>
+        <div class="narc-wrap">
+          <input type="number" class="narc-count" inputmode="numeric" min="0" max="9999" placeholder="PSI" aria-label="PSI for ${escapeAttr(it.name)}" />
+          <span class="narc-par">PSI</span>
+        </div>
+        <div class="narc-status"></div>
+      </div>
+      <div class="item-detail" style="display:none;">
+        <textarea placeholder="Anything to add? (who was notified, swap plan)"></textarea>
+        <label class="fixed-check"><input type="checkbox" data-fixed /> Swapped on the spot</label>
+        <label class="unfix-check"><input type="checkbox" data-unfixed /> Unable to swap</label>
+      </div>
+    </div>`;
+  }
   if (it.count) {
     return `
     <div class="item-row narc-row" data-comp="${escapeAttr(compName)}" data-bag="${escapeAttr(bagName)}" data-item="${escapeAttr(it.name)}" data-par="${it.qty}">
@@ -3305,11 +3343,12 @@ function wireCompartmentBody(safeId, comp) {
     const narc = row.querySelector('.narc-count');
     if (narc) narc.addEventListener('input', e => {
       const state = ensureItemState(compName, bagName, itemName);
-      const par = Number(row.dataset.par);
-      const v = e.target.value.replace(/[^0-9]/g, '').slice(0, 2);
+      const par = Number(row.dataset.par), psiMin = row.dataset.psi ? Number(row.dataset.psi) : 0;
+      const v = e.target.value.replace(/[^0-9]/g, '').slice(0, psiMin ? 4 : 2);
       if (v !== e.target.value) e.target.value = v;
       state.count = v;
-      state.status = v === '' ? null : (narcLow(v, par) ? 'abnormal' : 'complete');
+      if (psiMin) state.psi = true;
+      state.status = v === '' ? null : (psiMin ? (Number(v) < psiMin ? 'abnormal' : 'complete') : (narcLow(v, par) ? 'abnormal' : 'complete'));
       paintNarc(row, state);
       updateCompartmentCounts(safeId, comp);
       updateProgress(); saveAutosave();
@@ -3359,8 +3398,9 @@ function wireCompartmentBody(safeId, comp) {
 }
 
 function paintNarc(row, st) {
-  const par = Number(row.dataset.par);
-  const [cls, txt] = narcStatusText(st ? st.count : '', par);
+  const par = Number(row.dataset.par), psiMin = row.dataset.psi ? Number(row.dataset.psi) : 0;
+  const cnt = st ? st.count : '';
+  const [cls, txt] = psiMin ? (cnt === '' || cnt == null ? ['', ''] : Number(cnt) < psiMin ? ['low', `⚠ Under ${psiMin} PSI. Swap the cylinder.`] : ['ok', `✓ ${cnt} PSI`]) : narcStatusText(cnt, par);
   const el = row.querySelector('.narc-status');
   if (el) { el.className = 'narc-status ' + cls; el.textContent = txt; }
   const inp = row.querySelector('.narc-count');
@@ -3384,7 +3424,82 @@ function ensureItemState(compName, bagName, itemName) {
 
 /* After "✓ to Complete": if the compartment holds red tags, battery checks, or the fridge
    temp check that are still unanswered, open it and ask the crew to handle them individually. */
+/* ============================================================
+   2.17: every section folds up (tap the header). Open/closed is remembered per rig
+   while the check is going. Compartment groups start open because their compartments
+   already fold; everything else starts closed. Anything that scrolls to a row
+   (status bar, flags, prompts, Go to it) opens the section first.
+   ============================================================ */
+const SEC_OPEN = {};
+const SEC_START_OPEN = /^(exterior|interior) compartments/i;
+function secKey(sec) { return ((APP.check && APP.check.unitId) || '') + '|' + (sec.dataset.secTitle || ''); }
+function makeSectionsCollapsible() {
+  document.querySelectorAll('#check-body > .section, #check-body .section').forEach(sec => {
+    if (sec.classList.contains('collapsible')) return;
+    const head = sec.querySelector(':scope > .section-head'); if (!head) return;
+    const title = head.textContent.trim().replace(/\s*\(\d+\)$/, '');
+    sec.dataset.secTitle = title;
+    sec.classList.add('collapsible');
+    const right = document.createElement('span'); right.className = 'sec-right';
+    right.innerHTML = '<span class="sec-badge"></span><span class="sec-chev">▼</span>';
+    head.appendChild(right);
+    const k = secKey(sec);
+    const open = k in SEC_OPEN ? SEC_OPEN[k] : SEC_START_OPEN.test(title);
+    sec.classList.toggle('collapsed', !open);
+    head.addEventListener('click', e => {
+      if (e.target.closest('button, input, a, select, textarea')) return;
+      const nowOpen = sec.classList.toggle('collapsed') === false;
+      SEC_OPEN[secKey(sec)] = nowOpen;
+    });
+  });
+  paintSectionBadges();
+}
+function openSectionFor(el) {
+  const sec = el && el.closest && el.closest('.section.collapsed');
+  if (sec) { sec.classList.remove('collapsed'); SEC_OPEN[secKey(sec)] = true; }
+}
+function compHasRequired(comp) {
+  if (compNeedsStar(comp)) return true;
+  const its = (comp.items || []).concat(...(comp.bags || []).map(b => b.items || []));
+  return its.some(it => it.count || it.psi || /ambulance main\s*o?0?2/i.test(it.name || ''));
+}
+function paintRequired() {
+  const root = document.getElementById('check-body'); if (!root) return;
+  const pend = (el, on) => el && el.classList.toggle('req-pending', !!on);
+  root.querySelectorAll('.red-tag-row').forEach(r => { const i = r.querySelector('.red-tag-input'); pend(r, !r.classList.contains('confirmed') && (!i || !i.value || r.querySelector('.red-tag-confirm'))); });
+  root.querySelectorAll('.op-check-row[data-op-comp]').forEach(r => pend(r, !r.querySelector('.yn-btn.active')));
+  root.querySelectorAll('.op-check-row[data-oxygen]').forEach(r => { const i = r.querySelector('#oxygen-psi'); pend(r, i && !i.value); });
+  root.querySelectorAll('.op-check-row[data-cooler]').forEach(r => pend(r, !r.querySelector('[data-cooler-yn].active')));
+  root.querySelectorAll('.narc-row').forEach(r => { const i = r.querySelector('input.narc-count'); pend(r, i && !i.value); });
+  root.querySelectorAll('.bag-card').forEach(b => b.classList.toggle('req-wrap', !!b.querySelector('.req-pending')));
+  root.querySelectorAll('.compartment-card').forEach(cd => {
+    const body = cd.querySelector('[id^="comp-body-"]'), comp = findCompartmentByName(cd.dataset.compartment);
+    const wrap = body && body.dataset.rendered === 'true' ? !!cd.querySelector('.req-pending') : !!(comp && compHasRequired(comp));
+    cd.classList.toggle('req-wrap', wrap);
+  });
+}
+function paintSectionBadges() {
+  try { paintRequired(); } catch (e) {}
+  document.querySelectorAll('#check-body .section.collapsible').forEach(sec => {
+    const b = sec.querySelector(':scope > .section-head .sec-badge'); if (!b) return;
+    if (SEC_START_OPEN.test(sec.dataset.secTitle || '')) { b.textContent = ''; return; }   // compartments show their own counts
+    const rows = [...sec.querySelectorAll('.check-row[data-key], .yn-row, .item-row, .op-check-row')].filter(r => !r.closest('.op-detail') && !r.closest('.item-detail'));
+    const groups = [...sec.querySelectorAll('.fuel-picker')];
+    sec.classList.toggle('req-sec', !!sec.querySelector('.req-pending, .req-wrap'));
+    if (sec.querySelector('#walkaround-notes')) { b.textContent = 'optional'; b.classList.remove('done'); return; }
+    const total = rows.length + groups.length;
+    const done = rows.filter(r => r.querySelector('.active') || (r.querySelector('input.narc-count') && r.querySelector('input.narc-count').value)).length + groups.filter(g => g.querySelector('.active')).length;
+    if (!total) { b.textContent = ''; b.classList.remove('done'); return; }
+    b.textContent = done >= total ? '✓ done' : done + ' of ' + total;
+    b.classList.toggle('done', done >= total);
+  });
+}
+(function () {   // open the folded section before anything scrolls to a row inside it
+  const siv = Element.prototype.scrollIntoView;
+  Element.prototype.scrollIntoView = function () { try { openSectionFor(this); } catch (e) {} return siv.apply(this, arguments); };
+})();
 function revealForPrompt(el) {
+  openSectionFor(el);
   if (!el) return;
   const bag = el.closest('.bag-card'); if (bag) bag.classList.add('open');
   const comp = el.closest('.compartment-card'); if (comp) comp.classList.add('open');
@@ -3453,7 +3568,7 @@ function promptSpecialChecks(safeId, comp) {
   }
   // Fridge temp
   if (comp.name === 'Fridge' && !c.cooler?.answered) {
-    needs.push(['Fridge reading between 4–9°C? (Yes/No)', body.querySelector('[data-cooler]')]);
+    needs.push(['Fridge reading between 39 and 48°F? (Yes/No)', body.querySelector('[data-cooler]')]);
   }
 
   if (!needs.length) return;
@@ -3831,6 +3946,7 @@ async function handlePhoto(e, target, previewId) {
 function updateProgress() {
   const c = APP.check;
   if (!c) return;
+  paintSectionBadges();
   let total = 0, done = 0, flags = 0;
 
   if (c.type === 'ambulance') {
@@ -4242,7 +4358,7 @@ function collectIssueLog() {
     if (c.def === '25') push('DEF at 25%', '', false, false, 's|def');
     if (c.tireYN === 'no') push('Tire pressure out of range', c.tireNotes, c.tireFixed, c.tireUnfixed, 's|tire');
     if (c.oxygenYN === 'no') push(`Main O2 at ${c.oxygenPsi} PSI (below ${oxygenMin()}, exchange)`, c.oxygenNotes, c.oxygenFixed, c.oxygenUnfixed, 's|o2');
-    if (c.cooler && c.cooler.answered && !c.cooler.ok) push('Cooler/Fridge out of range', c.cooler.reading ? c.cooler.reading + '°C' : '', false, false, 's|cooler');
+    if (c.cooler && c.cooler.answered && !c.cooler.ok) push('Cooler/Fridge out of range', c.cooler.reading ? c.cooler.reading + '°F' : '', false, false, 's|cooler');
     allComps(c).forEach(comp => {
       (comp.specialChecks || []).forEach(sc => { if (c.gurney?.[sc.label] === 'no') push(`${comp.name}: ${sc.label}`, '', false, false, `g|${sc.label}`); });
     });
@@ -4254,10 +4370,10 @@ function collectIssueLog() {
     });
     allComps(c).forEach(comp => {
       const cs = c.compartments[comp.name]; if (!cs) return;
-      Object.entries(cs.items || {}).forEach(([nm, st]) => { if (st.status === 'abnormal') push(`${comp.name}: ${nm}${st.count != null && st.count !== '' ? ` (count ${st.count})` : ''}`, st.notes, st.fixed, st.unfixed, `i|${comp.name}||${nm}`, st.known); });
+      Object.entries(cs.items || {}).forEach(([nm, st]) => { if (st.status === 'abnormal') push(`${comp.name}: ${nm}${st.count != null && st.count !== '' ? ` (${st.psi ? 'PSI' : 'count'} ${st.count})` : ''}`, st.notes, st.fixed, st.unfixed, `i|${comp.name}||${nm}`, st.known); });
       (comp.bags || []).forEach(bag => {
         const bs = cs.bags?.[bag.name]; if (!bs) return;
-        Object.entries(bs.items || {}).forEach(([nm, st]) => { if (st.status === 'abnormal') push(`${comp.name} → ${bag.name}: ${nm}`, st.notes, st.fixed, st.unfixed, `i|${comp.name}|${bag.name}|${nm}`, st.known); });
+        Object.entries(bs.items || {}).forEach(([nm, st]) => { if (st.status === 'abnormal') push(`${comp.name} → ${bag.name}: ${nm}${st.psi && st.count ? ` (PSI ${st.count})` : ''}`, st.notes, st.fixed, st.unfixed, `i|${comp.name}|${bag.name}|${nm}`, st.known); });
       });
     });
   } else {
@@ -4429,7 +4545,7 @@ function liveDecide(k, local, e) {
   const sL = liveSev(k, local), sR = liveSev(k, rv);
   if (sR > sL) return { act: 'apply' };                                   // an issue beats Normal
   if (sL > sR) {                                                          // Normal only clears it if the flagger says so
-    if (live.flagDev[k] && live.flagDev[k] === e.dev && newer) return { act: 'apply' };
+    if (live.flagDev[k] && (live.flagDev[k] === e.dev || ((live.flagName[k] || '').trim().toLowerCase() === String(e.by || '').trim().toLowerCase() && e.by)) && newer) return { act: 'apply' };
     return { act: 'keep', repush: true };
   }
   if (sL === 1 && sR === 1 && (k[0] === 'i' || k[0] === 'r' || k[0] === 'o')) {   // two issues: keep both people's notes
@@ -4444,8 +4560,9 @@ function liveGuard(k, nowNormal) {
   if (!nowNormal || !live.docId) return false;
   const fd = live.flagDev[k];
   if (!fd || fd === liveDeviceId()) return false;
-  const who = (live.flagName[k] || 'Your partner').split(' ')[0];
-  alert(`${who} flagged this one. Only ${who} can switch it back to normal.\n\nIf it's fixed now, check "Fixed on the spot" under it instead.`);
+  const me = ((APP.check && APP.check.initials) || '').trim().toLowerCase();
+  if (me && (live.flagName[k] || '').trim().toLowerCase() === me) return false;   // you, on another screen or an older session
+  alert(`This one was marked as a problem on another phone checking this rig, so it stays a problem.\n\nIf it's fixed now, check "Fixed on the spot" under it instead.`);
   return true;
 }
 function liveApply(c, key, v) {
@@ -4532,9 +4649,11 @@ function liveOnSnap(snap) {
   if (n) liveRepaint(fresh);
   else if (repush) liveSchedule();
 }
+/* 2.17: no "Live with" banner. Doug: just show what's checked, not who. */
 function livePaintBanner() {
   const el = document.getElementById('live-banner');
-  if (!el) return;
+  if (el) el.classList.remove('on');
+  return;
   const dev = liveDeviceId(), cutoff = Date.now() - 3 * 3600 * 1000;
   const others = Object.entries(live.people || {}).filter(([d, p]) => d !== dev && p && p.at > cutoff).map(([, p]) => p.name || 'Partner');
   const names = [...new Set(others)];
@@ -4557,7 +4676,10 @@ function liveRepaint(fresh) {
   updateProgress();
   saveAutosave();
 }
+/* 2.17: no name tags and no flashing rows, the marks themselves are enough */
 function livePaintTags(fresh) {
+  document.querySelectorAll('#check-body .by-tag').forEach(t => t.remove());
+  return;
   const me = (APP.check && APP.check.initials || '').trim();
   document.querySelectorAll('#check-body .item-row').forEach(row => {
     const k = `i|${row.dataset.comp}|${row.dataset.bag}|${row.dataset.item}`;
@@ -4607,9 +4729,9 @@ function knownKeyFromLabel(label) {
   const L = String(label || '');
   const rows = [['mechanical', APP.data.mechanicalChecks || []], ['fluids', APP.data.fluidChecks || []], ['underHood', APP.data.underHoodChecks || []]];
   for (const [b, list] of rows) { const base = L.replace(/ \(overfilled\)$/, ''); if (list.includes(base)) return `r|${b}|${base}`; }
-  let m = L.match(/^(.+?) → (.+?): (.+)$/);
+  let m = L.match(/^(.+?) → (.+?): (.+?)( \(PSI \d+\))?$/);
   if (m && findCompartmentByName(m[1])) return `i|${m[1]}|${m[2]}|${m[3]}`;
-  m = L.match(/^(.+?): (.+?)( \(count \d+\))?$/);
+  m = L.match(/^(.+?): (.+?)( \((count|PSI) \d+\))?$/);
   if (m && findCompartmentByName(m[1])) return `i|${m[1]}||${m[2]}`;
   return '';
 }
@@ -4679,6 +4801,8 @@ function knownRenderBanner() {
   const el = document.getElementById('known-banner');
   if (!el) return;
   const h = knownBannerHTML();
+  if (el.__h === h) return;            // nothing changed, don't redraw (redraws made the page jump)
+  el.__h = h;
   el.innerHTML = h;
   el.style.display = h ? 'block' : 'none';
 }
@@ -4783,7 +4907,7 @@ function buildSummary() {
     // Cooler
     if (c.cooler.answered && !c.cooler.ok) {
       let fl = `  [ ABNORMAL ] Cooler/Fridge — out of range`;
-      if (c.cooler.reading) fl += `\n    Reading: ${c.cooler.reading}°C`;
+      if (c.cooler.reading) fl += `\n    Reading: ${c.cooler.reading}°F`;
       addFlag(fl);
     }
     // Operational checks
@@ -4933,8 +5057,8 @@ function buildSummary() {
 
     // Cooler
     if (c.cooler.answered) {
-      let cl = `Cooler (4-9°C): ${c.cooler.ok ? 'Yes ✓' : 'Out of range ⚠'}`;
-      if (!c.cooler.ok && c.cooler.reading) cl += `  Reading: ${c.cooler.reading}°C`;
+      let cl = `Cooler (39 to 48°F): ${c.cooler.ok ? 'Yes ✓' : 'Out of range ⚠'}`;
+      if (!c.cooler.ok && c.cooler.reading) cl += `  Reading: ${c.cooler.reading}°F`;
       if (c.cooler?.photo?.url) cl += `\n  Photo: ${c.cooler.photo.url}`;
       lines.push(cl); lines.push('');
     }
