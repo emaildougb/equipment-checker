@@ -265,6 +265,35 @@
     .corner-left { left: 12px; } .corner-right { right: 12px; }
     .corner-btn:active { background: rgba(255,255,255,0.3); }
 
+    /* ============ 2.16 additions ============ */
+    .wn-scrim { position: fixed; inset: 0; z-index: 100; background: rgba(10,25,10,0.55); display: flex; align-items: center; justify-content: center; padding: 16px; }
+    .wn-scrim[hidden] { display: none; }
+    .wn-card { background: #fff; color: var(--text); border-radius: 16px; max-width: 460px; width: 100%; max-height: 88vh; overflow-y: auto; padding: 20px 18px 16px; box-shadow: 0 12px 40px rgba(0,0,0,0.35); }
+    .wn-ver { font-size: 11px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--g-mid); }
+    .wn-card h2 { font-size: 22px; margin: 4px 0 12px; color: var(--g-deep); }
+    .wn-list { list-style: none; padding: 0; margin: 0; }
+    .wn-list li { padding: 10px 0; border-top: 1px solid var(--border); font-size: 14px; line-height: 1.45; }
+    .wn-list li b { display: block; color: var(--g-deep); margin-bottom: 2px; }
+    .wn-foot { font-size: 12px; color: var(--muted); margin: 10px 0 12px; }
+    .wn-btn { width: 100%; min-height: 48px; border: none; border-radius: 10px; background: var(--g-mid); color: #fff; font: inherit; font-size: 16px; font-weight: 800; cursor: pointer; }
+    .known-banner { margin: 10px 14px 0; padding: 12px; border-radius: 12px; background: #FFF6E5; border: 2px solid var(--warn); }
+    .known-banner h3 { font-size: 15px; color: var(--warn); margin: 0 0 4px; }
+    .known-banner .kb-sub { font-size: 13px; color: var(--text); line-height: 1.4; margin-bottom: 6px; }
+    .kb-item { background: #fff; border-radius: 10px; padding: 10px; margin-top: 8px; border: 1px solid var(--border); }
+    .kb-item.done-fixed { border-color: var(--g-accent); background: var(--g-pale); }
+    .kb-item.done-broken { border-color: var(--bad); background: #FBEAEA; }
+    .kb-label { font-weight: 800; font-size: 14px; color: var(--g-deep); }
+    .kb-line { font-size: 12.5px; color: var(--muted); line-height: 1.45; margin-top: 3px; }
+    .kb-line.chief { color: var(--info); font-weight: 700; }
+    .kb-btns { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+    .kb-btns button { flex: 1; min-height: 42px; border-radius: 9px; font: inherit; font-size: 14px; font-weight: 800; cursor: pointer; border: 1.5px solid var(--border); background: #fff; }
+    .kb-btns .kb-broken { border-color: var(--bad); color: var(--bad); }
+    .kb-btns .kb-fixed { border-color: var(--g-accent); color: var(--g-mid); }
+    .kb-btns .kb-go { flex: 0 0 auto; color: var(--info); }
+    .kb-result { font-size: 13px; font-weight: 800; margin-top: 6px; }
+    .item-row.known-row .item-name::after { content: 'Known problem'; display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 10px; background: #FFF0D6; color: var(--warn); font-size: 11px; font-weight: 800; vertical-align: middle; }
+    .by-tag.flag { background: #FBEAEA; color: var(--bad); }
+
     /* ============ 2.15 additions ============ */
     .hood-note { margin: 0 0 10px; padding: 10px 12px; background: #EAF2F8; border-left: 3px solid var(--info); border-radius: 8px; font-size: 13px; line-height: 1.45; color: var(--text); }
     .fluid-desc { width: 100%; margin-top: 8px; padding: 9px 10px; border: 1.5px solid var(--border); border-radius: 8px; font: inherit; font-size: 14px; background: var(--white); }
@@ -1381,6 +1410,17 @@
 </head>
 <body>
 
+<!-- ============ WHAT'S NEW ============ -->
+<div class="wn-scrim" id="whatsnew" hidden onclick="if(event.target===this)closeWhatsNew()">
+  <div class="wn-card" role="dialog" aria-labelledby="wn-title">
+    <div class="wn-ver" id="wn-ver"></div>
+    <h2 id="wn-title">What's new</h2>
+    <ul class="wn-list" id="wn-list"></ul>
+    <div class="wn-foot">Questions or problems: Doug Boyce, d.boyce@northcountryems.org</div>
+    <button type="button" class="wn-btn" onclick="closeWhatsNew()">Got it</button>
+  </div>
+</div>
+
 <!-- ============ HOME SCREEN ============ -->
 <div class="screen home active" id="screen-home">
   <a class="corner-btn corner-left" href="https://hub.northcountryems.org/" aria-label="Back to NCEMS Hub" title="NCEMS Hub">
@@ -1526,7 +1566,7 @@
    APP STATE
    ============================================================ */
 const APP = {
-  version: '2.15',
+  version: '2.16',
   data: null,        // loaded units.json
   screen: 'home',
   check: null,       // current in-progress check
@@ -1635,9 +1675,26 @@ function msalSignOut() {
   else goHome();
 }
 
-function showAppInfo() {
-  alert('NCEMS Equipment Checker\nVersion ' + ((APP.data && APP.data.version) || APP.version) +
-        '\n\nQuestions or problems: Doug Boyce, d.boyce@northcountryems.org');
+function showAppInfo() { showWhatsNew(true); }
+const WHATS_NEW = [
+  ['Known problems', 'If something on your rig was reported on an earlier check and nobody has fixed it yet, it shows at the top of your check with the latest note from the chiefs. Tap Still broken or Now fixed. No need to write it up again.'],
+  ['Checking with a partner', 'Your partner\'s marks show up on your phone as they go. If either of you marks something ✗, it stays ✗. Only the person who flagged it can switch it back, or check Fixed on the spot.'],
+  ['The lower number wins', 'If you and your partner put in different O2, fuel, DEF or narc numbers, the lower one is kept.'],
+  ['From 2.15', 'O2 is the actual PSI (under 500, exchange it). Oil and transmission have Overfilled and a describe it box. DEF gauge. Belts, fan and battery. Narc counts with pars. Other notes box everywhere. ABC button on the med kit.']
+];
+function showWhatsNew(force) {
+  let seen = '';
+  try { seen = localStorage.getItem('ep_seen_version') || ''; } catch (e) {}
+  if (!force && seen === APP.version) return;
+  const el = document.getElementById('whatsnew');
+  document.getElementById('wn-ver').textContent = 'Version ' + APP.version + (APP.data && APP.data.version && APP.data.version !== APP.version ? ' (list ' + APP.data.version + ')' : '');
+  document.getElementById('wn-title').textContent = seen && seen !== APP.version ? 'Updated to ' + APP.version : "What's new";
+  document.getElementById('wn-list').innerHTML = WHATS_NEW.map(([t, d]) => `<li><b>${escapeHTML(t)}</b><span>${escapeHTML(d)}</span></li>`).join('');
+  el.hidden = false;
+}
+function closeWhatsNew() {
+  try { localStorage.setItem('ep_seen_version', APP.version); } catch (e) {}
+  document.getElementById('whatsnew').hidden = true;
 }
 
 const APP_TITLE = document.title;
@@ -1712,7 +1769,8 @@ async function boot() {
     const res = await fetch(`./units.json?t=${Date.now()}`, { cache: 'no-store' });
     if (!res.ok) throw new Error(`Failed to load units.json: ${res.status}`);
     APP.data = await res.json();
-    document.getElementById('version-tag').textContent = APP.data.version || APP.version;
+    document.getElementById('version-tag').textContent = APP.version + (APP.data.version && APP.data.version !== APP.version ? ' · list ' + APP.data.version : '');
+    showWhatsNew(false);
 
     // Overlay any admin edits from localStorage on top of the base data
     applyOverrides();
@@ -2190,7 +2248,7 @@ function repaintRestoredState() {
   ['mechanical','fluids','underHood'].forEach(bucket => {
     Object.entries(c[bucket] || {}).forEach(([key, st]) => {
       const dsc = document.querySelector(`[data-desc="${cssEscape(key)}"]`); if (dsc && st.desc != null) dsc.value = st.desc;
-      if (!st.status) return;
+      if (!st.status) { const r0 = document.querySelector(`.check-row[data-key="${cssEscape(key)}"][data-bucket="${bucket}"]`); if (r0) r0.querySelectorAll('.check-btn').forEach(b => b.classList.remove('active')); return; }
       const row = document.querySelector(`.check-row[data-key="${cssEscape(key)}"][data-bucket="${bucket}"]`);
       if (!row) return;
       row.querySelectorAll('.check-btn').forEach(b => b.classList.toggle('active', b.dataset.status === st.status));
@@ -2260,6 +2318,8 @@ function startAmbulanceCheck(unitId) {
   updateProgress();
   restoreAutosave();    // restore any in-progress check for this unit+date
   liveStart();          // share progress with a partner checking the same rig
+  known.unit = null; known.list = [];
+  knownLoad();          // problems from earlier checks that nobody has fixed yet
 }
 
 function renderAmbulanceCheck() {
@@ -2271,6 +2331,7 @@ function renderAmbulanceCheck() {
   const body = document.getElementById('check-body');
   body.innerHTML = `
     <div class="live-banner" id="live-banner"></div>
+    <div class="known-banner" id="known-banner" style="${known.unit === c.unitId && known.list.length ? '' : 'display:none'}">${knownBannerHTML()}</div>
     ${renderUnitNotice()}
     ${renderMetaBlock()}
     ${renderWalkAroundSection()}
@@ -2835,6 +2896,7 @@ function renderCompartmentBody(safeId, comp) {
   wireCompartmentBody(safeId, comp);
   repaintCompartmentRestored(safeId, comp);
   if (live.docId) livePaintTags([]);
+  if (known.list.length) knownPaintRows();
 }
 
 /* Repaint saved item states inside a compartment when it first renders */
@@ -2861,6 +2923,10 @@ function repaintCompartmentRestored(safeId, comp) {
         const ufx = det.querySelector('[data-unfixed]'); if (ufx) ufx.checked = !!st.unfixed;
       }
       return;
+    }
+    if (st && !st.status) {
+      row.querySelectorAll('.item-btn').forEach(b => b.classList.remove('active'));
+      const det0 = row.querySelector('.item-detail'); if (det0) det0.style.display = 'none';
     }
     if (st && st.status) {
       row.querySelectorAll('.item-btn').forEach(b => b.classList.toggle('active', b.dataset.itemStatus === st.status));
@@ -3116,6 +3182,8 @@ function wireCompartmentBody(safeId, comp) {
     row.querySelectorAll('[data-op-yn]').forEach(btn => {
       btn.addEventListener('click', () => {
         const wasActive = btn.classList.contains('active');
+        const opk = `${compName}||${bagName}||${itemName}`;
+        if (APP.check.opChecks?.[opk] === 'no' && (btn.dataset.opYn === 'yes' || wasActive) && liveGuard('o|' + opk, true)) return;
         row.querySelectorAll('[data-op-yn]').forEach(b => b.classList.remove('active'));
         const c = APP.check;
         c.opChecks = c.opChecks || {};
@@ -3251,6 +3319,8 @@ function wireCompartmentBody(safeId, comp) {
       btn.addEventListener('click', () => {
         const status = btn.dataset.itemStatus;
         const wasActive = btn.classList.contains('active');
+        const cur = ensureItemState(compName, bagName, itemName);
+        if (cur.status === 'abnormal' && (status === 'complete' || wasActive) && liveGuard(`i|${compName}|${bagName}|${itemName}`, true)) return;
         row.querySelectorAll('.item-btn').forEach(b => b.classList.remove('active'));
         const state = ensureItemState(compName, bagName, itemName);
         if (wasActive) {
@@ -3555,6 +3625,8 @@ function attachAmbulanceHandlers() {
       btn.onclick = () => {
         const status = btn.dataset.status;
         const wasActive = btn.classList.contains('active');
+        const curS = APP.check[bucket]?.[key]?.status;
+        if ((curS === 'bad' || curS === 'over') && (status === 'wnl' || wasActive) && liveGuard(`r|${bucket}|${key}`, true)) return;
         row.querySelectorAll('.check-btn').forEach(b => b.classList.remove('active'));
         if (wasActive) {
           if (APP.check[bucket][key]) APP.check[bucket][key].status = null;
@@ -4059,7 +4131,7 @@ async function submitCheck() {
 
     const pct = computeCompletionPct();
     const sendNow = pct >= sendMinPct() || pastHoldTime(c.date);
-    logCheckToBoard(buildCheckLogRecord(c, crewLine, pct, !sendNow));  // fire and forget
+    logCheckToBoard(buildCheckLogRecord(c, crewLine, pct, !sendNow, (crew.length > 1 ? `Submitted by: ${crewLine}\n\n` : '') + summary.plain));  // fire and forget
     liveStop();
     if (sendNow) {
       await sendReport(params);
@@ -4158,30 +4230,34 @@ async function fbReady() {
 function collectIssueLog() {
   const c = APP.check; const out = [];
   if (!c) return out;
-  const push = (label, notes, fixed, unfixed) =>
-    out.push({ label, notes: notes || '', state: fixed ? 'fixed' : (unfixed ? 'unfixed' : 'open') });
+  const push = (label, notes, fixed, unfixed, key, known) => {
+    const o = { label, notes: notes || '', state: fixed ? 'fixed' : (unfixed ? 'unfixed' : 'open') };
+    if (key) o.key = key;
+    if (known) o.known = true;
+    out.push(o);
+  };
   if (c.type === 'ambulance') {
-    rowBuckets(c).forEach(([i, b]) => { const v = b[i]; if (rowIsBad(v)) push(i + (v.status === 'over' ? ' (overfilled)' : ''), [v.desc, v.notes].filter(Boolean).join(' | '), v.fixed, v.unfixed); });
-    if (c.fuel && c.fuel !== 'Full') push('Fuel ' + c.fuel, '', false, false);
-    if (c.def === '25') push('DEF at 25%', '', false, false);
-    if (c.tireYN === 'no') push('Tire pressure out of range', c.tireNotes, c.tireFixed, c.tireUnfixed);
-    if (c.oxygenYN === 'no') push(`Main O2 at ${c.oxygenPsi} PSI (below ${oxygenMin()}, exchange)`, c.oxygenNotes, c.oxygenFixed, c.oxygenUnfixed);
-    if (c.cooler && c.cooler.answered && !c.cooler.ok) push('Cooler/Fridge out of range', c.cooler.reading ? c.cooler.reading + '°C' : '', false, false);
+    rowBuckets(c).forEach(([i, b, bn]) => { const v = b[i]; if (rowIsBad(v)) push(i + (v.status === 'over' ? ' (overfilled)' : ''), [v.desc, v.notes].filter(Boolean).join(' | '), v.fixed, v.unfixed, `r|${bn}|${i}`, v.known); });
+    if (c.fuel && c.fuel !== 'Full') push('Fuel ' + c.fuel, '', false, false, 's|fuel');
+    if (c.def === '25') push('DEF at 25%', '', false, false, 's|def');
+    if (c.tireYN === 'no') push('Tire pressure out of range', c.tireNotes, c.tireFixed, c.tireUnfixed, 's|tire');
+    if (c.oxygenYN === 'no') push(`Main O2 at ${c.oxygenPsi} PSI (below ${oxygenMin()}, exchange)`, c.oxygenNotes, c.oxygenFixed, c.oxygenUnfixed, 's|o2');
+    if (c.cooler && c.cooler.answered && !c.cooler.ok) push('Cooler/Fridge out of range', c.cooler.reading ? c.cooler.reading + '°C' : '', false, false, 's|cooler');
     allComps(c).forEach(comp => {
-      (comp.specialChecks || []).forEach(sc => { if (c.gurney?.[sc.label] === 'no') push(`${comp.name}: ${sc.label}`, '', false, false); });
+      (comp.specialChecks || []).forEach(sc => { if (c.gurney?.[sc.label] === 'no') push(`${comp.name}: ${sc.label}`, '', false, false, `g|${sc.label}`); });
     });
     Object.entries(c.opChecks || {}).forEach(([key, val]) => {
       if (val !== 'no') return;
       const [cn, bn, inm] = key.split('||');
       const label = inm === '__comp_op__' ? cn : (bn ? `${bn} → ${inm}` : inm);
-      push(label + ' (operational check)', c.opNotes?.[key], c.opFixed?.[key], c.opUnfixed?.[key]);
+      push(label + ' (operational check)', c.opNotes?.[key], c.opFixed?.[key], c.opUnfixed?.[key], `o|${key}`);
     });
     allComps(c).forEach(comp => {
       const cs = c.compartments[comp.name]; if (!cs) return;
-      Object.entries(cs.items || {}).forEach(([nm, st]) => { if (st.status === 'abnormal') push(`${comp.name}: ${nm}${st.count != null && st.count !== '' ? ` (count ${st.count})` : ''}`, st.notes, st.fixed, st.unfixed); });
+      Object.entries(cs.items || {}).forEach(([nm, st]) => { if (st.status === 'abnormal') push(`${comp.name}: ${nm}${st.count != null && st.count !== '' ? ` (count ${st.count})` : ''}`, st.notes, st.fixed, st.unfixed, `i|${comp.name}||${nm}`, st.known); });
       (comp.bags || []).forEach(bag => {
         const bs = cs.bags?.[bag.name]; if (!bs) return;
-        Object.entries(bs.items || {}).forEach(([nm, st]) => { if (st.status === 'abnormal') push(`${comp.name} → ${bag.name}: ${nm}`, st.notes, st.fixed, st.unfixed); });
+        Object.entries(bs.items || {}).forEach(([nm, st]) => { if (st.status === 'abnormal') push(`${comp.name} → ${bag.name}: ${nm}`, st.notes, st.fixed, st.unfixed, `i|${comp.name}|${bag.name}|${nm}`, st.known); });
       });
     });
   } else {
@@ -4220,8 +4296,10 @@ function collectNarcCounts(c) {
   return out;
 }
 
-function buildCheckLogRecord(c, crewLine, pct, held) {
+function buildCheckLogRecord(c, crewLine, pct, held, detail) {
   return {
+    detail: detail || '',
+    knownChecked: (c.knownChecked || []).slice(),
     id: `${c.unitId || c.unitName}-${c.date}-${Date.now().toString(36)}`,
     unit: c.unitId || c.unitName,
     unitName: c.unitName,
@@ -4283,7 +4361,7 @@ async function flushCheckLogQueue() {
    Never blocks the check: if Firebase is unreachable it just stays quiet.
    ============================================================ */
 const LIVE_COL = 'liveChecks';
-const live = { unsub: null, docId: null, pushed: {}, localAt: {}, by: {}, timer: null, people: {}, starting: false };
+const live = { unsub: null, docId: null, pushed: {}, localAt: {}, by: {}, timer: null, people: {}, starting: false, flagDev: {}, flagName: {} };
 function liveDeviceId() {
   let id = '';
   try { id = localStorage.getItem('ep_device_id') || ''; if (!id) { id = Math.random().toString(36).slice(2, 10); localStorage.setItem('ep_device_id', id); } } catch (e) { id = id || 'dev'; }
@@ -4317,7 +4395,58 @@ function liveFlatten(c) {
   if (c.oxygenPsi !== '' && c.oxygenPsi != null) out['s|o2'] = { psi: String(c.oxygenPsi), notes: c.oxygenNotes || '', fixed: !!c.oxygenFixed, unfixed: !!c.oxygenUnfixed };
   if (c.tireYN) out['s|tire'] = { yn: c.tireYN, notes: c.tireNotes || '', fixed: !!c.tireFixed, unfixed: !!c.tireUnfixed };
   if (c.cooler && c.cooler.answered) out['s|cooler'] = { ok: !!c.cooler.ok, reading: c.cooler.reading || '' };
+  (c.knownChecked || []).forEach(k => { out[`k|${k.checkId}|${k.label}`] = { result: k.result, key: k.key || '' }; });
   return out;
+}
+/* 1 = an issue (✗, Abnormal, Overfilled, No, out of range), 0 = normal or just a value */
+function liveSev(k, v) {
+  if (v == null) return 0;
+  const kind = k.slice(0, k.indexOf('|'));
+  if (kind === 'i' || kind === 'r') return (v.status === 'abnormal' || v.status === 'bad' || v.status === 'over') ? 1 : 0;
+  if (kind === 'o') return v.v === 'no' ? 1 : 0;
+  if (kind === 'g') return v === 'no' ? 1 : 0;
+  if (k === 's|tire') return v.yn === 'no' ? 1 : 0;
+  if (k === 's|cooler') return v.ok ? 0 : 1;
+  if (k === 's|o2') return Number(v.psi) < oxygenMin() ? 1 : 0;
+  return 0;
+}
+const LIVE_FUEL = { '1/4': 1, '1/2': 2, '3/4': 3, 'Full': 4, '25': 1, '50': 2, '75': 3, '100': 4 };
+function liveMergeNotes(a, b) {
+  const parts = [...String(a || '').split(' | '), ...String(b || '').split(' | ')].map(x => x.trim()).filter(Boolean);
+  return [...new Set(parts)].sort().join(' | ');
+}
+/* decide what to do with a partner's mark: apply it, keep ours (and re-send ours), or apply a merged value */
+function liveDecide(k, local, e) {
+  const rv = e.v;
+  if (local === undefined) return { act: 'apply' };
+  if (JSON.stringify(local) === JSON.stringify(rv)) return { act: 'same' };
+  const newer = (e.at || 0) > (live.localAt[k] || 0);
+  // readings: the worse (lower) number wins
+  if (k === 's|o2') { const a = Number(local.psi), b = Number(rv.psi); if (!isNaN(a) && !isNaN(b) && a !== b) return b < a ? { act: 'apply' } : { act: 'keep', repush: true }; }
+  if (k === 's|fuel' || k === 's|def') { const a = LIVE_FUEL[local] || 9, b = LIVE_FUEL[rv] || 9; if (a !== b) return b < a ? { act: 'apply' } : { act: 'keep', repush: true }; }
+  const cntL = local && local.count != null ? Number(local.count) : NaN, cntR = rv && rv.count != null ? Number(rv.count) : NaN;
+  if (!isNaN(cntL) && !isNaN(cntR) && cntL !== cntR) return cntR < cntL ? { act: 'apply' } : { act: 'keep', repush: true };
+  const sL = liveSev(k, local), sR = liveSev(k, rv);
+  if (sR > sL) return { act: 'apply' };                                   // an issue beats Normal
+  if (sL > sR) {                                                          // Normal only clears it if the flagger says so
+    if (live.flagDev[k] && live.flagDev[k] === e.dev && newer) return { act: 'apply' };
+    return { act: 'keep', repush: true };
+  }
+  if (sL === 1 && sR === 1 && (k[0] === 'i' || k[0] === 'r' || k[0] === 'o')) {   // two issues: keep both people's notes
+    const base = newer ? rv : local, other = newer ? local : rv;
+    const merged = Object.assign({}, base, { notes: liveMergeNotes(base.notes, other.notes) });
+    return { act: 'apply', value: merged, merged: true };
+  }
+  return newer ? { act: 'apply' } : { act: 'keep' };
+}
+/* stop someone from clearing a mark their partner flagged */
+function liveGuard(k, nowNormal) {
+  if (!nowNormal || !live.docId) return false;
+  const fd = live.flagDev[k];
+  if (!fd || fd === liveDeviceId()) return false;
+  const who = (live.flagName[k] || 'Your partner').split(' ')[0];
+  alert(`${who} flagged this one. Only ${who} can switch it back to normal.\n\nIf it's fixed now, check "Fixed on the spot" under it instead.`);
+  return true;
 }
 function liveApply(c, key, v) {
   const p = key.indexOf('|'), kind = key.slice(0, p), rest = key.slice(p + 1);
@@ -4332,6 +4461,12 @@ function liveApply(c, key, v) {
     c.opChecks = c.opChecks || {}; c.opNotes = c.opNotes || {}; c.opFixed = c.opFixed || {}; c.opUnfixed = c.opUnfixed || {};
     c.opChecks[rest] = v.v; c.opNotes[rest] = v.notes || ''; c.opFixed[rest] = !!v.fixed; c.opUnfixed[rest] = !!v.unfixed;
   } else if (kind === 't') { c.redTags = c.redTags || {}; c.redTags[rest] = v; }
+  else if (kind === 'k') {
+    const q = rest.indexOf('|'), checkId = rest.slice(0, q), label = rest.slice(q + 1);
+    c.knownChecked = (c.knownChecked || []).filter(x => !(x.checkId === checkId && x.label === label));
+    c.knownChecked.push({ checkId, label, key: v.key || '', result: v.result });
+    if (typeof knownRenderBanner === 'function') setTimeout(knownRenderBanner, 0);
+  }
   else if (kind === 'g') { c.gurney = c.gurney || {}; c.gurney[rest] = v; }
   else if (key === 's|fuel') c.fuel = v;
   else if (key === 's|def') c.def = v;
@@ -4353,8 +4488,14 @@ async function livePush() {
   Object.entries(flat).forEach(([k, v]) => {
     const j = JSON.stringify(v);
     if (live.pushed[k] === j) return;
-    changed[liveEnc(k)] = { v, by: who, dev, at: now };
-    live.pushed[k] = j; live.localAt[k] = now; delete live.by[k];
+    const entry = { v, by: who, dev, at: now };
+    if (liveSev(k, v)) {
+      if (!live.flagDev[k]) { live.flagDev[k] = dev; live.flagName[k] = who; }
+      entry.fdev = live.flagDev[k]; entry.fby = live.flagName[k] || who;
+    } else { delete live.flagDev[k]; delete live.flagName[k]; }
+    changed[liveEnc(k)] = entry;
+    live.pushed[k] = j; live.localAt[k] = now;
+    if (live.flagDev[k] !== dev || !liveSev(k, v)) delete live.by[k];
   });
   const payload = { unit: c.unitId, date: c.date, updatedAt: now, people: { [dev]: { name: who, at: now } } };
   if (Object.keys(changed).length) payload.s = changed;
@@ -4372,17 +4513,24 @@ function liveOnSnap(snap) {
   if (!c || !d || `${c.unitId}_${c.date}` !== live.docId) return;
   const dev = liveDeviceId();
   live.people = d.people || {};
-  let n = 0; const fresh = [];
+  let n = 0, repush = false; const fresh = [], flat = liveFlatten(c);
   Object.entries(d.s || {}).forEach(([ek, e]) => {
     if (!e || e.dev === dev) return;
     const k = liveDec(ek), j = JSON.stringify(e.v);
     if (live.pushed[k] === j) { live.by[k] = e.by; return; }
-    if ((e.at || 0) <= (live.localAt[k] || 0)) return;   // our own newer change wins
-    if (!liveApply(c, k, e.v)) return;
-    live.pushed[k] = j; live.localAt[k] = e.at; live.by[k] = e.by; n++; fresh.push(k);
+    const dec = liveDecide(k, flat[k], e);
+    if (dec.act === 'same') { live.pushed[k] = j; live.by[k] = e.by; if (e.fdev) { live.flagDev[k] = e.fdev; live.flagName[k] = e.fby || e.by; } return; }
+    if (dec.act === 'keep') { if (dec.repush) { delete live.pushed[k]; repush = true; } return; }
+    const val = dec.value !== undefined ? dec.value : e.v;
+    if (!liveApply(c, k, val)) return;
+    if (liveSev(k, val)) { if (!live.flagDev[k] || flat[k] === undefined || !liveSev(k, flat[k])) { live.flagDev[k] = e.fdev || e.dev; live.flagName[k] = e.fby || e.by; } }
+    else { delete live.flagDev[k]; delete live.flagName[k]; }
+    if (dec.merged) { delete live.pushed[k]; repush = true; } else live.pushed[k] = j;
+    live.localAt[k] = Math.max(e.at || 0, live.localAt[k] || 0); live.by[k] = e.by; n++; fresh.push(k);
   });
   livePaintBanner();
   if (n) liveRepaint(fresh);
+  else if (repush) liveSchedule();
 }
 function livePaintBanner() {
   const el = document.getElementById('live-banner');
@@ -4415,9 +4563,13 @@ function livePaintTags(fresh) {
     const k = `i|${row.dataset.comp}|${row.dataset.bag}|${row.dataset.item}`;
     const who = live.by[k];
     let tag = row.querySelector('.by-tag');
-    if (who && who !== me) {
+    const st = APP.check.compartments[row.dataset.comp]?.[row.dataset.bag ? 'bags' : 'items'];
+    const sv = row.dataset.bag ? st?.[row.dataset.bag]?.items?.[row.dataset.item] : st?.[row.dataset.item];
+    const flagger = live.flagDev[k] && live.flagDev[k] !== liveDeviceId() && sv && sv.status === 'abnormal' ? (live.flagName[k] || who) : '';
+    if ((who && who !== me) || flagger) {
       if (!tag) { tag = document.createElement('span'); tag.className = 'by-tag'; row.querySelector('.item-name')?.appendChild(tag); }
-      tag.textContent = '✓ ' + who.split(' ')[0];
+      tag.classList.toggle('flag', !!flagger);
+      tag.textContent = flagger ? '✗ Flagged by ' + flagger.split(' ')[0] : '✓ ' + who.split(' ')[0];
       if (fresh.includes(k)) { row.classList.remove('live-flash'); void row.offsetWidth; row.classList.add('live-flash'); }
     } else if (tag) tag.remove();
   });
@@ -4427,7 +4579,7 @@ async function liveStart() {
   if (!c || c.type !== 'ambulance') return;
   liveStop();
   live.docId = `${c.unitId}_${c.date}`;
-  live.pushed = {}; live.localAt = {}; live.by = {}; live.people = {};
+  live.pushed = {}; live.localAt = {}; live.by = {}; live.people = {}; live.flagDev = {}; live.flagName = {};
   try {
     const db = await fbReady();
     if (!APP.check || `${APP.check.unitId}_${APP.check.date}` !== live.docId) return;
@@ -4439,6 +4591,150 @@ function liveStop() {
   clearTimeout(live.timer);
   if (live.unsub) { try { live.unsub(); } catch (e) {} }
   live.unsub = null; live.docId = null;
+}
+
+
+/* ============================================================
+   KNOWN PROBLEMS: anything reported on an earlier check of this rig
+   and not marked fixed yet (by a chief in CG Staff, a completed
+   Shift Ops card, or a crew tapping Now fixed) shows at the top of
+   the check with the latest note from the chiefs.
+   ============================================================ */
+const known = { unit: null, list: [] };
+function knownResKey(checkId, label) { return (checkId + '__' + label).replace(/[\/]/g, '-').slice(0, 400); }
+function knownAppVer(x) { const m = String((x && x.app) || '').match(/^(\d+)\.(\d+)/); return m ? (+m[1]) * 100 + (+m[2]) : 0; }
+function knownKeyFromLabel(label) {
+  const L = String(label || '');
+  const rows = [['mechanical', APP.data.mechanicalChecks || []], ['fluids', APP.data.fluidChecks || []], ['underHood', APP.data.underHoodChecks || []]];
+  for (const [b, list] of rows) { const base = L.replace(/ \(overfilled\)$/, ''); if (list.includes(base)) return `r|${b}|${base}`; }
+  let m = L.match(/^(.+?) → (.+?): (.+)$/);
+  if (m && findCompartmentByName(m[1])) return `i|${m[1]}|${m[2]}|${m[3]}`;
+  m = L.match(/^(.+?): (.+?)( \(count \d+\))?$/);
+  if (m && findCompartmentByName(m[1])) return `i|${m[1]}||${m[2]}`;
+  return '';
+}
+function knownCompute(checks, resolved, links, unit) {
+  const all = checks.filter(x => x.unit === unit && x.type !== 'rescue').sort((a, b) => (a.atMs || 0) - (b.atMs || 0));
+  const latest = all[all.length - 1] || null, recent6 = all.slice(-6), crewFixed = {}, crewBroken = {};
+  all.forEach(x => (x.knownChecked || []).forEach(k => { const rk = k.checkId + '|' + k.label; if (k.result === 'fixed') crewFixed[rk] = 1; else crewBroken[rk] = x; }));
+  const out = [];
+  all.forEach(x => (x.issues || []).forEach(i => {
+    const rk = x.id + '|' + i.label;
+    if (i.state === 'fixed' || i.known || resolved[rk] || crewFixed[rk]) return;
+    if (/^(Fuel |DEF at )/i.test(i.label || '')) return;
+    if (knownAppVer(x) < 216) {
+      if (i.state === 'open' && x !== latest) return;
+      if (i.state === 'unfixed' && recent6.indexOf(x) < 0) return;
+    }
+    const id = i.key || i.label;
+    if (out.some(o => (o.key || o.label) === id)) return;
+    out.push({ checkId: x.id, label: i.label, key: i.key || knownKeyFromLabel(i.label), notes: i.notes || '', state: i.state, crew: x.crew || '', at: x.at, link: links[knownResKey(x.id, i.label)] || null, lastBroken: crewBroken[rk] || null });
+  }));
+  return out;
+}
+async function knownLoad() {
+  const c = APP.check;
+  if (!c || c.type !== 'ambulance') return;
+  const unit = c.unitId;
+  try {
+    const db = await fbReady(), F = fbFs, since = Date.now() - 45 * 86400000;
+    const [cs, rs, ls] = await Promise.all([
+      F.getDocs(F.query(F.collection(db, 'vehicleChecks'), F.where('atMs', '>=', since))),
+      F.getDocs(F.collection(db, 'vehicleResolved')),
+      F.getDocs(F.collection(db, 'vehicleLinks')).catch(() => ({ forEach() {} }))
+    ]);
+    const checks = [], resolved = {}, links = {};
+    cs.forEach(d => checks.push(d.data()));
+    rs.forEach(d => { const v = d.data(); if (v) resolved[v.checkId + '|' + v.label] = v; });
+    ls.forEach(d => { const v = d.data(); if (v) links[d.id] = v; });
+    if (!APP.check || APP.check.unitId !== unit) return;
+    known.unit = unit;
+    known.list = knownCompute(checks, resolved, links, unit);
+    knownRenderBanner();
+    knownPaintRows();
+  } catch (e) { console.warn('Known problems not loaded:', e); }
+}
+function knownResult(k) { return ((APP.check && APP.check.knownChecked) || []).find(x => x.checkId === k.checkId && x.label === k.label); }
+function knownBannerHTML() {
+  const c = APP.check;
+  if (!c || known.unit !== c.unitId || !known.list.length) return '';
+  const open = known.list.filter(k => !knownResult(k)).length;
+  let h = `<h3>⚠ Known problems on ${escapeHTML(c.unitName)} (${known.list.length})</h3>
+    <div class="kb-sub">${open ? 'Reported on earlier checks and not marked fixed yet. Look at each one and tap Still broken or Now fixed.' : 'All checked. Thanks.'}</div>`;
+  known.list.forEach((k, n) => {
+    const r = knownResult(k), age = Math.floor((Date.now() - new Date(k.at).getTime()) / 86400000);
+    const when = new Date(k.at), whenTxt = `${when.getMonth() + 1}/${when.getDate()} ${String(when.getHours()).padStart(2, '0')}${String(when.getMinutes()).padStart(2, '0')}`;
+    h += `<div class="kb-item${r ? (r.result === 'fixed' ? ' done-fixed' : ' done-broken') : ''}">
+      <div class="kb-label">${escapeHTML(k.label)}</div>
+      <div class="kb-line">${k.state === 'unfixed' ? 'Could not fix' : 'Left open'} · reported by ${escapeHTML(k.crew || 'a crew')} ${whenTxt}${age >= 1 ? ` · open ${age} day${age === 1 ? '' : 's'}` : ''}</div>
+      ${k.notes ? `<div class="kb-line">Crew notes: ${escapeHTML(k.notes)}</div>` : ''}
+      ${k.link && k.link.lastNote ? `<div class="kb-line chief">Latest from the chiefs: ${escapeHTML(k.link.lastNote)}${k.link.lastNoteBy ? ` (${escapeHTML(String(k.link.lastNoteBy).split(' ')[0])})` : ''}</div>` : (k.link ? `<div class="kb-line chief">On the Shift Ops board${k.link.status ? ' · ' + escapeHTML(String(k.link.status).toLowerCase()) : ''}</div>` : '')}
+      ${r ? `<div class="kb-result">${r.result === 'fixed' ? '✓ Marked fixed' : '✗ Still broken, noted'} <a href="#" onclick="knownUndo(${n});return false;" style="font-weight:600;margin-left:6px;">change</a></div>`
+          : `<div class="kb-btns"><button type="button" class="kb-broken" onclick="knownMark(${n}, 'broken')">Still broken</button><button type="button" class="kb-fixed" onclick="knownMark(${n}, 'fixed')">Now fixed</button>${k.key && k.key[0] === 'i' ? `<button type="button" class="kb-go" onclick="knownGo(${n})">Go to it</button>` : ''}</div>`}
+    </div>`;
+  });
+  return h;
+}
+function knownRenderBanner() {
+  const el = document.getElementById('known-banner');
+  if (!el) return;
+  const h = knownBannerHTML();
+  el.innerHTML = h;
+  el.style.display = h ? 'block' : 'none';
+}
+function knownApplyToItem(k, result) {
+  const c = APP.check, key = k.key || '';
+  const note = 'Known problem from ' + (k.crew || 'an earlier check') + ', still broken';
+  if (key.startsWith('i|')) {
+    const parts = key.slice(2).split('|'), cn = parts[0], bn = parts[1], nm = parts.slice(2).join('|');
+    if (!findCompartmentByName(cn)) return;
+    const st = ensureItemState(cn, bn, nm);
+    if (result === 'broken') Object.assign(st, { status: 'abnormal', unfixed: true, fixed: false, known: true, notes: st.notes || note });
+    else if (result === 'fixed') { st.status = 'complete'; st.known = false; st.unfixed = false; }
+    else { st.status = null; st.known = false; }
+  } else if (key.startsWith('r|')) {
+    const q = key.indexOf('|', 2), b = key.slice(2, q), nm = key.slice(q + 1);
+    c[b] = c[b] || {};
+    const st = c[b][nm] = c[b][nm] || {};
+    if (result === 'broken') Object.assign(st, { status: 'bad', unfixed: true, fixed: false, known: true, notes: st.notes || note });
+    else if (result === 'fixed') { st.status = 'wnl'; st.known = false; st.unfixed = false; }
+    else { st.status = null; st.known = false; }
+  }
+}
+async function knownMark(n, result) {
+  const c = APP.check, k = known.list[n];
+  if (!c || !k) return;
+  c.knownChecked = (c.knownChecked || []).filter(x => !(x.checkId === k.checkId && x.label === k.label));
+  c.knownChecked.push({ checkId: k.checkId, label: k.label, key: k.key || '', result });
+  knownApplyToItem(k, result);
+  knownRenderBanner();
+  liveRepaint([]);
+  if (result === 'fixed') {
+    const rec = { checkId: k.checkId, label: k.label, by: (c.initials || 'Crew').trim(), at: new Date().toISOString(), note: `Crew found it fixed at the ${c.unitName} check` };
+    try { const db = await fbReady(); await fbFs.setDoc(fbFs.doc(db, 'vehicleResolved', knownResKey(k.checkId, k.label)), rec); }
+    catch (e) { console.warn('Fixed mark not sent yet; it also rides along with the check log', e); }
+  }
+}
+function knownUndo(n) {
+  const c = APP.check, k = known.list[n]; if (!c || !k) return;
+  c.knownChecked = (c.knownChecked || []).filter(x => !(x.checkId === k.checkId && x.label === k.label));
+  knownApplyToItem(k, 'clear');
+  knownRenderBanner(); liveRepaint([]);
+}
+function knownGo(n) {
+  const k = known.list[n]; if (!k || !k.key) return;
+  const parts = k.key.slice(2).split('|'), cn = parts[0], bn = parts[1], nm = parts.slice(2).join('|');
+  const card = [...document.querySelectorAll('.compartment-card')].find(cd => cd.dataset.compartment === cn); if (!card) return;
+  const comp = findCompartmentByName(cn), safeId = card.id.replace(/^comp-/, '');
+  renderCompartmentBody(safeId, comp); card.classList.add('open');
+  const row = [...card.querySelectorAll('.item-row')].find(r => r.dataset.item === nm && r.dataset.bag === bn);
+  if (row) { revealForPrompt(row); row.scrollIntoView({ behavior: 'smooth', block: 'center' }); row.style.outline = '3px solid var(--warn)'; setTimeout(() => { row.style.outline = ''; }, 1600); }
+}
+function knownPaintRows() {
+  const keys = new Set(known.list.filter(k => k.key && k.key[0] === 'i').map(k => k.key));
+  document.querySelectorAll('#check-body .item-row').forEach(row => {
+    row.classList.toggle('known-row', keys.has(`i|${row.dataset.comp}|${row.dataset.bag}|${row.dataset.item}`));
+  });
 }
 
 function buildSummary() {
@@ -4665,6 +4961,13 @@ function buildSummary() {
         const short = n.par - n.count;
         lines.push(`  ${n.name}: ${n.count} / ${n.par}${short > 0 ? ` (short ${short})` : ' ✓'}${narcLow(n.count, n.par) ? ' ⚠ NOT ENOUGH' : ''}`);
       });
+      lines.push('');
+    }
+
+    // Known problems carried over from earlier checks
+    if ((c.knownChecked || []).length) {
+      lines.push('Known problems from earlier checks:');
+      c.knownChecked.forEach(k => lines.push(`  ${k.label}: ${k.result === 'fixed' ? 'Crew found it fixed ✓' : 'Still broken ⚠'}`));
       lines.push('');
     }
 

@@ -2,7 +2,7 @@
 
 Equipment and property check submission tool for North Country EMS crews.
 
-**Version 2.15**
+**Version 2.16**
 
 ## Links
 
@@ -40,7 +40,7 @@ Every submitted check also saves a short record to Firebase (project `ncems-hub-
 
 ## Live share (two people, one rig)
 
-When two crew members check the same ambulance on the same day, each phone shows the other person's marks as they go, tagged with their first name, plus a "Live with ..." banner at the top. Stored in Firebase collection `liveChecks`, one doc per unit per day (`M19_2026-10-14`). The newest mark wins, so nobody's work gets overwritten by an older tap. Each person still submits their own check. If Firebase can't be reached, the check works exactly like before, just without the sharing. Needs the `liveChecks` line in the Firebase rules:
+When two crew members check the same ambulance on the same day, each phone shows the other person's marks as they go, tagged with their first name, plus a "Live with ..." banner at the top. Stored in Firebase collection `liveChecks`, one doc per unit per day (`M19_2026-10-14`). Since 2.16 an issue beats Normal: if either person marks something ✗ (Abnormal, Overfilled, No), it stays that way no matter who tapped last, and the other phone shows "Flagged by" with their name. Only the person who flagged it can switch it back, or anyone can check Fixed on the spot. Two issues on the same item keep both people's notes. For O2, fuel, DEF and narc counts, the lower number wins. Each person still submits their own check. If Firebase can't be reached, the check works exactly like before, just without the sharing. Needs the `liveChecks` line in the Firebase rules:
 
 ```
 rules_version = '2';
@@ -52,9 +52,14 @@ service cloud.firestore {
     match /vehicleStatus/{unit} { allow read: if true; allow create, update: if request.resource.data.oos is bool && request.resource.data.by is string; }
     match /vehicleResolved/{id} { allow read: if true; allow create, update: if request.resource.data.checkId is string && request.resource.data.by is string; }
     match /liveChecks/{id} { allow read: if true; allow create, update: if request.resource.data.unit is string && request.resource.data.date is string && request.resource.data.updatedAt is number; }
+    match /vehicleLinks/{id} { allow read: if true; allow create, update: if request.resource.data.checkId is string && request.resource.data.label is string; }
   }
 }
 ```
+
+## Known problems (carried over)
+
+When a crew opens a check, the app looks up every problem reported on earlier checks of that rig (last 45 days) that nobody has marked fixed, and shows them at the top with the crew notes and the latest note from the chiefs (from the linked Shift Ops card). The crew taps **Still broken** (the item gets marked ✗ and tagged as a known problem, so it isn't counted as a new report) or **Now fixed** (writes a fixed mark to `vehicleResolved`, which also completes the linked Shift Ops card in CG Staff). Low fuel and DEF don't carry over. Reads `vehicleChecks`, `vehicleResolved` and `vehicleLinks`.
 
 ## When the email goes out
 
@@ -64,6 +69,14 @@ service cloud.firestore {
 - These live in `units.json` under `sendRule` (`minPct`, `holdUntil`)
 
 ## Changelog
+
+### v2.16
+- Known problems: anything reported on an earlier check and not fixed yet shows at the top of the next check, with the latest note from the chiefs. Still broken or Now fixed, plus Go to it
+- Live share: an issue beats Normal. Only the person who flagged it can clear it (or check Fixed on the spot). Two issues keep both sets of notes. Lower O2, fuel, DEF and narc numbers win
+- The whole check (same text as the email) is saved with the log, so CG Staff can show the Full check
+- Every logged issue carries a key, so CG Staff and the next crew can match it to the exact item
+- What's new card on the home screen, once per version. The (i) button opens it any time
+- Home screen footer shows the app's own version. If units.json is a different version it says "list" with that number
 
 ### v2.15
 - Sends now at 75% (was 90%). Under 75% holds until 11:00 AM (was 5:00 PM)
