@@ -1,5 +1,5 @@
 {
-  "version": "2.17",
+  "version": "2.18",
   "submissionEmail": "d.boyce@northcountryems.org",
   "emailjs": {
     "serviceId": "service_uqfd3sj",
@@ -755,11 +755,6 @@
                   "ctrl": false
                 },
                 {
-                  "name": "Stethoscope",
-                  "qty": 1,
-                  "ctrl": false
-                },
-                {
                   "name": "Syringe 10cc",
                   "qty": 2,
                   "ctrl": false
@@ -848,31 +843,6 @@
           "name": "Med Vault",
           "items": [
             {
-              "name": "EZ IO Blue Needle",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "EZ IO Drill",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "EZ IO Pink Needle",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "EZ IO Stabilizer",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "EZ IO Yellow Needle",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
               "name": "Fentanyl",
               "qty": 8,
               "ctrl": true,
@@ -942,11 +912,6 @@
             {
               "name": "O2 Wall regulator with tree",
               "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "Stethoscope",
-              "qty": 1,
               "ctrl": false
             },
             {
@@ -1953,11 +1918,6 @@
               "ctrl": false
             },
             {
-              "name": "Stethoscope",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
               "name": "Small Sharps Container",
               "qty": 1,
               "ctrl": false
@@ -2169,11 +2129,6 @@
               "name": "Invasive and Rescue Airway Pocket",
               "items": [
                 {
-                  "name": "EZ IO Kit",
-                  "qty": 1,
-                  "ctrl": false
-                },
-                {
                   "name": "IGel #3",
                   "qty": 1,
                   "ctrl": false
@@ -2185,11 +2140,6 @@
                 },
                 {
                   "name": "IGel #5",
-                  "qty": 1,
-                  "ctrl": false
-                },
-                {
-                  "name": "Video Laryngoscope Kit (CMAC or King Vision)",
                   "qty": 1,
                   "ctrl": false
                 }
@@ -2784,6 +2734,67 @@
             }
           ],
           "operationalCheck": "Turns on and has suction when not plugged in"
+        },
+        {
+          "name": "EZ IO Kit",
+          "items": [
+            {
+              "name": "EZ IO Pink Needle",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "EZ IO Blue Needle",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "EZ IO Yellow Needle",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "EZ Connect (lock)",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "EZ IO Stabilizer",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "EZ IO Driver",
+              "qty": 1,
+              "ctrl": false
+            }
+          ]
+        },
+        {
+          "name": "CMAC Kit",
+          "items": [
+            {
+              "name": "CMAC Camera Unit",
+              "qty": 1,
+              "ctrl": false,
+              "operationalCheck": "Turns on"
+            },
+            {
+              "name": "Size 3 Blade",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Size 4 Blade",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "D Blade",
+              "qty": 1,
+              "ctrl": false
+            }
+          ]
         }
       ],
       "cabArea": {
@@ -3426,11 +3437,6 @@
                   "ctrl": false
                 },
                 {
-                  "name": "Stethoscope",
-                  "qty": 1,
-                  "ctrl": false
-                },
-                {
                   "name": "Syringe 10cc",
                   "qty": 2,
                   "ctrl": false
@@ -3514,31 +3520,6 @@
           "name": "Med Vault",
           "items": [
             {
-              "name": "EZ IO Blue Needle",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "EZ IO Drill",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "EZ IO Pink Needle",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "EZ IO Stabilizer",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "EZ IO Yellow Needle",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
               "name": "Fentanyl",
               "qty": 8,
               "ctrl": true,
@@ -3601,18 +3582,18 @@
           "name": "Action Area",
           "items": [
             {
-              "name": "IPad, Phone, Tuff Book, Chargers, electric stethoscope",
+              "name": "iPad, Phone, Toughbook, Chargers",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Electronic Stethoscope",
               "qty": 1,
               "ctrl": false
             },
             {
               "name": "O2 Wall regulator with tree",
               "qty": 2,
-              "ctrl": false
-            },
-            {
-              "name": "Stethoscope",
-              "qty": 1,
               "ctrl": false
             },
             {
@@ -4604,11 +4585,6 @@
               "ctrl": false
             },
             {
-              "name": "Stethoscope",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
               "name": "Small Sharps Container",
               "qty": 1,
               "ctrl": false
@@ -4825,11 +4801,6 @@
               "name": "Invasive and Rescue Airway Pocket",
               "items": [
                 {
-                  "name": "EZ IO Kit",
-                  "qty": 1,
-                  "ctrl": false
-                },
-                {
                   "name": "IGel #3",
                   "qty": 1,
                   "ctrl": false
@@ -4841,11 +4812,6 @@
                 },
                 {
                   "name": "IGel #5",
-                  "qty": 1,
-                  "ctrl": false
-                },
-                {
-                  "name": "Video Laryngoscope Kit (CMAC or King Vision)",
                   "qty": 1,
                   "ctrl": false
                 }
@@ -5444,6 +5410,67 @@
             }
           ],
           "operationalCheck": "Turns on and has suction when not plugged in"
+        },
+        {
+          "name": "EZ IO Kit",
+          "items": [
+            {
+              "name": "EZ IO Pink Needle",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "EZ IO Blue Needle",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "EZ IO Yellow Needle",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "EZ Connect (lock)",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "EZ IO Stabilizer",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "EZ IO Driver",
+              "qty": 1,
+              "ctrl": false
+            }
+          ]
+        },
+        {
+          "name": "CMAC Kit",
+          "items": [
+            {
+              "name": "CMAC Camera Unit",
+              "qty": 1,
+              "ctrl": false,
+              "operationalCheck": "Turns on"
+            },
+            {
+              "name": "Size 3 Blade",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Size 4 Blade",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "D Blade",
+              "qty": 1,
+              "ctrl": false
+            }
+          ]
         }
       ],
       "cabArea": {
@@ -6146,11 +6173,6 @@
                   "ctrl": false
                 },
                 {
-                  "name": "Stethoscope",
-                  "qty": 1,
-                  "ctrl": false
-                },
-                {
                   "name": "Syringe 10cc",
                   "qty": 2,
                   "ctrl": false
@@ -6190,26 +6212,6 @@
         {
           "name": "Med Vault",
           "items": [
-            {
-              "name": "EZ IO Blue Needle",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "EZ IO Drill",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "EZ IO Pink Needle",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "EZ IO Yellow Needle",
-              "qty": 1,
-              "ctrl": false
-            },
             {
               "name": "Fentanyl",
               "qty": 8,
@@ -6795,7 +6797,7 @@
               "ctrl": false
             },
             {
-              "name": "Stethoscope",
+              "name": "Electronic Stethoscope",
               "qty": 1,
               "ctrl": false
             }
@@ -7361,11 +7363,6 @@
               "ctrl": false
             },
             {
-              "name": "Stethoscope",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
               "name": "Small Sharps Container",
               "qty": 1,
               "ctrl": false
@@ -7582,11 +7579,6 @@
               "name": "Invasive and Rescue Airway Pocket",
               "items": [
                 {
-                  "name": "EZ IO Kit",
-                  "qty": 1,
-                  "ctrl": false
-                },
-                {
                   "name": "IGel #3",
                   "qty": 1,
                   "ctrl": false
@@ -7598,11 +7590,6 @@
                 },
                 {
                   "name": "IGel #5",
-                  "qty": 1,
-                  "ctrl": false
-                },
-                {
-                  "name": "Video Laryngoscope Kit (CMAC or King Vision)",
                   "qty": 1,
                   "ctrl": false
                 }
@@ -7872,6 +7859,67 @@
           "items": [
             {
               "name": "Gloves (S,M,L)",
+              "qty": 1,
+              "ctrl": false
+            }
+          ]
+        },
+        {
+          "name": "EZ IO Kit",
+          "items": [
+            {
+              "name": "EZ IO Pink Needle",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "EZ IO Blue Needle",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "EZ IO Yellow Needle",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "EZ Connect (lock)",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "EZ IO Stabilizer",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "EZ IO Driver",
+              "qty": 1,
+              "ctrl": false
+            }
+          ]
+        },
+        {
+          "name": "CMAC Kit",
+          "items": [
+            {
+              "name": "CMAC Camera Unit",
+              "qty": 1,
+              "ctrl": false,
+              "operationalCheck": "Turns on"
+            },
+            {
+              "name": "Size 3 Blade",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Size 4 Blade",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "D Blade",
               "qty": 1,
               "ctrl": false
             }
@@ -8522,11 +8570,6 @@
                   "ctrl": false
                 },
                 {
-                  "name": "Stethoscope",
-                  "qty": 1,
-                  "ctrl": false
-                },
-                {
                   "name": "Syringe 10cc",
                   "qty": 2,
                   "ctrl": false
@@ -8566,26 +8609,6 @@
         {
           "name": "Med Vault",
           "items": [
-            {
-              "name": "EZ IO Blue Needle",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "EZ IO Drill",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "EZ IO Pink Needle",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "EZ IO Yellow Needle",
-              "qty": 1,
-              "ctrl": false
-            },
             {
               "name": "Fentanyl",
               "qty": 8,
@@ -8654,7 +8677,12 @@
               "ctrl": false
             },
             {
-              "name": "IPad, Phone, Tuff Book, Chargers, electric stethoscope",
+              "name": "iPad, Phone, Toughbook, Chargers",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Electronic Stethoscope",
               "qty": 1,
               "ctrl": false
             },
@@ -9620,11 +9648,6 @@
               "ctrl": false
             },
             {
-              "name": "Stethoscope",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
               "name": "Small Sharps Container",
               "qty": 1,
               "ctrl": false
@@ -9841,11 +9864,6 @@
               "name": "Invasive and Rescue Airway Pocket",
               "items": [
                 {
-                  "name": "EZ IO Kit",
-                  "qty": 1,
-                  "ctrl": false
-                },
-                {
                   "name": "IGel #3",
                   "qty": 1,
                   "ctrl": false
@@ -9857,11 +9875,6 @@
                 },
                 {
                   "name": "IGel #5",
-                  "qty": 1,
-                  "ctrl": false
-                },
-                {
-                  "name": "Video Laryngoscope Kit (CMAC or King Vision)",
                   "qty": 1,
                   "ctrl": false
                 }
@@ -10279,6 +10292,67 @@
             },
             {
               "name": "portable suction",
+              "qty": 1,
+              "ctrl": false
+            }
+          ]
+        },
+        {
+          "name": "EZ IO Kit",
+          "items": [
+            {
+              "name": "EZ IO Pink Needle",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "EZ IO Blue Needle",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "EZ IO Yellow Needle",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "EZ Connect (lock)",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "EZ IO Stabilizer",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "EZ IO Driver",
+              "qty": 1,
+              "ctrl": false
+            }
+          ]
+        },
+        {
+          "name": "CMAC Kit",
+          "items": [
+            {
+              "name": "CMAC Camera Unit",
+              "qty": 1,
+              "ctrl": false,
+              "operationalCheck": "Turns on"
+            },
+            {
+              "name": "Size 3 Blade",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Size 4 Blade",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "D Blade",
               "qty": 1,
               "ctrl": false
             }
@@ -10893,11 +10967,6 @@
                   "ctrl": false
                 },
                 {
-                  "name": "Stethoscope",
-                  "qty": 1,
-                  "ctrl": false
-                },
-                {
                   "name": "Syringe 10cc",
                   "qty": 2,
                   "ctrl": false
@@ -10937,26 +11006,6 @@
         {
           "name": "Med Vault",
           "items": [
-            {
-              "name": "EZ IO Blue Needle",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "EZ IO Drill",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "EZ IO Pink Needle",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "EZ IO Yellow Needle",
-              "qty": 1,
-              "ctrl": false
-            },
             {
               "name": "Fentanyl",
               "qty": 8,
@@ -11020,7 +11069,12 @@
           "name": "Action Area",
           "items": [
             {
-              "name": "IPad, Phone, Tuff Book, Chargers, electric stethoscope",
+              "name": "iPad, Phone, Toughbook, Chargers",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Electronic Stethoscope",
               "qty": 1,
               "ctrl": false
             },
@@ -11928,11 +11982,6 @@
               "ctrl": false
             },
             {
-              "name": "Stethoscope",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
               "name": "Small Sharps Container",
               "qty": 1,
               "ctrl": false
@@ -12149,11 +12198,6 @@
               "name": "Invasive and Rescue Airway Pocket",
               "items": [
                 {
-                  "name": "EZ IO Kit",
-                  "qty": 1,
-                  "ctrl": false
-                },
-                {
                   "name": "IGel #3",
                   "qty": 1,
                   "ctrl": false
@@ -12165,11 +12209,6 @@
                 },
                 {
                   "name": "IGel #5",
-                  "qty": 1,
-                  "ctrl": false
-                },
-                {
-                  "name": "Video Laryngoscope Kit (CMAC or King Vision)",
                   "qty": 1,
                   "ctrl": false
                 }
@@ -12772,6 +12811,67 @@
             },
             {
               "name": "Safety Vest",
+              "qty": 1,
+              "ctrl": false
+            }
+          ]
+        },
+        {
+          "name": "EZ IO Kit",
+          "items": [
+            {
+              "name": "EZ IO Pink Needle",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "EZ IO Blue Needle",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "EZ IO Yellow Needle",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "EZ Connect (lock)",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "EZ IO Stabilizer",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "EZ IO Driver",
+              "qty": 1,
+              "ctrl": false
+            }
+          ]
+        },
+        {
+          "name": "CMAC Kit",
+          "items": [
+            {
+              "name": "CMAC Camera Unit",
+              "qty": 1,
+              "ctrl": false,
+              "operationalCheck": "Turns on"
+            },
+            {
+              "name": "Size 3 Blade",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "Size 4 Blade",
+              "qty": 1,
+              "ctrl": false
+            },
+            {
+              "name": "D Blade",
               "qty": 1,
               "ctrl": false
             }

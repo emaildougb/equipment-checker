@@ -2,7 +2,7 @@
 
 Equipment and property check submission tool for North Country EMS crews.
 
-**Version 2.17**
+**Version 2.18**
 
 ## Links
 
@@ -69,6 +69,20 @@ When a crew opens a check, the app looks up every problem reported on earlier ch
 - These live in `units.json` under `sendRule` (`minPct`, `holdUntil`)
 
 ## Changelog
+
+### v2.18
+- Compartments sort numbers and letters first (1, 2, 3 / A, B, C), then everything else A to Z
+- Kits group: LifePak 35, Medication Kit, Airway Bag, Pediatric I-Gels, Portable Suction, EZ IO Kit, CMAC Kit (any interior compartment named like these, or marked `"kit": true`)
+- Cab section holds fuel, DEF and the cab items, all open (no second Cab dropdown). Tire pressure moved inside Mechanical & Lights
+- Fuel and DEF colors: Full green, ¾ yellow, ½ orange, ¼ red
+- Engine oil and transmission: Normal or Abnormal. Abnormal opens Overfilled, notes, Fixed or Unable to fix, and a Save note button. Enter closes the keyboard on any note box
+- Sealed transmission note only shows on rigs listed in `sealedTransmission` (25A, 25B)
+- Mandatory items: light red box and red dot on the row itself once you open it. Main screen just shows the asterisk
+- To Complete popup lists what's missing; tap anywhere on it to close and jump to the first one (cursor lands in the box)
+- Fixed on the spot needs no note. Unable to fix needs a reason before Submit
+- Outstanding button on any row with an unfixed known problem (items and mechanical/fluid rows); tap for notes and Still broken / Now fixed
+- Compartment and bag arrows point right when closed, down when open
+- units.json 2.18, all ambulances: EZ IO Kit (pink, blue, yellow needles, EZ Connect lock, stabilizer, driver; moved out of the Med Vault), CMAC Kit (camera unit with turns on check, size 3, size 4, D blade), the old EZ IO Kit and Video Laryngoscope lines removed from the airway bag, regular stethoscopes removed and one Electronic Stethoscope per rig (M19 gets it in Compartment E)
 
 ### v2.17
 - Live share simplified: no names, no "Live with" banner, no flashing rows. Only the checkmarks sync. Fixes the banner saying you were live with yourself after deleting and re-adding the icon or opening the rig on a second screen

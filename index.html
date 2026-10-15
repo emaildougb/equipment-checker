@@ -291,11 +291,14 @@
     .kb-btns .kb-fixed { border-color: var(--g-accent); color: var(--g-mid); }
     .kb-btns .kb-go { flex: 0 0 auto; color: var(--info); }
     .kb-result { font-size: 13px; font-weight: 800; margin-top: 6px; }
-    .item-row.known-row .item-name::after { content: 'Known problem'; display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 10px; background: #FFF0D6; color: var(--warn); font-size: 11px; font-weight: 800; vertical-align: middle; }
+    .known-btn { display: inline-block; margin-left: 6px; padding: 2px 9px; border-radius: 10px; border: 1.5px solid var(--warn); background: #FFF0D6; color: var(--warn); font: inherit; font-size: 11px; font-weight: 800; vertical-align: middle; cursor: pointer; text-transform: none; letter-spacing: 0; }
+    .known-btn.ok { border-color: var(--g-mid); background: var(--g-pale); color: var(--g-deep); }
+    .known-btn.still { border-color: var(--bad); background: #FBEAEA; color: var(--bad); }
     .by-tag.flag { background: #FBEAEA; color: var(--bad); }
 
     /* ============ 2.15 additions ============ */
     .hood-note { margin: 0 0 10px; padding: 10px 12px; background: #EAF2F8; border-left: 3px solid var(--info); border-radius: 8px; font-size: 13px; line-height: 1.45; color: var(--text); }
+    .note-done { margin-top: 8px; padding: 8px 14px; border: 0; border-radius: 8px; background: var(--g-mid); color: #fff; font: inherit; font-size: 14px; font-weight: 800; cursor: pointer; }
     .fluid-desc { width: 100%; margin-top: 8px; padding: 9px 10px; border: 1.5px solid var(--border); border-radius: 8px; font: inherit; font-size: 14px; background: var(--white); }
     .check-btn.over.active { background: var(--warn); border-color: var(--warn); color: #fff; }
     .sec-notes { margin-top: 10px; }
@@ -488,8 +491,6 @@
     }
     /* 2.17: anything mandatory and not done yet gets a light red box */
     .req-pending { box-shadow: 0 0 0 2px #E9A3A3 inset !important; background-color: #FDF0F0 !important; border-radius: 10px; }
-    .compartment-card.req-wrap, .bag-card.req-wrap { box-shadow: 0 0 0 2px #E9A3A3 !important; background-color: #FFF7F7; }
-    .section.collapsible.collapsed.req-sec > .section-head { box-shadow: 0 0 0 2px #E9A3A3 inset; background: #FDF0F0; }
     .section.collapsible > .section-head { cursor: pointer; user-select: none; -webkit-user-select: none; }
     .section.collapsible > .section-head .sec-right { display: flex; align-items: center; gap: 8px; margin-left: auto; }
     .section.collapsible > .section-head .sec-badge { font-size: 11px; font-weight: 800; letter-spacing: 0; text-transform: none; color: var(--muted); }
@@ -661,6 +662,14 @@
       gap: 2px;
     }
     .fuel-btn small { font-size: 11px; font-weight: 600; opacity: 0.7; }
+    .fuel-btn.lvl-4 { border-color: #7fb07f; } .fuel-btn.lvl-3 { border-color: #e2c45a; } .fuel-btn.lvl-2 { border-color: #eda35a; } .fuel-btn.lvl-1 { border-color: #e08a8a; }
+    .fuel-btn.lvl-4.active { background: #2E7D32 !important; border-color: #2E7D32 !important; color: #fff !important; }
+    .fuel-btn.lvl-3.active { background: #E5B800 !important; border-color: #E5B800 !important; color: #222 !important; }
+    .fuel-btn.lvl-2.active { background: #E67E22 !important; border-color: #E67E22 !important; color: #fff !important; }
+    .fuel-btn.lvl-1.active { background: #C0392B !important; border-color: #C0392B !important; color: #fff !important; }
+    .compartment-card.pinned { border: 0; box-shadow: none; background: transparent; }
+    .compartment-card.pinned > .compartment-head { cursor: default; padding-top: 0; }
+    .compartment-card.pinned > .compartment-head .compartment-name, .compartment-card.pinned > .compartment-head .compartment-expand { display: none; }
     .fuel-btn:active { transform: scale(0.96); }
     .fuel-btn.active {
       background: var(--warn);
@@ -809,7 +818,8 @@
       width: 28px;
       text-align: center;
     }
-    .compartment-card.open .compartment-expand { transform: rotate(180deg); }
+    .compartment-expand { transform: rotate(-90deg); transition: transform .15s; }
+    .compartment-card.open .compartment-expand { transform: rotate(0deg); }
     .compartment-body { display: none; padding: 0 14px 14px; }
     .compartment-card.open .compartment-body { display: block; }
     .compartment-status-row {
@@ -944,7 +954,8 @@
       width: 24px;
       text-align: center;
     }
-    .bag-card.open .bag-expand { transform: rotate(180deg); }
+    .bag-expand { transform: rotate(-90deg); transition: transform .15s; }
+    .bag-card.open .bag-expand { transform: rotate(0deg); }
     .bag-body { display: none; padding: 8px 12px 12px; }
     .bag-card.open .bag-body { display: block; }
     .lazy-placeholder { padding: 10px; color: var(--muted); font-size: 13px; text-align: center; }
@@ -1423,6 +1434,26 @@
 <body>
 
 <!-- ============ WHAT'S NEW ============ -->
+<div class="wn-scrim" id="kpop" hidden onclick="if(event.target===this)knownPopClose()">
+  <div class="wn-card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+      <div><div class="wn-ver">Outstanding item</div><h2 id="kpop-title" style="font-size:19px;margin:4px 0 10px"></h2></div>
+      <button type="button" onclick="knownPopClose()" aria-label="Close" style="border:0;background:var(--g-pale);color:var(--g-deep);font-weight:800;border-radius:8px;padding:6px 10px;font-size:15px;cursor:pointer">✕</button>
+    </div>
+    <ul class="wn-list" id="kpop-body"></ul>
+    <div class="kb-btns" id="kpop-btns" style="margin-top:12px"></div>
+  </div>
+</div>
+<div class="wn-scrim" id="needs-pop" hidden onclick="needsGo()">
+  <div class="wn-card" style="cursor:pointer">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px">
+      <h2 id="needs-title" style="font-size:19px;margin:0 0 10px">Fill these out</h2>
+      <button type="button" onclick="event.stopPropagation();needsGo()" aria-label="Close" style="border:0;background:var(--g-pale);color:var(--g-deep);font-weight:800;border-radius:8px;padding:6px 10px;font-size:15px;cursor:pointer">✕</button>
+    </div>
+    <ul class="wn-list" id="needs-list"></ul>
+    <div style="margin-top:12px;font-size:13px;color:var(--muted)">Tap anywhere to go to it.</div>
+  </div>
+</div>
 <div class="wn-scrim" id="whatsnew" hidden onclick="if(event.target===this)closeWhatsNew()">
   <div class="wn-card" role="dialog" aria-labelledby="wn-title">
     <div class="wn-ver" id="wn-ver"></div>
@@ -1578,7 +1609,7 @@
    APP STATE
    ============================================================ */
 const APP = {
-  version: '2.17',
+  version: '2.18',
   data: null,        // loaded units.json
   screen: 'home',
   check: null,       // current in-progress check
@@ -1690,14 +1721,15 @@ function msalSignOut() {
 
 function showAppInfo() { showWhatsNew(true); }
 const WHATS_NEW = [
-  ['Known problems', 'If something on your rig was reported on an earlier check and nobody has fixed it yet, it shows at the top of your check with the latest note from the chiefs. Tap Still broken or Now fixed. No need to write it up again.'],
-  ['Checking with a partner, simpler', 'Your partner\'s checkmarks still show up on your phone as they go. No more names, banner or flashing. If either phone marks something ✗, it stays ✗ until it\'s fixed.'],
-  ['Fridge in °F', 'The fridge thermometer reading is now in Fahrenheit. Good is 39 to 48°F.'],
-  ['Portable O2 PSI', 'The portable O2 in the middle airway bag gets its own PSI box. Under 500 PSI, swap the cylinder.'],
-  ['Everything folds up', 'Every section on the check now folds. Tap a header to open or close it. Closed sections show how many are done, or a ✓ when finished.'],
-  ['Evening checks', 'Checks done after 5 PM now save under the right date.'],
-  ['The lower number wins', 'If you and your partner put in different O2, fuel, DEF or narc numbers, the lower one is kept.'],
-  ['From 2.15', 'O2 is the actual PSI (under 500, exchange it). Oil and transmission have Overfilled and a describe it box. DEF gauge. Belts, fan and battery. Narc counts with pars. Other notes box everywhere. ABC button on the med kit.']
+  ['Easier to find things', 'Compartments go in order (1, 2, 3 and A, B, C), then everything else A to Z. LifePak 35, Med Kit, Airway Bag, Ped I-Gels, Portable Suction, EZ IO and CMAC are now their own Kits group.'],
+  ['Cab', 'Fuel and DEF are in the Cab section now, along with the cab items, all open. Fuel colors: Full green, ¾ yellow, ½ orange, ¼ red.'],
+  ['Tire pressure', 'Now inside Mechanical & Lights, open and ready to tap.'],
+  ['Engine oil', 'Just Normal or Abnormal. Abnormal opens a box with Overfilled, notes on color and thickness, and Fixed or Unable to fix.'],
+  ['Must do items', 'Anything mandatory (red tags, LifePak self test, suction, O2 PSI) has a light red box and a red dot until it\'s done. Tap the popup anywhere to jump right to it.'],
+  ['Unable to fix', 'Needs a reason before you can submit. Fixed on the spot doesn\'t need a note.'],
+  ['Outstanding items', 'Anything reported earlier and not fixed yet has an Outstanding button on its row. Tap it to see the notes and mark it Still broken or Now fixed.'],
+  ['New kits', 'EZ IO kit (pink, blue and yellow needles, EZ Connect, stabilizer, driver) and CMAC kit (camera turns on, size 3, size 4 and D blades). One stethoscope now: the electronic one.'],
+  ['Everything folds', 'Tap a section header to open or close it. Arrows point right when closed and down when open.']
 ];
 function showWhatsNew(force) {
   let seen = '';
@@ -2268,7 +2300,8 @@ function repaintRestoredState() {
       if (!st.status) { const r0 = document.querySelector(`.check-row[data-key="${cssEscape(key)}"][data-bucket="${bucket}"]`); if (r0) r0.querySelectorAll('.check-btn').forEach(b => b.classList.remove('active')); return; }
       const row = document.querySelector(`.check-row[data-key="${cssEscape(key)}"][data-bucket="${bucket}"]`);
       if (!row) return;
-      row.querySelectorAll('.check-btn').forEach(b => b.classList.toggle('active', b.dataset.status === st.status));
+      row.querySelectorAll('.check-btn').forEach(b => b.classList.toggle('active', b.dataset.status === st.status || (st.status === 'over' && b.dataset.status === 'bad')));
+      const ovr = row.querySelector('[data-over]'); if (ovr) ovr.checked = st.status === 'over';
       const safeKey = key.replace(/[^a-zA-Z0-9]/g, '_');
       const det = document.getElementById('detail-' + safeKey);
       if (det) {
@@ -2323,7 +2356,7 @@ function startAmbulanceCheck(unitId) {
     opChecks: {},      // { 'comp||bag||item': 'yes'|'no' }
     // compartments: { compName: { items: {itemName: {status, notes, fixed}}, bags: { bagName: { items: {...} } } } }
     compartments: {},
-    _comps: comps,
+    _comps: arrangeComps(comps),
     _cabArea: comps.cabArea || null,
   };
   allComps(APP.check).forEach(co => {
@@ -2355,16 +2388,16 @@ function renderAmbulanceCheck() {
     ${renderMechanicalSection()}
     ${renderCabSection()}
     ${renderFluidsSection()}
-    ${renderFuelSection()}
-    ${renderTireSection()}
     ${renderCompartmentSection('Exterior Compartments', 'exterior', c._comps.exterior)}
     ${renderCompartmentSection('Interior Compartments', 'interior', c._comps.interior)}
+    ${(c._comps.kits || []).length ? renderCompartmentSection('Kits', 'kits', c._comps.kits) : ''}
     <div class="submit-wrap">
       <button type="button" id="submit-flags" style="display:none;width:100%;margin-bottom:10px;padding:12px;font-family:inherit;font-size:15px;font-weight:800;color:var(--warn);background:var(--warn-bg);border:1.5px solid var(--warn);border-radius:10px;cursor:pointer;" onclick="cycleToNextFlag()"></button>
       <button class="submit-btn" id="submit-btn" onclick="showSubmitModal()">Submit Check</button>
     </div>
   `;
   attachAmbulanceHandlers();
+  if (c._cabArea && document.getElementById('comp-body-cabarea')) renderCompartmentBody('cabarea', c._cabArea);   // Cab items sit open right in the Cab section
   makeSectionsCollapsible();
   if (typeof livePaintBanner === 'function' && live.docId) { livePaintBanner(); }
 }
@@ -2376,8 +2409,12 @@ function renderCabSection() {
   const safeId = 'cabarea';
   return `
     <div class="section"><div class="section-head">Cab</div>
-    <div class="compartment-list">
-      ${renderCompartmentCard(safeId, cab, 'cab')}
+    <div class="section-body">
+      ${fuelPickerHTML()}
+      ${defRowHTML()}
+    </div>
+    <div class="compartment-list cab-inline">
+      ${renderCompartmentCard(safeId, cab, 'cab').replace('class="compartment-card"', 'class="compartment-card pinned open"')}
     </div></div>`;
 }
 
@@ -2545,6 +2582,7 @@ function renderMechanicalSection() {
   APP.data.mechanicalChecks.forEach(item => {
     html += renderWNLRow(item, item, 'mechanical');
   });
+  html += tireInnerHTML();          // 2.18: tire pressure lives here, open, no dropdown
   html += sectionNotesHTML('Mechanical & Lights');
   html += `</div></div>`;
   return html;
@@ -2577,7 +2615,7 @@ function isSealedTransmission(item) {
 
 function renderFluidsSection() {
   let html = `<div class="section"><div class="section-head">Under the Hood</div><div class="section-body">
-    <div class="hood-note">🔥 Warm the engine up first so the readings are accurate. Closed (sealed) transmissions can't be checked with a dipstick, so leave those alone.</div>`;
+    <div class="hood-note">🔥 Warm the engine up first so the readings are accurate.${(APP.data.sealedTransmission || []).includes(APP.check?.unitId) ? ' This rig has a closed (sealed) transmission that can\'t be checked with a dipstick, so leave it alone.' : ''}</div>`;
   APP.data.fluidChecks.forEach(item => {
     if (isSealedTransmission(item)) {
       html += `<div class="check-row" style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
@@ -2588,16 +2626,6 @@ function renderFluidsSection() {
     }
     html += isTextFluid(item) ? renderFluidRow(item) : renderWNLRow(item, item, 'fluids');
   });
-  html += `
-    <div class="check-row" data-def-row>
-      <div class="check-label" style="margin-bottom:8px;">DEF level</div>
-      <div class="fuel-picker" id="def-picker">
-        <button class="fuel-btn def-btn" data-def="25">¼<small>25%</small></button>
-        <button class="fuel-btn def-btn" data-def="50">½<small>50%</small></button>
-        <button class="fuel-btn def-btn" data-def="75">¾<small>75%</small></button>
-        <button class="fuel-btn def-btn full" data-def="100">Full<small>100%</small></button>
-      </div>
-    </div>`;
   (APP.data.underHoodChecks || []).forEach(item => { html += renderWNLRow(item, item, 'underHood'); });
   html += sectionNotesHTML('Under the Hood');
   html += `</div></div>`;
@@ -2614,15 +2642,15 @@ function renderFluidRow(item) {
         <div class="check-label">${escapeHTML(item)}</div>
         <div class="check-buttons">
           <button class="check-btn wnl" data-status="wnl">Normal</button>
-          <button class="check-btn over" data-status="over">Overfilled</button>
           <button class="check-btn bad" data-status="bad">Abnormal</button>
         </div>
       </div>
-      <input type="text" class="fluid-desc" data-desc="${escapeAttr(item)}" maxlength="200" value="${escapeAttr(v.desc || '')}" placeholder="Color, thickness, smell (plain words, like &quot;honey colored, clean&quot;)" />
       <div class="check-detail" id="detail-${safeKey}" style="display:none;">
-        <textarea placeholder="What was wrong? (notes)"></textarea>
+        <label class="fixed-check" style="color:var(--warn)"><input type="checkbox" data-over /> Overfilled</label>
+        <textarea placeholder="What's wrong? Color, thickness, smell (like dark and gritty, or milky)">${escapeHTML(v.desc && !v.notes ? v.desc : '')}</textarea>
         <label class="fixed-check"><input type="checkbox" data-fixed /> Fixed on the spot</label>
         <label class="unfix-check"><input type="checkbox" data-unfixed /> Unable to fix</label>
+        <button type="button" class="note-done" onclick="this.closest('.check-detail').querySelector('textarea').blur()">✓ Save note</button>
       </div>
     </div>`;
 }
@@ -2653,6 +2681,30 @@ function renderWNLRow(label, key, stateBucket) {
   `;
 }
 
+function fuelPickerHTML() {
+  return `
+    <div class="check-row" data-fuel-row>
+      <div class="check-label" style="margin-bottom:8px;">Fuel level</div>
+      <div class="fuel-picker" id="fuel-picker">
+        <button class="fuel-btn lvl-1" data-fuel="1/4">¼<small>25%</small></button>
+        <button class="fuel-btn lvl-2" data-fuel="1/2">½<small>50%</small></button>
+        <button class="fuel-btn lvl-3" data-fuel="3/4">¾<small>75%</small></button>
+        <button class="fuel-btn lvl-4 full" data-fuel="Full">Full<small>100%</small></button>
+      </div>
+    </div>`;
+}
+function defRowHTML() {
+  return `
+    <div class="check-row" data-def-row>
+      <div class="check-label" style="margin-bottom:8px;">DEF level</div>
+      <div class="fuel-picker" id="def-picker">
+        <button class="fuel-btn def-btn lvl-1" data-def="25">¼<small>25%</small></button>
+        <button class="fuel-btn def-btn lvl-2" data-def="50">½<small>50%</small></button>
+        <button class="fuel-btn def-btn lvl-3" data-def="75">¾<small>75%</small></button>
+        <button class="fuel-btn def-btn lvl-4 full" data-def="100">Full<small>100%</small></button>
+      </div>
+    </div>`;
+}
 function renderFuelSection() {
   return `
     <div class="section">
@@ -2670,11 +2722,8 @@ function renderFuelSection() {
   `;
 }
 
-function renderTireSection() {
+function tireInnerHTML() {
   return `
-    <div class="section">
-      <div class="section-head">Tire Pressure</div>
-      <div class="section-body">
         <div class="yn-row" data-tire>
           <div class="yn-label">Is tire pressure between 75–85 PSI on all tires?</div>
           <div class="yn-buttons">
@@ -2693,7 +2742,14 @@ function renderTireSection() {
             Unable to fix
           </label>
         </div>
-        ${sectionNotesHTML('Tire Pressure')}
+`;
+}
+function renderTireSection() {
+  return `
+    <div class="section">
+      <div class="section-head">Tire Pressure</div>
+      <div class="section-body">
+${tireInnerHTML()}        ${sectionNotesHTML('Tire Pressure')}
       </div>
     </div>
   `;
@@ -2895,7 +2951,7 @@ function renderCompartmentBody(safeId, comp) {
         <div class="bag-card" id="bag-${bagSafeId}" data-bag-name="${escapeAttr(bag.name)}">
           <div class="bag-head" data-bag-toggle="${bagSafeId}">
             <div>
-              <div class="bag-name"><span class="bag-icon">▸</span>${escapeHTML(bag.name)}${bag.redTag ? '<span class="req-star">*</span>' : ''}</div>
+              <div class="bag-name">${escapeHTML(bag.name)}${bag.redTag ? '<span class="req-star">*</span>' : ''}</div>
               <div class="bag-counts">${bag.items.length} items</div>
             </div>
             <button class="comp-header-mark-btn" type="button" data-bag-mark="${escapeAttr(bag.name)}" data-bag-mark-comp="${escapeAttr(comp.name)}" data-bag-mark-safeid="${safeId}" title="Mark the rest of this bag complete">✓ All</button>
@@ -3057,7 +3113,7 @@ function setRedTagConfirmed(row, on) {
 function opCheckHTML(compName, bagName, itemName, label) {
   return `
     <div class="op-check-row" data-op-comp="${escapeAttr(compName)}" data-op-bag="${escapeAttr(bagName)}" data-op-item="${escapeAttr(itemName)}">
-      <div class="op-check-label">🔋 ${escapeHTML(label)}</div>
+      <div class="op-check-label">🔴 ${escapeHTML(label)}</div>
       <div class="yn-buttons">
         <button class="yn-btn yes" data-op-yn="yes" style="min-width:60px;">Yes</button>
         <button class="yn-btn no" data-op-yn="no" style="min-width:60px;">No</button>
@@ -3431,7 +3487,7 @@ function ensureItemState(compName, bagName, itemName) {
    (status bar, flags, prompts, Go to it) opens the section first.
    ============================================================ */
 const SEC_OPEN = {};
-const SEC_START_OPEN = /^(exterior|interior) compartments/i;
+const SEC_START_OPEN = /^((exterior|interior) compartments|kits)/i;
 function secKey(sec) { return ((APP.check && APP.check.unitId) || '') + '|' + (sec.dataset.secTitle || ''); }
 function makeSectionsCollapsible() {
   document.querySelectorAll('#check-body > .section, #check-body .section').forEach(sec => {
@@ -3471,12 +3527,6 @@ function paintRequired() {
   root.querySelectorAll('.op-check-row[data-oxygen]').forEach(r => { const i = r.querySelector('#oxygen-psi'); pend(r, i && !i.value); });
   root.querySelectorAll('.op-check-row[data-cooler]').forEach(r => pend(r, !r.querySelector('[data-cooler-yn].active')));
   root.querySelectorAll('.narc-row').forEach(r => { const i = r.querySelector('input.narc-count'); pend(r, i && !i.value); });
-  root.querySelectorAll('.bag-card').forEach(b => b.classList.toggle('req-wrap', !!b.querySelector('.req-pending')));
-  root.querySelectorAll('.compartment-card').forEach(cd => {
-    const body = cd.querySelector('[id^="comp-body-"]'), comp = findCompartmentByName(cd.dataset.compartment);
-    const wrap = body && body.dataset.rendered === 'true' ? !!cd.querySelector('.req-pending') : !!(comp && compHasRequired(comp));
-    cd.classList.toggle('req-wrap', wrap);
-  });
 }
 function paintSectionBadges() {
   try { paintRequired(); } catch (e) {}
@@ -3485,7 +3535,6 @@ function paintSectionBadges() {
     if (SEC_START_OPEN.test(sec.dataset.secTitle || '')) { b.textContent = ''; return; }   // compartments show their own counts
     const rows = [...sec.querySelectorAll('.check-row[data-key], .yn-row, .item-row, .op-check-row')].filter(r => !r.closest('.op-detail') && !r.closest('.item-detail'));
     const groups = [...sec.querySelectorAll('.fuel-picker')];
-    sec.classList.toggle('req-sec', !!sec.querySelector('.req-pending, .req-wrap'));
     if (sec.querySelector('#walkaround-notes')) { b.textContent = 'optional'; b.classList.remove('done'); return; }
     const total = rows.length + groups.length;
     const done = rows.filter(r => r.querySelector('.active') || (r.querySelector('input.narc-count') && r.querySelector('input.narc-count').value)).length + groups.filter(g => g.querySelector('.active')).length;
@@ -3498,6 +3547,60 @@ function paintSectionBadges() {
   const siv = Element.prototype.scrollIntoView;
   Element.prototype.scrollIntoView = function () { try { openSectionFor(this); } catch (e) {} return siv.apply(this, arguments); };
 })();
+/* Unable to fix: a reason is required. Fixed on the spot: no note needed. */
+const UNFIX_SEL = '[data-unfixed], [data-op-unfixed], #oxygen-unfixed, #tire-unfixed';
+function unfixNotesFor(box) {
+  let el = box;
+  for (let i = 0; i < 6 && el; i++) { el = el.parentElement; const t = el && el.querySelector('textarea'); if (t) return t; }
+  return null;
+}
+function unfixedNoReasonEls() {
+  return [...document.querySelectorAll('#check-body ' + UNFIX_SEL.split(', ').join(':checked, #check-body ') + ':checked')]
+    .map(b => unfixNotesFor(b)).filter(t => t && !t.value.trim());
+}
+document.addEventListener('change', e => {
+  const box = e.target; if (!box.matches || !box.matches(UNFIX_SEL)) return;
+  const t = unfixNotesFor(box); if (!t) return;
+  if (!t.dataset.ph0) t.dataset.ph0 = t.placeholder || '';
+  if (box.checked) {
+    t.placeholder = "Why couldn't it be fixed? (required)";
+    t.classList.toggle('req-pending', !t.value.trim());
+    if (!t.value.trim()) setTimeout(() => { try { t.focus({ preventScroll: true }); } catch (err) {} }, 50);
+  } else { t.placeholder = t.dataset.ph0; t.classList.remove('req-pending'); }
+});
+document.addEventListener('input', e => { const t = e.target; if (t.tagName === 'TEXTAREA' && t.classList.contains('req-pending') && t.value.trim()) t.classList.remove('req-pending'); });
+document.addEventListener('keydown', e => {
+  const t = e.target;
+  if (e.key === 'Enter' && !e.shiftKey && t && (t.tagName === 'TEXTAREA' || (t.tagName === 'INPUT' && /text|number/.test(t.type))) && t.closest('#check-body')) { e.preventDefault(); t.blur(); }
+});
+let needsTarget = null;
+function needsPopup(title, needs) {
+  needs.forEach(n => revealForPrompt(n[1]));
+  needsTarget = (needs.find(n => n[1]) || [])[1] || null;
+  document.getElementById('needs-title').textContent = title;
+  document.getElementById('needs-list').innerHTML = needs.map(n => `<li><span style="color:var(--bad)">🔴</span> ${escapeHTML(n[0])}</li>`).join('');
+  document.getElementById('needs-pop').hidden = false;
+}
+function needsGo() {
+  document.getElementById('needs-pop').hidden = true;
+  const t = needsTarget; needsTarget = null;
+  if (!t) return;
+  revealForPrompt(t);
+  t.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  t.style.outline = '3px solid var(--warn)';
+  setTimeout(() => { t.style.outline = ''; }, 2000);
+  const inp = t.querySelector && t.querySelector('input[type=text], input[type=number]');
+  if (inp && !inp.value) setTimeout(() => { try { inp.focus({ preventScroll: true }); } catch (e) {} }, 450);
+}
+function needsCounts(body, comp, bagName) {   // number boxes (narc counts, PSI) still empty
+  const out = [];
+  body.querySelectorAll('.narc-row').forEach(r => {
+    if (bagName != null && r.dataset.bag !== bagName) return;
+    const i = r.querySelector('input.narc-count');
+    if (i && !i.value) out.push([`${r.dataset.item}: ${r.classList.contains('psi-row') ? 'PSI' : 'count'}`, r]);
+  });
+  return out;
+}
 function revealForPrompt(el) {
   openSectionFor(el);
   if (!el) return;
@@ -3523,15 +3626,9 @@ function promptBagSpecials(safeId, compName, bagName) {
       `${r.dataset.opComp}||${r.dataset.opBag}||${r.dataset.opItem}` === key);
     if (el) needs.push([`${it.name}: ${it.operationalCheck}`, el]);
   });
+  needs.push(...needsCounts(body, comp, bagName));
   if (!needs.length) return;
-  needs.forEach(n => revealForPrompt(n[1]));
-  const bullet = '\n\u2022 ';
-  alert('\u26a0 ' + bagName + ' \u2014 please fill out the red tag # (last 4) / battery check:' + bullet +
-        needs.map(n => n[0]).join(bullet) + '\n\nThese are open below \u2014 fill them in or skip (not required).');
-  const t = needs[0][1];
-  t.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  t.style.outline = '3px solid var(--warn)';
-  setTimeout(() => { t.style.outline = ''; }, 2000);
+  needsPopup(bagName + ': please fill out', needs);
 }
 
 function promptSpecialChecks(safeId, comp) {
@@ -3571,20 +3668,11 @@ function promptSpecialChecks(safeId, comp) {
     needs.push(['Fridge reading between 39 and 48°F? (Yes/No)', body.querySelector('[data-cooler]')]);
   }
 
+  needs.push(...needsCounts(body, comp, null));
   if (!needs.length) return;
 
   card.classList.add('open');
-  needs.forEach(n => revealForPrompt(n[1]));
-  const bullet = '\n\u2022 ';
-  alert('\u26a0 ' + comp.name + ' \u2014 please fill out the red tag # (last 4) and battery checks below:\n' + bullet +
-        needs.map(n => n[0]).join(bullet) +
-        '\n\nThese are open for you now \u2014 fill them in or skip (not required).');
-  const target = needs[0][1];
-  if (target) {
-    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    target.style.outline = '3px solid var(--warn)';
-    setTimeout(() => { target.style.outline = ''; }, 2000);
-  }
+  needsPopup(comp.name + ': please fill out', needs);
 }
 
 function markAllCompartmentComplete(safeId, comp) {
@@ -3624,8 +3712,28 @@ function markAllItemsAsComplete(safeId, compName, bagName, btn) {
   updateProgress();
 }
 
+/* 2.18: Compartment 1, 2, 3 / A, B, C first, everything else A to Z.
+   Kits (LifePak, Med Kit, Airway Bag, Ped I-Gels, Portable Suction, EZ IO, CMAC) get their own group. */
+const KIT_RE = /^(life ?pak|medication kit|airway bag|pediatric i-?gels|portable suction|ez ?-?io|c-?mac)/i;
+function sortComps(arr) {
+  return (arr || []).slice().sort((a, b) => {
+    const ca = /^compartment\s/i.test(a.name), cb = /^compartment\s/i.test(b.name);
+    if (ca !== cb) return ca ? -1 : 1;
+    return a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' });
+  });
+}
+function arrangeComps(comps) {
+  const isKit = x => x.kit || KIT_RE.test(x.name || '');
+  const inside = comps.interior || [];
+  return {
+    exterior: sortComps(comps.exterior),
+    interior: sortComps(inside.filter(x => !isKit(x))),
+    kits: sortComps(inside.filter(isKit).concat(comps.kits || [])),
+    cabArea: comps.cabArea
+  };
+}
 function allComps(c) {
-  const a = [...c._comps.exterior, ...c._comps.interior];
+  const a = [...c._comps.exterior, ...c._comps.interior, ...(c._comps.kits || [])];
   if (c._cabArea) a.push(c._cabArea);
   return a;
 }
@@ -3750,13 +3858,21 @@ function attachAmbulanceHandlers() {
           btn.classList.add('active');
           APP.check[bucket] = APP.check[bucket] || {};
           APP.check[bucket][key] = APP.check[bucket][key] || {};
-          APP.check[bucket][key].status = status;
+          const ovBox = row.querySelector('[data-over]');
+          APP.check[bucket][key].status = (status === 'bad' && ovBox && ovBox.checked) ? 'over' : status;
           document.getElementById('detail-' + safeKey).style.display = (status === 'bad' || status === 'over') ? 'block' : 'none';
         }
         updateProgress(); saveAutosave();
       };
     });
     const detail = document.getElementById('detail-' + safeKey);
+    const ovB = detail.querySelector('[data-over]');
+    if (ovB) ovB.onchange = e => {
+      APP.check[bucket] = APP.check[bucket] || {};
+      APP.check[bucket][key] = APP.check[bucket][key] || {};
+      APP.check[bucket][key].status = e.target.checked ? 'over' : 'bad';
+      updateProgress(); saveAutosave();
+    };
     detail.querySelector('textarea').oninput = e => {
       APP.check[bucket] = APP.check[bucket] || {};
       APP.check[bucket][key] = APP.check[bucket][key] || {};
@@ -3863,6 +3979,7 @@ function attachAmbulanceHandlers() {
     head.addEventListener('click', () => {
       const safeId = head.dataset.compToggle;
       const card = document.getElementById('comp-' + safeId);
+      if (card.classList.contains('pinned')) return;   // Cab items stay open
       const compName = card.dataset.compartment;
       const comp = findCompartmentByName(compName);
       if (comp && !card.classList.contains('open')) {
@@ -4154,6 +4271,13 @@ function showSubmitModal() {
   if (!c) return;
   if (!c.initials) {
     alert('Please enter your name before submitting.');
+    return;
+  }
+  // 2.18: Fixed on the spot needs nothing, but Unable to fix needs a reason
+  const noReason = collectIssueLog().filter(x => x.state === 'unfixed' && !String(x.notes || '').trim() && !x.known);
+  if (noReason.length) {
+    const box = unfixedNoReasonEls()[0] || null;
+    needsPopup('Unable to fix needs a reason', noReason.map((x, n) => [x.label, n === 0 ? box : null]));
     return;
   }
 
@@ -4854,12 +4978,40 @@ function knownGo(n) {
   const row = [...card.querySelectorAll('.item-row')].find(r => r.dataset.item === nm && r.dataset.bag === bn);
   if (row) { revealForPrompt(row); row.scrollIntoView({ behavior: 'smooth', block: 'center' }); row.style.outline = '3px solid var(--warn)'; setTimeout(() => { row.style.outline = ''; }, 1600); }
 }
+/* 2.18: every row with an open known problem gets an "Outstanding" button until it's fixed
+   (a chief marks it fixed in CG Staff, the Shift Ops card is completed, or a crew taps Now fixed) */
 function knownPaintRows() {
-  const keys = new Set(known.list.filter(k => k.key && k.key[0] === 'i').map(k => k.key));
-  document.querySelectorAll('#check-body .item-row').forEach(row => {
-    row.classList.toggle('known-row', keys.has(`i|${row.dataset.comp}|${row.dataset.bag}|${row.dataset.item}`));
+  const byKey = {};
+  known.list.forEach((k, n) => { if (k.key) byKey[k.key] = n; });
+  document.querySelectorAll('#check-body .known-btn').forEach(b => b.remove());
+  document.querySelectorAll('#check-body .item-row, #check-body .check-row[data-key]').forEach(row => {
+    const key = row.classList.contains('item-row') ? `i|${row.dataset.comp}|${row.dataset.bag}|${row.dataset.item}` : `r|${row.dataset.bucket}|${row.dataset.key}`;
+    const n = byKey[key];
+    row.classList.toggle('known-row', n != null);
+    if (n == null) return;
+    const r = knownResult(known.list[n]);
+    const holder = row.querySelector('.item-name, .check-label'); if (!holder) return;
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'known-btn' + (r ? (r.result === 'fixed' ? ' ok' : ' still') : '');
+    b.textContent = r ? (r.result === 'fixed' ? '✓ Marked fixed' : '⚠ Still broken') : '⚠ Outstanding';
+    b.onclick = e => { e.stopPropagation(); knownRowPop(n); };
+    holder.appendChild(b);
   });
 }
+function knownRowPop(n) {
+  const k = known.list[n]; if (!k) return;
+  const when = new Date(k.at), age = Math.floor((Date.now() - when.getTime()) / 86400000);
+  const lines = [
+    `${k.state === 'unfixed' ? 'Could not fix' : 'Left open'} · reported by ${k.crew || 'a crew'} ${when.getMonth() + 1}/${when.getDate()}${age >= 1 ? ` · open ${age} day${age === 1 ? '' : 's'}` : ''}`,
+    k.notes ? 'Crew notes: ' + k.notes : '',
+    k.link && k.link.lastNote ? 'Latest from the chiefs: ' + k.link.lastNote : (k.link ? 'On the Shift Ops board' : 'Not on the Shift Ops board yet')
+  ].filter(Boolean);
+  document.getElementById('kpop-title').textContent = k.label;
+  document.getElementById('kpop-body').innerHTML = lines.map(t => `<li>${escapeHTML(t)}</li>`).join('');
+  document.getElementById('kpop-btns').innerHTML = `<button type="button" class="kb-broken" onclick="knownMark(${n}, 'broken');knownPopClose()">Still broken</button><button type="button" class="kb-fixed" onclick="knownMark(${n}, 'fixed');knownPopClose()">Now fixed</button>`;
+  document.getElementById('kpop').hidden = false;
+}
+function knownPopClose() { document.getElementById('kpop').hidden = true; knownPaintRows(); }
 
 function buildSummary() {
   const c = APP.check;
@@ -5125,7 +5277,8 @@ function buildSummary() {
     // Compartments
     [['Cab', c._cabArea ? [c._cabArea] : []],
      ['Exterior Compartments', c._comps.exterior],
-     ['Interior Compartments', c._comps.interior]].forEach(([title, comps]) => {
+     ['Interior Compartments', c._comps.interior],
+     ['Kits', c._comps.kits || []]].forEach(([title, comps]) => {
       const touched = comps.filter(comp => {
         const cs = c.compartments[comp.name];
         if (!cs) return false;
