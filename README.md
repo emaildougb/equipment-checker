@@ -70,6 +70,9 @@ When a crew opens a check, the app looks up every problem reported on earlier ch
 
 ## Changelog
 
+### v2.19
+- Chuck Andrus and Kim Reid added to the admin list (behind the logo flip). Everyone still lands on the regular check; admin only opens from the logo
+
 ### v2.18
 - Compartments sort numbers and letters first (1, 2, 3 / A, B, C), then everything else A to Z
 - Kits group: LifePak 35, Medication Kit, Airway Bag, Pediatric I-Gels, Portable Suction, EZ IO Kit, CMAC Kit (any interior compartment named like these, or marked `"kit": true`)
