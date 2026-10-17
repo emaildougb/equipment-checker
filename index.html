@@ -10,8 +10,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="theme-color" content="#1C3A1C" />
   <title>NCEMS EP Checker</title>
-  <link rel="icon" type="image/png" href="./logo.png" />
-  <link rel="apple-touch-icon" href="./logo.png" />
+  <meta name="apple-mobile-web-app-title" content="Apparatus" />
+  <link rel="icon" type="image/png" href="./apple-touch-icon.png" />
+  <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
   <link rel="manifest" href="./manifest.json" />
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@3.30.0/lib/msal-browser.min.js"></script>
@@ -1609,7 +1610,7 @@
    APP STATE
    ============================================================ */
 const APP = {
-  version: '2.19',
+  version: '2.20',
   data: null,        // loaded units.json
   screen: 'home',
   check: null,       // current in-progress check
@@ -1723,15 +1724,7 @@ function msalSignOut() {
 
 function showAppInfo() { showWhatsNew(true); }
 const WHATS_NEW = [
-  ['Easier to find things', 'Compartments go in order (1, 2, 3 and A, B, C), then everything else A to Z. LifePak 35, Med Kit, Airway Bag, Ped I-Gels, Portable Suction, EZ IO and CMAC are now their own Kits group.'],
-  ['Cab', 'Fuel and DEF are in the Cab section now, along with the cab items, all open. Fuel colors: Full green, ¾ yellow, ½ orange, ¼ red.'],
-  ['Tire pressure', 'Now inside Mechanical & Lights, open and ready to tap.'],
-  ['Engine oil', 'Just Normal or Abnormal. Abnormal opens a box with Overfilled, notes on color and thickness, and Fixed or Unable to fix.'],
-  ['Must do items', 'Anything mandatory (red tags, LifePak self test, suction, O2 PSI) has a light red box and a red dot until it\'s done. Tap the popup anywhere to jump right to it.'],
-  ['Unable to fix', 'Needs a reason before you can submit. Fixed on the spot doesn\'t need a note.'],
-  ['Outstanding items', 'Anything reported earlier and not fixed yet has an Outstanding button on its row. Tap it to see the notes and mark it Still broken or Now fixed.'],
-  ['New kits', 'EZ IO kit (pink, blue and yellow needles, EZ Connect, stabilizer, driver) and CMAC kit (camera turns on, size 3, size 4 and D blades). One stethoscope now: the electronic one.'],
-  ['Everything folds', 'Tap a section header to open or close it. Arrows point right when closed and down when open.']
+  ['New icon', 'The app has a new home screen icon: a white ambulance on NCEMS green and navy, named Apparatus. Delete the old icon and add the app to your home screen again to get it.'],
 ];
 function showWhatsNew(force) {
   let seen = '';

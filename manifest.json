@@ -1,12 +1,21 @@
 {
-  "name": "NCEMS EP Checker",
-  "short_name": "EP Checker",
+  "name": "NCEMS Apparatus Checker",
+  "short_name": "Apparatus",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#1C3A1C",
   "theme_color": "#1C3A1C",
   "icons": [
-    { "src": "apple-touch-icon.png", "sizes": "180x180", "type": "image/png" },
-    { "src": "logo.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    {
+      "src": "apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
   ]
 }
