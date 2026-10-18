@@ -2,7 +2,7 @@
 
 Equipment and property check submission tool for North Country EMS crews.
 
-**Version 2.21**
+**Version 2.22**
 
 ## Links
 
@@ -69,6 +69,12 @@ When a crew opens a check, the app looks up every problem reported on earlier ch
 - These live in `units.json` under `sendRule` (`minPct`, `holdUntil`)
 
 ## Changelog
+
+### v2.22
+- Add photo (optional) button on every item marked as a problem: compartment items, bags, mechanical, fluids and under the hood rows, operational checks, tire pressure, main O2 and other unit checks. The photo uploads to Cloudinary like the walk-around photo and saves with the check. Remove photo takes it off
+- Problem photos go in the check's `photos` list (labeled with the unit and item) so CG Staff shows them with the check, and each issue also carries its own `photo` link
+- Photos are never required. A short description is now required for any problem still open or Unable to fix. Fixed on the spot still needs nothing. Fuel, DEF, cooler reading, main O2 PSI, gurney checks and narc counts are skipped because the reading already says it
+- If a crew taps an item back to OK, its photo is left off the check
 
 ### v2.21
 - Home screen on a computer: the logo stays a circle (it was squashing into an oval on short or zoomed windows), and the Ambulances and Other Units buttons are bigger so the words fit. Phones look the same

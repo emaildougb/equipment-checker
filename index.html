@@ -620,6 +620,12 @@
       height: 20px;
       accent-color: var(--bad);
     }
+    .iss-photo { margin-top: 8px; }
+    .iss-photo-btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border: 1px dashed var(--border); border-radius: 8px; background: var(--white); color: var(--info); font-size: 14px; font-weight: 700; cursor: pointer; }
+    .iss-photo-btn input { display: none; }
+    .iss-photo-prev { margin-top: 6px; display: flex; align-items: flex-start; gap: 8px; flex-wrap: wrap; font-size: 13px; }
+    .iss-photo-prev img { max-width: 160px; max-height: 120px; border-radius: 6px; border: 1px solid var(--border); }
+    .iss-photo-x { border: 0; background: none; color: var(--bad); font: inherit; font-size: 13px; font-weight: 700; cursor: pointer; padding: 4px 0; }
     .photo-input {
       margin-top: 8px;
       font-size: 13px;
@@ -1616,7 +1622,7 @@
    APP STATE
    ============================================================ */
 const APP = {
-  version: '2.21',
+  version: '2.22',
   data: null,        // loaded units.json
   screen: 'home',
   check: null,       // current in-progress check
@@ -1730,7 +1736,8 @@ function msalSignOut() {
 
 function showAppInfo() { showWhatsNew(true); }
 const WHATS_NEW = [
-  ['Computer screens', 'The home screen fits better on a computer: the logo stays round and the Ambulances and Other Units buttons fit their words.'],
+  ['Photo on problems', 'Anything you mark as a problem now has an Add photo button. Photos are optional. Snap one when it helps the chiefs see it.'],
+  ['Describe the problem', 'Every problem needs a short description before you submit, unless you fixed it on the spot. Fuel, DEF, O2 PSI and narc counts already say it, so they are skipped.'],
 ];
 function showWhatsNew(force) {
   let seen = '';
@@ -2213,6 +2220,7 @@ function saveAutosave() {
       if (k === '_comps') return undefined;
       // don't persist giant base64 photos; keep only uploaded URLs
       if (k === 'photo' && v && v.type === 'base64') return undefined;
+      if (v && typeof v === 'object' && v.type === 'base64' && /^data:/.test(v.url || '')) return undefined;
       return v;
     }));
     localStorage.setItem(autosaveKey(c), JSON.stringify({ savedAt: Date.now(), check: slim }));
@@ -2335,6 +2343,7 @@ function startAmbulanceCheck(unitId) {
     initials: getSavedInitials(),
     mileage: '',
     walkAround: { notes: '', photo: null },
+    issuePhotos: {},
     mechanical: {},
     fluids: {},
     fuel: null,
@@ -4005,6 +4014,78 @@ function toggleCompartment(safeId) {
 }
 
 /* ============================================================
+   2.22 ISSUE PHOTOS: optional photo on any item marked as a problem
+   ============================================================ */
+function needsDescription(x) {
+  const k = x.key || '';
+  if (/^s\|(fuel|def|cooler|o2)$/.test(k) || /^g\|/.test(k)) return false; // the reading or level says it
+  if (/\((count|PSI) [^)]*\)/.test(x.label || '')) return false;          // narc counts and cylinder PSI say it
+  return true;
+}
+function issueKeyFor(det) {
+  if (det.id === 'tire-detail') return ['s|tire', 'Tire pressure'];
+  if (det.id === 'oxygen-detail') return ['s|o2', 'Main O2'];
+  const op = det.closest('.op-check-row');
+  if (op && det.classList.contains('op-detail')) {
+    const cn = op.dataset.opComp || '', bn = op.dataset.opBag || '', inm = op.dataset.opItem || '';
+    const lab = (op.querySelector('.op-check-label')?.textContent || inm).replace(/^\W+/, '').trim();
+    return [`o|${cn}||${bn}||${inm}`, (inm === '__comp_op__' ? cn : cn + ': ' + lab) + ' (operational check)'];
+  }
+  const it = det.closest('.item-row');
+  if (it && it.dataset.comp != null) {
+    const cn = it.dataset.comp || '', bn = it.dataset.bag || '', nm = it.dataset.item || '';
+    return [`i|${cn}|${bn}|${nm}`, cn + (bn ? ' → ' + bn : '') + ': ' + nm];
+  }
+  const row = det.closest('.check-row');
+  if (row && row.dataset.key) {
+    const b = row.dataset.bucket, k = row.dataset.key;
+    return [b === 'rescueChecks' ? `x|${k}` : `r|${b}|${k}`, b === 'rescueChecks' ? k.split('::').pop() : k];
+  }
+  return [null, ''];
+}
+function issueNoteEl(key) {
+  if (!key) return null;
+  const det = [...document.querySelectorAll('#check-body [data-pk]')].find(d => d.dataset.pk === key);
+  return det ? det.querySelector('textarea') : null;
+}
+function paintIssuePhoto(det) {
+  const key = det.dataset.pk, prev = det.querySelector('.iss-photo-prev'); if (!prev) return;
+  const ph = APP.check && APP.check.issuePhotos && APP.check.issuePhotos[key];
+  if (!ph) { prev.innerHTML = ''; return; }
+  prev.innerHTML = `<a href="${escapeAttr(ph.url)}" target="_blank" rel="noopener"><img src="${escapeAttr(ph.url)}" alt="Photo"></a><button type="button" class="iss-photo-x">Remove photo</button>`;
+  prev.querySelector('.iss-photo-x').onclick = () => { delete APP.check.issuePhotos[key]; paintIssuePhoto(det); saveAutosave(); };
+}
+function addIssuePhotoButtons() {
+  if (!APP.check || APP.check.type == null) return;
+  document.querySelectorAll('#check-body .check-detail, #check-body .item-detail, #check-body .op-detail, #check-body #tire-detail, #check-body #oxygen-detail').forEach(det => {
+    if (det.querySelector(':scope > .iss-photo')) return;
+    const [key, label] = issueKeyFor(det); if (!key) return;
+    det.dataset.pk = key; det.dataset.plabel = label;
+    const box = document.createElement('div'); box.className = 'iss-photo';
+    box.innerHTML = `<label class="iss-photo-btn">📷 Add photo (optional)<input type="file" accept="image/*" capture="environment"></label><div class="iss-photo-prev"></div>`;
+    const done = det.querySelector(':scope > .note-done');
+    if (done) det.insertBefore(box, done); else det.appendChild(box);
+    box.querySelector('input').addEventListener('change', async e => {
+      const file = e.target.files[0]; e.target.value = ''; if (!file) return;
+      const prev = box.querySelector('.iss-photo-prev');
+      prev.innerHTML = '<span style="color:var(--muted)">Uploading photo…</span>';
+      try {
+        const r = await uploadPhoto(file);
+        APP.check.issuePhotos = APP.check.issuePhotos || {};
+        APP.check.issuePhotos[key] = { url: r.url, type: r.type, label: (APP.check.unitName ? APP.check.unitName + ' ' : '') + label };
+        paintIssuePhoto(det); saveAutosave();
+      } catch (err) { prev.innerHTML = '<span style="color:var(--bad)">Photo upload failed. Try again, or just describe it.</span>'; }
+    });
+    paintIssuePhoto(det);
+  });
+}
+(function () {
+  let t = null;
+  new MutationObserver(() => { clearTimeout(t); t = setTimeout(addIssuePhotoButtons, 60); })
+    .observe(document.documentElement, { childList: true, subtree: true });
+})();
+
+/* ============================================================
    PHOTOS — Cloudinary upload (falls back to base64 if not configured)
    ============================================================ */
 async function uploadPhoto(file) {
@@ -4274,11 +4355,11 @@ function showSubmitModal() {
     alert('Please enter your name before submitting.');
     return;
   }
-  // 2.18: Fixed on the spot needs nothing, but Unable to fix needs a reason
-  const noReason = collectIssueLog().filter(x => x.state === 'unfixed' && !String(x.notes || '').trim() && !x.known);
+  // 2.18: Fixed on the spot needs nothing. 2.22: any problem still open or Unable to fix needs a short description. Photos are always optional.
+  const noReason = collectIssueLog().filter(x => x.state !== 'fixed' && !x.known && !String(x.notes || '').trim() && needsDescription(x));
   if (noReason.length) {
-    const box = unfixedNoReasonEls()[0] || null;
-    needsPopup('Unable to fix needs a reason', noReason.map((x, n) => [x.label, n === 0 ? box : null]));
+    const first = issueNoteEl(noReason[0].key) || unfixedNoReasonEls()[0] || null;
+    needsPopup('Add a short description', noReason.map((x, n) => [x.label, n === 0 ? first : null]));
     return;
   }
 
@@ -4475,6 +4556,8 @@ function collectIssueLog() {
     const o = { label, notes: notes || '', state: fixed ? 'fixed' : (unfixed ? 'unfixed' : 'open') };
     if (key) o.key = key;
     if (known) o.known = true;
+    const ph = key && c.issuePhotos && c.issuePhotos[key];
+    if (ph && ph.type === 'url') o.photo = ph.url;
     out.push(o);
   };
   if (c.type === 'ambulance') {
@@ -4505,7 +4588,7 @@ function collectIssueLog() {
     ['exterior','fluids','interior','operational','cleaning'].forEach(group => {
       (APP.data.rescueRigChecks[group] || []).forEach(item => {
         const v = c.rescueChecks[`${group}::${item}`];
-        if (v && v.status === 'bad') push(item, v.notes, v.fixed, v.unfixed);
+        if (v && v.status === 'bad') push(item, v.notes, v.fixed, v.unfixed, `x|${group}::${item}`);
       });
     });
   }
@@ -4516,6 +4599,9 @@ function collectPhotos(c) {
   const out = [];
   if (c.walkAround?.photo?.type === 'url') out.push({ label: 'Walk-around', url: c.walkAround.photo.url });
   if (c.cooler?.photo?.type === 'url') out.push({ label: 'Fridge thermometer', url: c.cooler.photo.url });
+  // 2.22: photos on problem items (only items still marked as a problem)
+  const live = new Set(collectIssueLog().map(x => x.key).filter(Boolean));
+  Object.entries(c.issuePhotos || {}).forEach(([k, ph]) => { if (ph && ph.type === 'url' && live.has(k)) out.push({ label: ph.label || 'Issue photo', url: ph.url, key: k }); });
   return out;
 }
 function collectSectionNotes(c) {
