@@ -2,7 +2,7 @@
 
 Equipment and property check submission tool for North Country EMS crews.
 
-**Version 2.20**
+**Version 2.21**
 
 ## Links
 
@@ -69,6 +69,9 @@ When a crew opens a check, the app looks up every problem reported on earlier ch
 - These live in `units.json` under `sendRule` (`minPct`, `holdUntil`)
 
 ## Changelog
+
+### v2.21
+- Home screen on a computer: the logo stays a circle (it was squashing into an oval on short or zoomed windows), and the Ambulances and Other Units buttons are bigger so the words fit. Phones look the same
 
 ### v2.20
 - New phone icon: NCEMS green and navy split corner to corner with a white box ambulance, NCEMS across the bottom (matches the Open Shifts icon). `apple-touch-icon.png` is the new icon and `icon-512.png` is the big one Android uses for the icon and the launch screen. Delete the old icon from the home screen and add it again to see it

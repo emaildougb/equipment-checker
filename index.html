@@ -81,10 +81,11 @@
     }
     /* ── 3D flip card for logo / admin login ── */
     .logo-flip-wrap {
-      width: 200px;
-      max-width: 52%;
-      height: 200px;
-      max-height: 26vh;
+      /* 2.21: always a circle. Size follows the shorter of width or height so it never squashes into an oval */
+      width: min(200px, 52vw, 26vh);
+      height: auto;
+      aspect-ratio: 1 / 1;
+      flex-shrink: 0;
       margin: 0 auto 4px;
       perspective: 900px;
       cursor: pointer;
@@ -239,11 +240,15 @@
       align-items: center;
       justify-content: center;
       color: var(--white);
-      font-size: 30px;
+      font-size: clamp(22px, 7vw, 30px);
       font-weight: 800;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.06em;
       text-transform: uppercase;
       text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+      padding: 0 12px;
+      text-align: center;
+      line-height: 1.15;
+      overflow-wrap: anywhere;
     }
     .home-btn.ambulances { background-image: url('./ambulance.jpg'); }
     .home-btn.others { background-image: url('./sar51.jpg'); }
@@ -1286,8 +1291,9 @@
     }
 
     @media (min-width: 600px) {
-      .home-buttons { flex-direction: row; }
-      .home-btn { height: 220px; }
+      .home-buttons { flex-direction: row; max-width: 760px; flex: 0 1 auto; }
+      .home-btn { height: auto; aspect-ratio: 4 / 3; max-height: 46vh; flex: 1 1 0; }
+      .home-btn-label { font-size: clamp(22px, 3vw, 32px); }
       .tire-grid { grid-template-columns: repeat(3, 1fr); }
     }
 
@@ -1610,7 +1616,7 @@
    APP STATE
    ============================================================ */
 const APP = {
-  version: '2.20',
+  version: '2.21',
   data: null,        // loaded units.json
   screen: 'home',
   check: null,       // current in-progress check
@@ -1724,7 +1730,7 @@ function msalSignOut() {
 
 function showAppInfo() { showWhatsNew(true); }
 const WHATS_NEW = [
-  ['New icon', 'The app has a new home screen icon: a white ambulance on NCEMS green and navy, named Apparatus. Delete the old icon and add the app to your home screen again to get it.'],
+  ['Computer screens', 'The home screen fits better on a computer: the logo stays round and the Ambulances and Other Units buttons fit their words.'],
 ];
 function showWhatsNew(force) {
   let seen = '';
