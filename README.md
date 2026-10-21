@@ -2,7 +2,7 @@
 
 Equipment and property check submission tool for North Country EMS crews.
 
-**Version 2.26**
+**Version 2.27**
 
 ## Links
 
@@ -20,6 +20,17 @@ Equipment and property check submission tool for North Country EMS crews.
 - `apple-touch-icon.png` : iOS home-screen + tab icon
 - `manifest.json` : standalone app-mode config
 - `README.md` : this file
+
+## Kit moves (2.27)
+
+Trusted crew put kit items in the order they really sit. Doug approves every move before it reaches anyone else.
+
+- **Who can move:** Josh Robertson (j.robertson) and Joseph Slack (j.slack). **Who approves:** Doug (d.boyce). Both lists live in the Worker (`DEFAULT_MOVERS`, `DEFAULT_APPROVERS` in worker.js 1.2). To change them without new code, add `MOVERS` or `APPROVERS` (comma separated emails) under the Worker's Settings, Variables and Secrets.
+- **Mover:** open a check, open a compartment or bag, tap **↕ Reorder**. Hold ≡ and drag, or use the arrows. Tick other rigs that carry the exact same kit, add a note, **Send to Doug**. Needs signal.
+- **Doug:** gets an email (EmailJS) with the new and old order and a link to `?moves=1`. Opening the Checker signed in as Doug shows a blue "kit moves waiting" banner. **Approve** saves the new order to the shared list (table `units`, note "Kit move by ...") for every device. **Turn down** takes an optional reason. Either way the mover gets an email back.
+- **Safe:** a move only changes order, never adds or removes items. If a rig's kit changed since the move was sent, that rig is skipped and the decision says so. Checks in progress are not affected (marks are kept by item name).
+- **Stored:** D1 table `moves` (who, when, rigs, kit, old and new order, note, status, who decided, when, why). Movers see their own moves from their banner.
+- Josh is also a Checker admin, so he can still edit lists directly in admin mode. Moves are the path that comes to Doug.
 
 ## Cloudflare (2.24)
 

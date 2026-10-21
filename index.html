@@ -1474,6 +1474,62 @@
       color: var(--bad);
       font-size: 13px;
     }
+    /* ===== 2.27 kit moves ===== */
+    .mv-open-row { display: flex; justify-content: flex-end; margin: 2px 0 8px; }
+    .mv-open { font: 800 13px/1 inherit; color: var(--info); background: var(--white); border: 1.5px solid var(--info); border-radius: 999px; padding: 9px 14px; cursor: pointer; }
+    .moves-banner { display: block; width: min(92%, 420px); margin: 10px auto 0; padding: 12px 14px; font: 800 15px/1.3 inherit; color: var(--info); background: #E8F1F8; border: 2px solid var(--info); border-radius: 12px; cursor: pointer; text-align: center; }
+    .moves-banner.mine { color: var(--g-dark); background: var(--g-pale); border-color: var(--g-mid); font-weight: 700; font-size: 14px; }
+    .mv-overlay { position: fixed; inset: 0; z-index: 9000; background: rgba(15, 30, 15, 0.55); display: flex; align-items: flex-end; justify-content: center; }
+    .mv-overlay[hidden] { display: none; }
+    .mv-panel { background: var(--bg); width: 100%; max-width: 560px; max-height: 94vh; display: flex; flex-direction: column; border-radius: 16px 16px 0 0; box-shadow: 0 -6px 30px rgba(0,0,0,.25); }
+    @media (min-width: 620px) { .mv-overlay { align-items: center; } .mv-panel { border-radius: 16px; } }
+    .mv-top { display: flex; align-items: flex-start; gap: 10px; padding: 16px 16px 8px; }
+    .mv-title { font-size: 18px; font-weight: 800; color: var(--g-deep); }
+    .mv-sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
+    .mv-x { margin-left: auto; width: 40px; height: 40px; flex: none; border-radius: 50%; border: 1.5px solid var(--border); background: var(--white); font: 800 18px/1 inherit; color: var(--muted); cursor: pointer; }
+    .mv-scroll { overflow: auto; padding: 0 16px 8px; -webkit-overflow-scrolling: touch; }
+    .mv-hint { font-size: 13px; color: var(--muted); margin: 0 0 8px; }
+    .mv-warn { font-size: 13px; color: var(--warn); background: var(--warn-bg); border-radius: 8px; padding: 8px 10px; margin: 0 0 8px; }
+    .mv-list { list-style: none; margin: 0; padding: 0; }
+    .mv-row { display: flex; align-items: center; gap: 8px; background: var(--white); border: 1.5px solid var(--border); border-radius: 10px; padding: 4px 4px 4px 0; margin-bottom: 6px; user-select: none; -webkit-user-select: none; }
+    .mv-row.moved { border-color: var(--info); background: #F2F7FB; }
+    .mv-row.dragging { border-color: var(--g-mid); box-shadow: 0 6px 18px rgba(0,0,0,.18); background: var(--g-pale); }
+    .mv-grip { flex: none; width: 44px; align-self: stretch; display: flex; align-items: center; justify-content: center; font-size: 22px; color: var(--muted); cursor: grab; touch-action: none; }
+    .mv-num { flex: none; width: 24px; font-size: 12px; font-weight: 800; color: var(--muted); text-align: right; }
+    .mv-name { flex: 1; min-width: 0; font-size: 15px; font-weight: 600; color: var(--text); overflow-wrap: anywhere; }
+    .mv-was { display: block; font-size: 11px; font-weight: 700; color: var(--info); }
+    .mv-arrow { flex: none; width: 38px; height: 38px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--white); font: 800 15px/1 inherit; color: var(--g-mid); cursor: pointer; }
+    .mv-arrow:disabled { opacity: .3; }
+    .mv-label { font-size: 13px; font-weight: 800; color: var(--g-dark); margin: 12px 0 6px; }
+    .mv-rigs { display: flex; flex-wrap: wrap; gap: 8px; }
+    .mv-rig { display: flex; align-items: center; gap: 6px; padding: 8px 12px; border: 1.5px solid var(--border); border-radius: 999px; background: var(--white); font-size: 14px; font-weight: 700; }
+    .mv-rig.off { opacity: .55; font-weight: 600; }
+    .mv-rig small { font-weight: 600; color: var(--muted); }
+    .mv-note { width: 100%; min-height: 64px; font: 15px/1.35 inherit; padding: 10px; border: 1.5px solid var(--border); border-radius: 10px; background: var(--white); }
+    .mv-foot { display: flex; gap: 10px; padding: 10px 16px calc(14px + env(safe-area-inset-bottom)); border-top: 1px solid var(--border); background: var(--bg); border-radius: 0 0 16px 16px; }
+    .mv-btn { flex: 1; min-height: 50px; border-radius: 12px; font: 800 16px/1.1 inherit; cursor: pointer; border: 2px solid var(--g-mid); background: var(--white); color: var(--g-mid); }
+    .mv-btn.go { background: var(--g-mid); color: var(--white); }
+    .mv-btn.no { border-color: var(--bad); color: var(--bad); }
+    .mv-btn:disabled { opacity: .45; }
+    .mv-msg { font-size: 14px; font-weight: 700; margin: 8px 0 0; }
+    .mv-msg.bad { color: var(--bad); }
+    .mv-msg.ok { color: var(--g-mid); }
+    .mv-card { background: var(--white); border: 1.5px solid var(--border); border-radius: 12px; padding: 12px; margin-bottom: 12px; }
+    .mv-card-h { font-size: 15px; font-weight: 800; color: var(--g-deep); }
+    .mv-card-s { font-size: 13px; color: var(--muted); margin-top: 2px; }
+    .mv-card-note { font-size: 14px; margin: 8px 0 0; padding: 8px 10px; background: var(--g-pale); border-radius: 8px; }
+    .mv-card ol { margin: 10px 0 0; padding-left: 26px; font-size: 14px; }
+    .mv-card li { padding: 2px 0; }
+    .mv-card li.moved { color: var(--info); font-weight: 800; }
+    .mv-card li small { font-weight: 700; color: var(--info); }
+    .mv-card details { margin-top: 8px; font-size: 13px; color: var(--muted); }
+    .mv-card-btns { display: flex; gap: 8px; margin-top: 12px; }
+    .mv-card-btns .mv-btn { min-height: 46px; font-size: 15px; }
+    .mv-status { display: inline-block; font-size: 12px; font-weight: 800; padding: 3px 8px; border-radius: 999px; margin-left: 6px; }
+    .mv-status.pending { background: var(--warn-bg); color: var(--warn); }
+    .mv-status.approved { background: var(--g-pale); color: var(--g-mid); }
+    .mv-status.rejected { background: var(--bad-bg); color: var(--bad); }
+    .mv-reason { width: 100%; margin-top: 8px; font: 14px inherit; padding: 8px; border: 1.5px solid var(--border); border-radius: 8px; }
   </style>
 </head>
 <body>
@@ -1542,6 +1598,7 @@
   <div class="logo-flip-hint" id="logo-flip-hint">Tap logo to flip</div>
   <div class="home-sub">Daily Apparatus Check</div>
   <div class="who-strip" id="who-strip" hidden>Signed in as <b id="who-name"></b> · <button type="button" id="who-switch">Switch user</button></div>
+  <button type="button" class="moves-banner" id="moves-banner" hidden></button>
   <div class="home-buttons">
     <button class="home-btn ambulances" id="home-btn-ambulances" type="button">
       <div class="home-btn-label">Ambulances</div>
@@ -1665,7 +1722,7 @@
    APP STATE
    ============================================================ */
 const APP = {
-  version: '2.26',
+  version: '2.27',
   data: null,        // loaded units.json
   screen: 'home',
   check: null,       // current in-progress check
@@ -1817,9 +1874,11 @@ function setAuth(state, detail) {
     document.getElementById('who-name').textContent = AUTH.name;
     strip.hidden = false;
     gate.hidden = true;
+    if (typeof movesBoot === 'function') setTimeout(movesBoot, 0);
     return;
   }
   strip.hidden = true;
+  if (typeof movesBanner === 'function') movesBanner();
   gate.hidden = false;
   if (state === 'out') {
     msg.textContent = 'Sign in with your North Country EMS Microsoft account (the same one you use for NCEMS email) to start your check.';
@@ -1932,7 +1991,7 @@ async function pushSharedList(note) {
     try { localStorage.removeItem(PENDING_LIST); } catch (e) {}
     APP.data = data;
     APP.listSource = { from: 'shared', at: r.at, by: r.by };
-    return { ok: true };
+    return { ok: true, id: r.id };
   } catch (e) {
     return { ok: false, why: e.message || String(e) };
   }
@@ -1947,6 +2006,7 @@ async function retryPendingList() {
 
 function showAppInfo() { showWhatsNew(true); }
 const WHATS_NEW = [
+  ['Kit order', 'Josh Robertson and Joseph Slack can now drag items into the order they really sit in a kit. Doug approves each change before it shows up for everyone, so your list will start matching the bags.'],
   ['All on North Country', 'Live share with your partner and the known problems list now come from the agency\'s own Cloudflare account too. Nothing changes in how you use them.'],
   ['Med Vault', 'A count over par now shows an error. It can never be over. Recount, and if it really is over, contact a BC right away.'],
   ['Mechanical & Lights', 'New All Normal button marks the whole list Normal. Every item stays on screen so you can look them over and change any that aren\'t.'],
@@ -3180,6 +3240,7 @@ function renderCompartmentBody(safeId, comp) {
         <button type="button" class="abc-btn${alpha ? ' on' : ''}" data-abc="${escapeAttr(comp.name)}" data-abc-safeid="${safeId}" title="Sort A to Z" aria-label="Sort A to Z">ABC</button></div>`;
     }
     const list = alpha ? [...comp.items].sort((a, b) => a.name.localeCompare(b.name, 'en', { numeric: true, sensitivity: 'base' })) : comp.items;
+    html += moveBtnHTML(comp.name, '', comp.items.length);
     html += `<div class="item-list" data-bag-name="">`;
     list.forEach((it, itIdx) => {
       html += itemRowHTML(it, comp.name, '', itIdx);
@@ -3225,6 +3286,7 @@ function renderCompartmentBody(safeId, comp) {
           </div>
           <div class="bag-body">
             ${bagRedTag}
+            ${moveBtnHTML(comp.name, bag.name, bag.items.length)}
             <div class="item-list" data-bag-name="${escapeAttr(bag.name)}">
               ${bag.items.map((it, itIdx) => itemRowHTML(it, comp.name, bag.name, itIdx)).join('')}
             </div>
@@ -6054,6 +6116,416 @@ function escapeHTML(s) {
 function escapeAttr(s) {
   return escapeHTML(s);
 }
+</script>
+
+<!-- ============ 2.27 KIT MOVES ============ -->
+<div class="mv-overlay" id="mv-sheet" hidden role="dialog" aria-modal="true" aria-labelledby="mv-sheet-title">
+  <div class="mv-panel">
+    <div class="mv-top">
+      <div><div class="mv-title" id="mv-sheet-title">Reorder</div><div class="mv-sub" id="mv-sheet-sub"></div></div>
+      <button type="button" class="mv-x" id="mv-x" aria-label="Close">✕</button>
+    </div>
+    <div class="mv-scroll" id="mv-scroll">
+      <p class="mv-hint">Put the items in the order they really sit. Hold ≡ and drag, or use the arrows. Doug approves it before anyone else sees it.</p>
+      <div class="mv-warn" id="mv-sheet-warn" hidden></div>
+      <ol class="mv-list" id="mv-list"></ol>
+      <div id="mv-rigs-wrap"><div class="mv-label">Same new order on</div><div class="mv-rigs" id="mv-rigs"></div></div>
+      <div class="mv-label">Note for Doug (optional)</div>
+      <textarea class="mv-note" id="mv-note" placeholder="Why the change, or anything else that moved"></textarea>
+      <div class="mv-msg" id="mv-msg"></div>
+    </div>
+    <div class="mv-foot">
+      <button type="button" class="mv-btn" id="mv-reset">Undo all</button>
+      <button type="button" class="mv-btn go" id="mv-send">Send to Doug</button>
+    </div>
+  </div>
+</div>
+<div class="mv-overlay" id="mv-review" hidden role="dialog" aria-modal="true" aria-labelledby="mv-review-title">
+  <div class="mv-panel">
+    <div class="mv-top">
+      <div><div class="mv-title" id="mv-review-title">Kit moves</div><div class="mv-sub" id="mv-review-sub"></div></div>
+      <button type="button" class="mv-x" id="mv-review-x" aria-label="Close">✕</button>
+    </div>
+    <div class="mv-scroll"><div id="mv-review-list"></div></div>
+  </div>
+</div>
+<script>
+/* ============================================================
+   KIT MOVES (2.27): trusted crew drag items into the order they
+   really sit in a kit. Doug approves each move before it reaches
+   the shared list. Movers and approver are set in the Worker.
+   ============================================================ */
+const MOVES = { me: null, list: [], sheet: null };
+const MOVES_ME_KEY = 'ep_moves_me_v1';
+const MOVE_SITE = 'https://checks.northcountryems.org/';
+
+function movesCanMove() { return AUTH.state === 'in' && MOVES.me && MOVES.me.mover && MOVES.me.email === AUTH.email; }
+function movesIsApprover() { return AUTH.state === 'in' && MOVES.me && MOVES.me.approver && MOVES.me.email === AUTH.email; }
+
+async function movesBoot() {
+  try {
+    const c = JSON.parse(localStorage.getItem(MOVES_ME_KEY) || 'null');
+    if (c && c.email === AUTH.email) MOVES.me = c;
+  } catch (e) {}
+  try {
+    const me = await cfFetch('/moves/me', { auth: true, timeout: 8000 });
+    MOVES.me = { email: me.email, mover: !!me.mover, approver: !!me.approver };
+    try { localStorage.setItem(MOVES_ME_KEY, JSON.stringify(MOVES.me)); } catch (e) {}
+  } catch (e) { if (!MOVES.me) return; }
+  if (!MOVES.me.mover) { movesBanner(); return; }
+  await movesRefresh();
+  if (movesIsApprover() && /[?&]moves=1/.test(location.search) && movesPending().length) movesOpenReview();
+}
+async function movesRefresh() {
+  try {
+    const r = await cfFetch('/moves?status=' + (movesIsApprover() ? 'pending' : 'all'), { auth: true, timeout: 10000 });
+    MOVES.list = r.moves || [];
+  } catch (e) { console.warn('Kit moves did not load:', e); }
+  movesBanner();
+}
+function movesPending() { return MOVES.list.filter(m => m.status === 'pending'); }
+function movesBanner() {
+  const b = document.getElementById('moves-banner');
+  if (!b) return;
+  if (!MOVES.me || !MOVES.me.mover || AUTH.state !== 'in') { b.hidden = true; return; }
+  const n = movesPending().length;
+  if (movesIsApprover()) {
+    b.className = 'moves-banner';
+    b.textContent = n === 1 ? '1 kit move waiting for you' : n + ' kit moves waiting for you';
+    b.hidden = n === 0;
+  } else {
+    b.className = 'moves-banner mine';
+    b.textContent = n ? `Your kit moves: ${n} waiting on Doug` : 'You can reorder kits. Open a check and tap ↕ Reorder';
+    b.hidden = false;
+  }
+}
+
+/* ---------- finding a kit in the unit list ---------- */
+function moveFindKit(data, unitId, compName, bagName) {
+  const u = data && data.ambulanceCompartments && data.ambulanceCompartments[unitId];
+  if (!u) return null;
+  const groups = [];
+  ['interior', 'exterior'].forEach(t => (u[t] || []).forEach(c => groups.push({ type: t, comp: c })));
+  if (u.cabArea) groups.push({ type: 'cabArea', comp: u.cabArea });
+  const g = groups.find(x => x.comp && x.comp.name === compName);
+  if (!g) return null;
+  if (!bagName) return Array.isArray(g.comp.items) ? { type: g.type, items: g.comp.items } : null;
+  const bag = (g.comp.bags || []).find(b => b.name === bagName);
+  return bag && Array.isArray(bag.items) ? { type: g.type, items: bag.items } : null;
+}
+/* Which positions really moved: everything outside the longest run that kept its old order */
+function moveJumped(oldIdx) {
+  const n = oldIdx.length, len = new Array(n).fill(1), prev = new Array(n).fill(-1);
+  let best = -1;
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < i; j++) if (oldIdx[j] < oldIdx[i] && len[j] + 1 > len[i]) { len[i] = len[j] + 1; prev[i] = j; }
+    if (best < 0 || len[i] > len[best]) best = i;
+  }
+  const keep = new Set();
+  for (let k = best; k >= 0; k = prev[k]) keep.add(k);
+  return oldIdx.map((_, i) => !keep.has(i));
+}
+function moveOldIdx(before, after) {
+  const used = new Set();
+  return after.map(n => { let i = before.findIndex((x, k) => x === n && !used.has(k)); used.add(i); return i; });
+}
+const moveSameSet = (a, b) => a.length === b.length && [...a].sort().join('\u0001') === [...b].sort().join('\u0001');
+function moveWhere(m) { return m.comp + (m.bag ? ' › ' + m.bag : ''); }
+function moveWhen(iso) {
+  try { return new Date(iso).toLocaleString([], { month: 'numeric', day: 'numeric', hour: 'numeric', minute: '2-digit' }); } catch (e) { return iso; }
+}
+
+/* ---------- the Reorder button inside a compartment or bag ---------- */
+function moveBtnHTML(compName, bagName, count) {
+  if (!movesCanMove() || count < 2 || !APP.check || APP.check.type !== 'ambulance') return '';
+  return `<div class="mv-open-row"><button type="button" class="mv-open" data-mv-comp="${escapeAttr(compName)}" data-mv-bag="${escapeAttr(bagName || '')}">↕ Reorder</button></div>`;
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest && e.target.closest('[data-mv-comp]');
+  if (!b) return;
+  e.preventDefault(); e.stopPropagation();
+  moveOpenSheet(APP.check.unitId, b.dataset.mvComp, b.dataset.mvBag || '');
+}, true);
+
+/* ---------- mover sheet ---------- */
+function moveOpenSheet(unitId, compName, bagName) {
+  const kit = moveFindKit(APP.data, unitId, compName, bagName);
+  if (!kit) { alert('Could not find that kit in the unit list.'); return; }
+  const before = kit.items.map(it => it.name);
+  MOVES.sheet = { unitId, type: kit.type, comp: compName, bag: bagName, before };
+  const ov = document.getElementById('mv-sheet');
+  document.getElementById('mv-sheet-title').textContent = 'Reorder ' + (bagName || compName);
+  document.getElementById('mv-sheet-sub').textContent = unitId + ' · ' + moveWhere({ comp: compName, bag: bagName });
+  const dup = movesPending().find(m => m.comp === compName && (m.bag || '') === bagName && m.units.includes(unitId));
+  const warn = document.getElementById('mv-sheet-warn');
+  warn.hidden = !dup;
+  if (dup) warn.textContent = `You already sent a new order for this kit on ${moveWhen(dup.at)}. It is waiting on Doug. Sending another one adds a second request.`;
+  const list = document.getElementById('mv-list');
+  list.innerHTML = before.map((n, i) => `
+    <li class="mv-row" data-i="${i}" data-name="${escapeAttr(n)}">
+      <span class="mv-grip" aria-hidden="true">≡</span>
+      <span class="mv-num"></span>
+      <span class="mv-name">${escapeHTML(n)}<span class="mv-was"></span></span>
+      <button type="button" class="mv-arrow" data-mv-up aria-label="Move ${escapeAttr(n)} up">▲</button>
+      <button type="button" class="mv-arrow" data-mv-down aria-label="Move ${escapeAttr(n)} down">▼</button>
+    </li>`).join('');
+  // other rigs that carry the exact same kit
+  const rigs = (APP.data.ambulances || []).map(a => a.id);
+  const rigHTML = rigs.map(id => {
+    if (id === unitId) return `<label class="mv-rig"><input type="checkbox" checked disabled data-mv-rig="${escapeAttr(id)}"> ${escapeHTML(id)}</label>`;
+    const k = moveFindKit(APP.data, id, compName, bagName);
+    if (!k) return '';
+    if (!moveSameSet(k.items.map(x => x.name), before)) return `<label class="mv-rig off"><input type="checkbox" disabled> ${escapeHTML(id)} <small>different items</small></label>`;
+    return `<label class="mv-rig"><input type="checkbox" data-mv-rig="${escapeAttr(id)}"> ${escapeHTML(id)}</label>`;
+  }).join('');
+  document.getElementById('mv-rigs').innerHTML = rigHTML;
+  document.getElementById('mv-rigs-wrap').hidden = !rigHTML.includes('data-mv-rig="') || rigs.filter(id => id !== unitId && moveFindKit(APP.data, id, compName, bagName)).length === 0;
+  document.getElementById('mv-note').value = '';
+  moveSetMsg('');
+  moveRenumber();
+  ov.hidden = false;
+  document.body.style.overflow = 'hidden';
+}
+function moveCloseSheet() {
+  document.getElementById('mv-sheet').hidden = true;
+  document.body.style.overflow = '';
+  MOVES.sheet = null;
+}
+function moveCurrentOrder() { return [...document.querySelectorAll('#mv-list .mv-row')].map(r => r.dataset.name); }
+function moveRenumber() {
+  const rows = [...document.querySelectorAll('#mv-list .mv-row')];
+  const jumped = moveJumped(rows.map(r => Number(r.dataset.i)));
+  let changed = 0;
+  rows.forEach((r, i) => {
+    const was = Number(r.dataset.i);
+    r.querySelector('.mv-num').textContent = i + 1;
+    r.querySelector('.mv-was').textContent = jumped[i] ? 'was ' + (was + 1) : '';
+    r.classList.toggle('moved', jumped[i]);
+    if (jumped[i]) changed++;
+    r.querySelector('[data-mv-up]').disabled = i === 0;
+    r.querySelector('[data-mv-down]').disabled = i === rows.length - 1;
+  });
+  document.getElementById('mv-send').disabled = changed === 0;
+  document.getElementById('mv-reset').disabled = changed === 0;
+}
+function moveSetMsg(text, kind) {
+  const el = document.getElementById('mv-msg');
+  el.textContent = text || '';
+  el.className = 'mv-msg' + (kind ? ' ' + kind : '');
+}
+function moveWireSheet() {
+  const list = document.getElementById('mv-list');
+  list.addEventListener('click', e => {
+    const row = e.target.closest('.mv-row');
+    if (!row) return;
+    if (e.target.closest('[data-mv-up]') && row.previousElementSibling) list.insertBefore(row, row.previousElementSibling);
+    else if (e.target.closest('[data-mv-down]') && row.nextElementSibling) list.insertBefore(row.nextElementSibling, row);
+    else return;
+    moveRenumber();
+  });
+  // Drag with a finger or mouse on the ≡ grip. Pointer events work on iPhone, iPad and PC.
+  list.addEventListener('pointerdown', e => {
+    const grip = e.target.closest('.mv-grip');
+    if (!grip) return;
+    const row = grip.closest('.mv-row');
+    const scroller = document.getElementById('mv-scroll');
+    e.preventDefault();
+    try { grip.setPointerCapture(e.pointerId); } catch (x) {}
+    row.classList.add('dragging');
+    let y = e.clientY, timer = null;
+    const place = () => {
+      const others = [...list.children].filter(r => r !== row);
+      let target = null;
+      for (const r of others) { const b = r.getBoundingClientRect(); if (y < b.top + b.height / 2) { target = r; break; } }
+      if (target) { if (row.nextElementSibling !== target) list.insertBefore(row, target); }
+      else if (list.lastElementChild !== row) list.appendChild(row);
+    };
+    const edge = () => {
+      const box = scroller.getBoundingClientRect();
+      if (y < box.top + 50) { scroller.scrollTop -= 14; place(); }
+      else if (y > box.bottom - 50) { scroller.scrollTop += 14; place(); }
+    };
+    timer = setInterval(edge, 30);
+    const move = ev => { y = ev.clientY; place(); };
+    const up = () => {
+      clearInterval(timer);
+      grip.removeEventListener('pointermove', move);
+      grip.removeEventListener('pointerup', up);
+      grip.removeEventListener('pointercancel', up);
+      row.classList.remove('dragging');
+      moveRenumber();
+    };
+    grip.addEventListener('pointermove', move);
+    grip.addEventListener('pointerup', up);
+    grip.addEventListener('pointercancel', up);
+  });
+  document.getElementById('mv-x').addEventListener('click', moveCloseSheet);
+  document.getElementById('mv-sheet').addEventListener('click', e => { if (e.target.id === 'mv-sheet') moveCloseSheet(); });
+  document.getElementById('mv-reset').addEventListener('click', () => {
+    const rows = [...list.children].sort((a, b) => a.dataset.i - b.dataset.i);
+    rows.forEach(r => list.appendChild(r));
+    moveRenumber();
+  });
+  document.getElementById('mv-send').addEventListener('click', moveSend);
+  document.getElementById('mv-review-x').addEventListener('click', movesCloseReview);
+  document.getElementById('mv-review').addEventListener('click', e => { if (e.target.id === 'mv-review') movesCloseReview(); });
+  const banner = document.getElementById('moves-banner');
+  if (banner) banner.addEventListener('click', movesOpenReview);
+}
+
+async function moveSend() {
+  const s = MOVES.sheet;
+  if (!s) return;
+  const after = moveCurrentOrder();
+  const units = [s.unitId, ...[...document.querySelectorAll('#mv-rigs [data-mv-rig]')].filter(c => c.checked && !c.disabled).map(c => c.dataset.mvRig)];
+  const note = document.getElementById('mv-note').value.trim();
+  const btn = document.getElementById('mv-send');
+  btn.disabled = true; btn.textContent = 'Sending…';
+  moveSetMsg('');
+  try {
+    const body = { units, type: s.type, comp: s.comp, bag: s.bag, before: s.before, after, note, byName: AUTH.name, listVersion: (APP.data && APP.data.version) || '' };
+    const r = await cfFetch('/moves', { method: 'POST', auth: true, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    const mv = Object.assign({}, body, { id: r.id, at: r.at, by: AUTH.email, status: 'pending' });
+    MOVES.list.unshift(mv);
+    movesBanner();
+    moveEmail(movesApproverEmail(), 'KIT MOVE REQUEST', moveRequestText(mv));
+    moveSetMsg('Sent. Doug gets an email and approves it in the Checker. The new order shows for everyone after he does.', 'ok');
+    btn.textContent = 'Sent ✓';
+    setTimeout(() => { if (MOVES.sheet === s) moveCloseSheet(); }, 2200);
+  } catch (e) {
+    moveSetMsg('Did not send: ' + (e.message || e) + '. You need signal for this. Try again in a minute.', 'bad');
+    btn.disabled = false; btn.textContent = 'Send to Doug';
+    return;
+  }
+  setTimeout(() => { btn.textContent = 'Send to Doug'; }, 2400);
+}
+function movesApproverEmail() { return 'd.boyce@northcountryems.org'; }
+
+function moveOrderLines(m) {
+  const old = moveOldIdx(m.before, m.after), jumped = moveJumped(old);
+  return m.after.map((n, i) => `${i + 1}. ${n}${jumped[i] ? `   (moved, was ${old[i] + 1})` : ''}`);
+}
+function moveRequestText(m) {
+  return `KIT MOVE REQUEST, Apparatus Checker\n` +
+    `From: ${m.byName || m.by} (${m.by})\n` +
+    `Sent: ${moveWhen(m.at)}\n` +
+    `Rigs: ${m.units.join(', ')}\n` +
+    `Kit: ${moveWhere(m)}\n` +
+    (m.note ? `Note: ${m.note}\n` : '') +
+    `\nNEW ORDER\n${moveOrderLines(m).join('\n')}\n\n` +
+    `OLD ORDER\n${m.before.map((n, i) => `${i + 1}. ${n}`).join('\n')}\n\n` +
+    `Approve or turn it down in the Checker (sign in as yourself): ${MOVE_SITE}?moves=1`;
+}
+async function moveEmail(to, unitLabel, message) {
+  try {
+    if (!window.emailjs || !APP.data || !APP.data.emailjs) return false;
+    await emailjs.send(APP.data.emailjs.serviceId, APP.data.emailjs.templateId, {
+      unit_id: unitLabel, check_date: localDateStr(), check_type: 'kit move',
+      initials: AUTH.name || 'KIT', message, flags_count: 0, to_email: to
+    });
+    return true;
+  } catch (e) { console.warn('Kit move email did not send:', e); return false; }
+}
+
+/* ---------- review: Doug approves, movers see their own ---------- */
+function movesOpenReview() {
+  movesPaintReview();
+  document.getElementById('mv-review').hidden = false;
+  document.body.style.overflow = 'hidden';
+  movesRefresh().then(movesPaintReview);
+}
+function movesCloseReview() {
+  document.getElementById('mv-review').hidden = true;
+  document.body.style.overflow = '';
+}
+function movesPaintReview() {
+  const approver = movesIsApprover();
+  document.getElementById('mv-review-title').textContent = approver ? 'Kit moves waiting' : 'Your kit moves';
+  document.getElementById('mv-review-sub').textContent = approver
+    ? 'Approve puts the new order on the shared list for every device.'
+    : 'Doug approves each one. Approved moves show for everyone the next time the Checker opens.';
+  const rows = approver ? movesPending() : MOVES.list;
+  const box = document.getElementById('mv-review-list');
+  if (!rows.length) { box.innerHTML = `<div class="mv-hint">${approver ? 'Nothing waiting. You are all caught up.' : 'No moves sent yet. Open a check, open a compartment or bag, and tap ↕ Reorder.'}</div>`; return; }
+  box.innerHTML = rows.map(m => {
+    const st = m.status === 'approved' ? 'Approved' : m.status === 'rejected' ? 'Not approved' : 'Waiting on Doug';
+    const dec = m.decision || {};
+    const old = moveOldIdx(m.before, m.after), jumped = moveJumped(old);
+    const order = m.after.map((n, i) => `<li class="${jumped[i] ? 'moved' : ''}">${escapeHTML(n)}${jumped[i] ? ` <small>was ${old[i] + 1}</small>` : ''}</li>`).join('');
+    return `<div class="mv-card" data-mv-id="${escapeAttr(m.id)}">
+      <div class="mv-card-h">${escapeHTML(moveWhere(m))}${approver ? '' : `<span class="mv-status ${escapeAttr(m.status)}">${st}</span>`}</div>
+      <div class="mv-card-s">${escapeHTML(m.units.join(', '))} · ${approver ? escapeHTML(m.byName || m.by) + ' · ' : ''}${escapeHTML(moveWhen(m.at))}</div>
+      ${m.note ? `<div class="mv-card-note">${escapeHTML(m.note)}</div>` : ''}
+      ${!approver && m.status !== 'pending' ? `<div class="mv-card-s">${m.status === 'approved' ? 'Approved' : 'Turned down'} ${escapeHTML(moveWhen(m.decidedAt))}${dec.reason ? ': ' + escapeHTML(dec.reason) : ''}${dec.skipped && dec.skipped.length ? ' · not changed on ' + escapeHTML(dec.skipped.join(', ')) : ''}</div>` : ''}
+      <ol>${order}</ol>
+      <details><summary>Old order</summary><ol>${m.before.map(n => `<li>${escapeHTML(n)}</li>`).join('')}</ol></details>
+      ${approver ? `<textarea class="mv-reason" placeholder="Reason, if you turn it down (optional)"></textarea>
+      <div class="mv-card-btns">
+        <button type="button" class="mv-btn no" data-mv-decide="rejected">Turn down</button>
+        <button type="button" class="mv-btn go" data-mv-decide="approved">Approve</button>
+      </div><div class="mv-msg"></div>` : ''}
+    </div>`;
+  }).join('');
+  box.querySelectorAll('[data-mv-decide]').forEach(b => b.addEventListener('click', () => {
+    const card = b.closest('.mv-card');
+    const m = MOVES.list.find(x => x.id === card.dataset.mvId);
+    if (m) moveDecide(m, b.dataset.mvDecide, card);
+  }));
+}
+
+/* Put the new order into the unit list. Returns which rigs changed and which were skipped. */
+function moveApplyTo(data, m) {
+  const applied = [], skipped = [];
+  m.units.forEach(u => {
+    const kit = moveFindKit(data, u, m.comp, m.bag);
+    if (!kit) { skipped.push(u + ' (kit not found)'); return; }
+    if (!moveSameSet(kit.items.map(x => x.name), m.after)) { skipped.push(u + ' (items changed since)'); return; }
+    const pool = kit.items.slice();
+    const next = m.after.map(n => pool.splice(pool.findIndex(x => x.name === n), 1)[0]);
+    kit.items.splice(0, kit.items.length, ...next);
+    applied.push(u);
+  });
+  return { applied, skipped };
+}
+
+async function moveDecide(m, status, card) {
+  const msg = card.querySelector('.mv-msg');
+  const btns = card.querySelectorAll('[data-mv-decide]');
+  const reason = (card.querySelector('.mv-reason') || {}).value || '';
+  const say = (t, k) => { msg.textContent = t; msg.className = 'mv-msg' + (k ? ' ' + k : ''); };
+  btns.forEach(b => b.disabled = true);
+  say(status === 'approved' ? 'Saving the new order…' : 'Saving…');
+  try {
+    let decision = { status, reason: reason.trim() };
+    if (status === 'approved') {
+      // Start from the newest shared list so no one else's save is lost
+      const shared = await loadSharedList();
+      if (shared && shared.data && verCmp(shared.data.version, APP.data.version) >= 0) APP.data = shared.data;
+      const res = moveApplyTo(APP.data, m);
+      if (!res.applied.length) {
+        say('None of these rigs still have this exact kit (' + res.skipped.join(', ') + '). Turn it down, or have them send it again.', 'bad');
+        btns.forEach(b => b.disabled = false);
+        return;
+      }
+      const saved = await pushSharedList(`Kit move by ${m.byName || m.by}: ${res.applied.join(', ')} ${moveWhere(m)}`);
+      if (!saved.ok) throw new Error(saved.why || 'shared list did not save');
+      Object.assign(decision, { unitsId: saved.id || null, applied: res.applied, skipped: res.skipped });
+    }
+    await cfFetch(`/moves/${encodeURIComponent(m.id)}/decide`, { method: 'POST', auth: true, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(decision) });
+    m.status = status; m.decision = decision; m.decidedAt = new Date().toISOString();
+    const back = status === 'approved'
+      ? `Doug approved your kit move: ${moveWhere(m)} on ${decision.applied.join(', ')}.` + (decision.skipped.length ? ` Not changed on ${decision.skipped.join(', ')}.` : '') + ` Every device gets the new order the next time the Checker opens.`
+      : `Doug did not approve your kit move: ${moveWhere(m)} (${m.units.join(', ')}).` + (decision.reason ? ` Reason: ${decision.reason}` : '');
+    moveEmail(m.by, 'KIT MOVE ' + (status === 'approved' ? 'APPROVED' : 'NOT APPROVED'), back + `\n\nNEW ORDER YOU SENT\n${moveOrderLines(m).join('\n')}`);
+    say(status === 'approved' ? 'Approved. Saved to the shared list.' + (decision.skipped.length ? ' Skipped ' + decision.skipped.join(', ') + '.' : '') : 'Turned down.', 'ok');
+    setTimeout(() => { movesBanner(); movesPaintReview(); if (!movesPending().length) setTimeout(movesCloseReview, 900); }, 1200);
+  } catch (e) {
+    say('Did not save: ' + (e.message || e) + '. Nothing was changed on the decision. Try again.', 'bad');
+    btns.forEach(b => b.disabled = false);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', moveWireSheet);
 </script>
 </body>
 </html>
