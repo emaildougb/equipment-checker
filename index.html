@@ -1434,6 +1434,36 @@
       min-height: 48px;
     }
     .big-btn:active { background: var(--g-mid); }
+
+    /* 2.23: everyone signs in with their NCEMS Microsoft account */
+    .signin-gate {
+      position: fixed; inset: 0; z-index: 9000;
+      background: linear-gradient(180deg, var(--g-deep) 0%, var(--g-mid) 100%);
+      color: var(--white);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 24px 20px; padding-top: calc(24px + env(safe-area-inset-top));
+      text-align: center; gap: 14px;
+    }
+    .signin-gate[hidden] { display: none; }
+    .signin-gate img { width: 132px; height: 132px; border-radius: 50%; object-fit: cover; }
+    .signin-gate h1 { font-size: 22px; margin: 4px 0 0; }
+    .signin-gate p { font-size: 15px; line-height: 1.5; color: rgba(255,255,255,0.85); max-width: 340px; margin: 0; }
+    .signin-gate .gate-btn {
+      width: 100%; max-width: 340px; min-height: 52px; border: none; border-radius: 12px;
+      background: var(--white); color: var(--g-deep); font-size: 17px; font-weight: 800; cursor: pointer;
+    }
+    .signin-gate .gate-link {
+      background: none; border: none; color: rgba(255,255,255,0.8); font-size: 14px;
+      text-decoration: underline; cursor: pointer; padding: 8px;
+    }
+    .signin-gate .gate-err { font-size: 13px; color: #FFD4D4; max-width: 340px; }
+    .who-strip {
+      font-size: 13px; color: rgba(255,255,255,0.85); margin: 0 0 6px; flex-shrink: 0;
+    }
+    .who-strip button {
+      background: none; border: none; color: var(--white); text-decoration: underline;
+      font-size: 13px; font-weight: 700; cursor: pointer; padding: 6px 4px;
+    }
     .err-box {
       background: var(--bad-bg);
       border: 1px solid var(--bad);
@@ -1477,6 +1507,16 @@
   </div>
 </div>
 
+<!-- ============ SIGN IN GATE (2.23) ============ -->
+<div class="signin-gate" id="signin-gate">
+  <img src="./logo.png" alt="North Country EMS" />
+  <h1>Daily Apparatus Check</h1>
+  <p id="gate-msg">Checking your sign in...</p>
+  <button class="gate-btn" id="gate-signin-btn" type="button" hidden>Sign in with Microsoft</button>
+  <button class="gate-link" id="gate-offline-btn" type="button" hidden>Continue without signing in</button>
+  <div class="gate-err" id="gate-err"></div>
+</div>
+
 <!-- ============ HOME SCREEN ============ -->
 <div class="screen home active" id="screen-home">
   <a class="corner-btn corner-left" href="https://hub.northcountryems.org/" aria-label="Back to NCEMS Hub" title="NCEMS Hub">
@@ -1499,6 +1539,7 @@
   </div>
   <div class="logo-flip-hint" id="logo-flip-hint">Tap logo to flip</div>
   <div class="home-sub">Daily Apparatus Check</div>
+  <div class="who-strip" id="who-strip" hidden>Signed in as <b id="who-name"></b> · <button type="button" id="who-switch">Switch user</button></div>
   <div class="home-buttons">
     <button class="home-btn ambulances" id="home-btn-ambulances" type="button">
       <div class="home-btn-label">Ambulances</div>
@@ -1622,14 +1663,14 @@
    APP STATE
    ============================================================ */
 const APP = {
-  version: '2.22',
+  version: '2.24',
   data: null,        // loaded units.json
   screen: 'home',
   check: null,       // current in-progress check
 };
 
 /* ============================================================
-   MSAL CONFIG — Microsoft sign-in for admin
+   MSAL CONFIG — Microsoft sign-in for everyone (2.23) and admin
    ============================================================ */
 const MSAL_CONFIG = {
   clientId: 'f3d031a6-3fc4-42df-8f01-d3c3d28ae9a5',
@@ -1685,6 +1726,7 @@ async function initMsal(goToAdmin) {
   const res = await msalApp.handleRedirectPromise();
   if (res && res.account) {
     msalAccount = res.account;
+    try { msalApp.setActiveAccount(res.account); } catch (e) {}
     saveInitialsFromAccount(msalAccount);
     if (goToAdmin) {
       if (isAuthorizedAdmin(msalAccount)) {
@@ -1734,10 +1776,179 @@ function msalSignOut() {
   else goHome();
 }
 
+/* ============================================================
+   2.23 SIGN IN FOR EVERYONE
+   Everyone signs in with their NCEMS Microsoft account before a check.
+   Admins still use the logo flip for the admin side.
+   ============================================================ */
+const AUTH = { state: 'pending', email: '', name: '' };
+function acctIsNcems(a) { return !!(a && /@northcountryems\.org$/i.test((a.username || '').trim())); }
+function loginHint() {
+  try {
+    const q = new URLSearchParams(location.search).get('login_hint');
+    if (q) return q;
+    return localStorage.getItem('ncems_login_hint') || '';
+  } catch (e) { return ''; }
+}
+function gateSignIn(selectAccount) {
+  if (!msalApp) return;
+  const req = { scopes: ['User.Read'] };
+  const hint = loginHint();
+  if (selectAccount || !hint) req.prompt = 'select_account';
+  else req.loginHint = hint;
+  msalApp.loginRedirect(req);
+}
+function setAuth(state, detail) {
+  AUTH.state = state;
+  const gate = document.getElementById('signin-gate');
+  const msg = document.getElementById('gate-msg');
+  const btn = document.getElementById('gate-signin-btn');
+  const off = document.getElementById('gate-offline-btn');
+  const err = document.getElementById('gate-err');
+  const strip = document.getElementById('who-strip');
+  err.textContent = '';
+  btn.hidden = true; off.hidden = true;
+  if (state === 'in') {
+    AUTH.email = (msalAccount.username || '').toLowerCase();
+    AUTH.name = (msalAccount.name || AUTH.email).trim();
+    try { localStorage.setItem('ncems_login_hint', AUTH.email); } catch (e) {}
+    document.getElementById('who-name').textContent = AUTH.name;
+    strip.hidden = false;
+    gate.hidden = true;
+    return;
+  }
+  strip.hidden = true;
+  gate.hidden = false;
+  if (state === 'out') {
+    msg.textContent = 'Sign in with your North Country EMS Microsoft account (the same one you use for NCEMS email) to start your check.';
+    btn.hidden = false;
+  } else if (state === 'wrong') {
+    msg.textContent = 'That account (' + (detail || 'unknown') + ') is not a North Country EMS account. Sign in with your @northcountryems.org account.';
+    btn.textContent = 'Use a different account';
+    btn.hidden = false;
+  } else if (state === 'offline') {
+    msg.textContent = 'Microsoft sign in could not load. If you have no signal, you can still do the check. Type your name on the check and it will be marked not signed in.';
+    off.hidden = false;
+    if (detail) err.textContent = detail;
+  } else {
+    msg.textContent = 'Checking your sign in...';
+  }
+}
+async function authBoot() {
+  if (!MSAL_CONFIG.clientId) { setAuth('offline', 'Sign in is not set up yet.'); return; }
+  if (typeof msal === 'undefined') { setAuth('offline'); return; }
+  try {
+    await initMsal(false);
+  } catch (e) {
+    setAuth(navigator.onLine === false ? 'offline' : 'out');
+    document.getElementById('gate-err').textContent = e.message || String(e);
+    return;
+  }
+  if (msalAccount && acctIsNcems(msalAccount)) {
+    msalApp.setActiveAccount(msalAccount);
+    saveInitialsFromAccount(msalAccount);
+    setAuth('in');
+  } else if (msalAccount) {
+    setAuth('wrong', msalAccount.username);
+  } else {
+    setAuth('out');
+  }
+}
+function authWire() {
+  document.getElementById('gate-signin-btn').addEventListener('click', () => gateSignIn(AUTH.state === 'wrong'));
+  document.getElementById('gate-offline-btn').addEventListener('click', () => {
+    AUTH.state = 'offline-ok';
+    document.getElementById('signin-gate').hidden = true;
+  });
+  document.getElementById('who-switch').addEventListener('click', () => {
+    if (APP.check && hasUnsavedWork() && !confirm('A check is in progress on this device. Switch user anyway? It stays saved here.')) return;
+    gateSignIn(true);
+  });
+}
+
+/* ============================================================
+   2.24 CLOUDFLARE: Doug's ncems-checks Worker
+   Check records (D1), photos (R2) and the shared unit list.
+   Firebase still gets every check until CG Staff reads from Cloudflare too.
+   ============================================================ */
+const CHECKS_API_DEFAULT = 'https://ncems-checks.d-boyce.workers.dev';
+function checksApi() { return ((APP.data && APP.data.checksApi) || CHECKS_API_DEFAULT).replace(/\/+$/, ''); }
+function jwtExp(t) {
+  try { return JSON.parse(atob(t.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))).exp || 0; } catch (e) { return 0; }
+}
+async function getIdToken() {
+  if (!msalApp || !msalAccount || AUTH.state !== 'in') return null;
+  try {
+    let r = await msalApp.acquireTokenSilent({ scopes: ['User.Read'], account: msalAccount });
+    if (!r.idToken || jwtExp(r.idToken) * 1000 < Date.now() + 5 * 60 * 1000) {
+      r = await msalApp.acquireTokenSilent({ scopes: ['User.Read'], account: msalAccount, forceRefresh: true });
+    }
+    return r.idToken || null;
+  } catch (e) {
+    console.warn('No sign in token right now:', e);
+    return null;
+  }
+}
+async function cfFetch(path, opts) {
+  opts = opts || {};
+  const headers = Object.assign({}, opts.headers || {});
+  if (opts.auth) {
+    const tok = await getIdToken();
+    if (!tok) throw new Error('Not signed in');
+    headers.Authorization = 'Bearer ' + tok;
+  }
+  const ctl = new AbortController();
+  const timer = setTimeout(() => ctl.abort(), opts.timeout || 15000);
+  try {
+    const res = await fetch(checksApi() + path, { method: opts.method || 'GET', headers, body: opts.body, signal: ctl.signal, cache: 'no-store' });
+    let data = null;
+    try { data = await res.json(); } catch (e) {}
+    if (!res.ok) { const err = new Error((data && data.error) || ('Worker ' + res.status)); err.status = res.status; throw err; }
+    return data;
+  } finally { clearTimeout(timer); }
+}
+function verNum(v) { return String(v || '0').split('.').map(n => parseInt(n, 10) || 0); }
+function verCmp(a, b) {
+  const x = verNum(a), y = verNum(b);
+  for (let i = 0; i < Math.max(x.length, y.length); i++) { const d = (x[i] || 0) - (y[i] || 0); if (d) return d; }
+  return 0;
+}
+/* Shared unit list: one copy in the Worker, every save kept as history.
+   The newer list version wins; on a tie the shared copy wins (it has admin edits). */
+const PENDING_LIST = 'equipcheck_pending_list_v1';
+async function loadSharedList() {
+  try { return await cfFetch('/units', { timeout: 5000 }); } catch (e) { return null; }
+}
+async function pushSharedList(note) {
+  const data = JSON.parse(JSON.stringify(APP.data));
+  delete data._note;
+  data.editedAt = new Date().toISOString();
+  data.editedBy = AUTH.email || '';
+  try { localStorage.setItem(PENDING_LIST, JSON.stringify({ data, note, at: data.editedAt })); } catch (e) {}
+  try {
+    const r = await cfFetch('/units', { method: 'PUT', auth: true, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ data, note }) });
+    try { localStorage.removeItem(PENDING_LIST); } catch (e) {}
+    APP.data = data;
+    APP.listSource = { from: 'shared', at: r.at, by: r.by };
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, why: e.message || String(e) };
+  }
+}
+async function retryPendingList() {
+  let p = null;
+  try { p = JSON.parse(localStorage.getItem(PENDING_LIST) || 'null'); } catch (e) {}
+  if (!p || !p.data || AUTH.state !== 'in' || !isAuthorizedAdmin(msalAccount)) return;
+  const r = await pushSharedList(p.note || 'Saved earlier, sent when signal came back');
+  if (r.ok) console.log('Sent the saved unit list to the shared copy');
+}
+
 function showAppInfo() { showWhatsNew(true); }
 const WHATS_NEW = [
-  ['Photo on problems', 'Anything you mark as a problem now has an Add photo button. Photos are optional. Snap one when it helps the chiefs see it.'],
-  ['Describe the problem', 'Every problem needs a short description before you submit, unless you fixed it on the spot. Fuel, DEF, O2 PSI and narc counts already say it, so they are skipped.'],
+  ['Saved to North Country', 'Checks and photos now save to the agency\'s own Cloudflare account. Nothing changes in how you do the check.'],
+  ['One shared list', 'When an admin edits a rig\'s inventory, every phone and iPad gets it the next time the app opens.'],
+  ['Sign in', 'Everyone now signs in with their North Country EMS Microsoft account. Your name fills in for you. On a shared iPad, tap Switch user on the home screen.'],
+  ['Airway Bag', 'C-MAC and EZ IO kits now live inside the Airway Bag. The airway roll runs by tube size, and the middle bag and adjunct pocket are in a new order.'],
 ];
 function showWhatsNew(force) {
   let seen = '';
@@ -1764,9 +1975,8 @@ window.addEventListener('DOMContentLoaded', boot);
 
 async function boot() {
   // Handle MSAL redirect return first — catches ?code=/?state= on page load
-  if (MSAL_CONFIG && MSAL_CONFIG.clientId) {
-    initMsal(false).catch(function(){});
-  }
+  authWire();
+  authBoot();
 
   document.getElementById('today-date').textContent =
     new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
@@ -1826,11 +2036,24 @@ async function boot() {
     const res = await fetch(`./units.json?t=${Date.now()}`, { cache: 'no-store' });
     if (!res.ok) throw new Error(`Failed to load units.json: ${res.status}`);
     APP.data = await res.json();
+    APP.listSource = { from: 'github' };
+    // 2.24: the shared list on Cloudflare has admin edits from every device
+    const shared = await loadSharedList();
+    if (shared && shared.data && verCmp(shared.data.version, APP.data.version) >= 0) {
+      APP.data = shared.data;
+      APP.listSource = { from: 'shared', at: shared.at, by: shared.by };
+    }
+    // A save that could not reach Cloudflare yet wins until it is sent
+    try {
+      const pend = JSON.parse(localStorage.getItem(PENDING_LIST) || 'null');
+      if (pend && pend.data && verCmp(pend.data.version, APP.data.version) >= 0) { APP.data = pend.data; APP.listSource = { from: 'pending', at: pend.at }; }
+    } catch (e) {}
     document.getElementById('version-tag').textContent = APP.version + (APP.data.version && APP.data.version !== APP.version ? ' · list ' + APP.data.version : '');
     showWhatsNew(false);
 
-    // Overlay any admin edits from localStorage on top of the base data
+    // Old per-device admin edits (before 2.24) are no longer applied; the admin page offers to send them
     applyOverrides();
+    setTimeout(retryPendingList, 4000);
 
     // Initialize EmailJS
     if (APP.data.emailjs && APP.data.emailjs.publicKey && window.emailjs) {
@@ -1847,9 +2070,12 @@ async function boot() {
 }
 
 function applyOverrides() {
+  // 2.24: kept for reference only. Old edits made on one device are not applied any more,
+  // because they hid every later list change on that device. Admin home offers to send them.
   try {
     const raw = localStorage.getItem('equipcheck_overrides_v1');
-    if (!raw) return;
+    APP.legacyEdits = !!raw;
+    return;
     const overrides = JSON.parse(raw);
     if (overrides.ambulanceCompartments) {
       // Replace per-unit overrides (admin saves whole compartments structure per unit)
@@ -1876,10 +2102,18 @@ function saveOverrides(unitId, compartments) {
   APP.data.ambulanceCompartments[unitId] = compartments;
 }
 
+function mergeLegacyEdits() {
+  const o = JSON.parse(localStorage.getItem('equipcheck_overrides_v1') || 'null');
+  if (!o || !o.ambulanceCompartments) return [];
+  Object.keys(o.ambulanceCompartments).forEach(u => { APP.data.ambulanceCompartments[u] = o.ambulanceCompartments[u]; });
+  return Object.keys(o.ambulanceCompartments);
+}
+
 function clearAllOverrides() {
-  if (!confirm('Clear ALL admin edits on this device? Inventory will reset to whatever is in units.json on the server. This cannot be undone.')) return;
+  if (!confirm('Throw away the old edits saved only on this device? The shared list everyone uses is not touched.')) return;
   localStorage.removeItem('equipcheck_overrides_v1');
-  alert('Cleared. Reload the page to see the original inventory.');
+  APP.legacyEdits = false;
+  showAdminHome();
 }
 
 /* Email this device's admin edits as a readable change request.
@@ -4070,7 +4304,7 @@ function addIssuePhotoButtons() {
       const prev = box.querySelector('.iss-photo-prev');
       prev.innerHTML = '<span style="color:var(--muted)">Uploading photo…</span>';
       try {
-        const r = await uploadPhoto(file);
+        const r = await uploadPhoto(file, label);
         APP.check.issuePhotos = APP.check.issuePhotos || {};
         APP.check.issuePhotos[key] = { url: r.url, type: r.type, label: (APP.check.unitName ? APP.check.unitName + ' ' : '') + label };
         paintIssuePhoto(det); saveAutosave();
@@ -4088,7 +4322,17 @@ function addIssuePhotoButtons() {
 /* ============================================================
    PHOTOS — Cloudinary upload (falls back to base64 if not configured)
    ============================================================ */
-async function uploadPhoto(file) {
+async function uploadPhoto(file, label) {
+  // 2.24: Cloudflare R2 first (kept with the check record), Cloudinary if that fails
+  try {
+    const unit = (APP.check && (APP.check.unitId || APP.check.unitName)) || 'unit';
+    const type = /^image\//.test(file.type || '') ? file.type : 'image/jpeg';
+    const r = await cfFetch(`/photos?unit=${encodeURIComponent(unit)}&label=${encodeURIComponent(label || 'photo')}`,
+      { method: 'POST', auth: true, headers: { 'Content-Type': type }, body: file, timeout: 60000 });
+    if (r && r.url) return { url: r.url, type: 'url', store: 'r2' };
+  } catch (e) {
+    console.warn('Cloudflare photo upload failed, trying Cloudinary:', e);
+  }
   const cfg = APP.data.cloudinary;
   if (cfg && cfg.cloudName && cfg.cloudName !== 'YOUR_CLOUD_NAME' && cfg.uploadPreset && cfg.uploadPreset !== 'YOUR_UPLOAD_PRESET') {
     // Upload to Cloudinary, get back a URL
@@ -4121,7 +4365,7 @@ async function handlePhoto(e, target, previewId) {
   if (preview) preview.innerHTML = `<div style="color:var(--muted);font-size:13px;padding:6px;">Uploading photo…</div>`;
 
   try {
-    const result = await uploadPhoto(file);
+    const result = await uploadPhoto(file, target === 'cooler' ? 'Fridge thermometer' : 'Walk around');
 
     if (target === 'walkAround') APP.check.walkAround.photo = result;
     else if (target === 'cooler') APP.check.cooler.photo = result;
@@ -4635,6 +4879,8 @@ function buildCheckLogRecord(c, crewLine, pct, held, detail) {
     at: new Date().toISOString(),
     atMs: Date.now(),
     crew: crewLine || c.initials || '',
+    by: AUTH.state === 'in' ? AUTH.email : '',
+    byName: AUTH.state === 'in' ? AUTH.name : '',
     pct: pct,
     held: !!held,
     mileage: c.mileage || '',
@@ -4649,12 +4895,33 @@ function buildCheckLogRecord(c, crewLine, pct, held, detail) {
   };
 }
 
+/* 2.24: every record goes to Cloudflare and (for the 2 week overlap) Firebase.
+   Each record remembers where it already landed (_cf, _fb) so a retry only redoes what is missing.
+   Both use the record id, so a resend is an update, never a duplicate. */
+// Stays on until units.json (or the shared list) sets "firebaseUntil": "YYYY-MM-DD", once CG Staff reads from Cloudflare
+const FIREBASE_UNTIL = '9999-12-31';
+function firebaseStillOn() { return localDateStr() <= ((APP.data && APP.data.firebaseUntil) || FIREBASE_UNTIL); }
+function bare(r) { const o = Object.assign({}, r); delete o._cf; delete o._fb; return o; }
 async function pushCheckLog(records) {
   if (!records.length) return true;
-  const db = await fbReady(), col = checkLogCfg().collection;
-  // doc id = record id, so a retry never makes a duplicate
-  for (const r of records) await fbFs.setDoc(fbFs.doc(db, col, r.id), r);
-  return true;
+  let err = null;
+  const needCf = records.filter(r => !r._cf);
+  if (needCf.length) {
+    try {
+      for (let i = 0; i < needCf.length; i += 25) {
+        await cfFetch('/checks', { method: 'POST', auth: true, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(needCf.slice(i, i + 25).map(bare)) });
+      }
+      needCf.forEach(r => { r._cf = true; });
+    } catch (e) { err = e; }
+  }
+  const needFb = firebaseStillOn() ? records.filter(r => !r._fb) : [];
+  if (needFb.length) {
+    try {
+      const db = await fbReady(), col = checkLogCfg().collection;
+      for (const r of needFb) { await fbFs.setDoc(fbFs.doc(db, col, r.id), bare(r)); r._fb = true; }
+    } catch (e) { err = err || e; }
+  } else records.forEach(r => { r._fb = true; });
+  return !err;
 }
 
 async function logCheckToBoard(record) {
@@ -4672,8 +4939,9 @@ async function flushCheckLogQueue() {
   checkLogBusy = true;
   try {
     await pushCheckLog(q);
-    const sent = new Set(q.map(x => x.id));
-    const left = loadJSON(CHECKLOG_QUEUE, []).filter(x => !sent.has(x.id));
+    const done = new Map(q.map(x => [x.id, x]));
+    // keep anything new that queued while we were sending; keep partly sent ones with their flags
+    const left = loadJSON(CHECKLOG_QUEUE, []).map(x => done.get(x.id) || x).filter(x => !(x._cf && x._fb));
     try { localStorage.setItem(CHECKLOG_QUEUE, JSON.stringify(left)); } catch (e) {}
   } catch (e) {
     console.warn('Check log not sent yet, will retry:', e);
@@ -5205,6 +5473,7 @@ function buildSummary() {
 
   lines.push(`APPARATUS CHECK — ${c.unitName}`);
   lines.push(`Date: ${c.date}   Crew: ${c.initials}   Type: ${c.type === 'ambulance' ? 'Ambulance' : 'Rescue Rig'}`);
+  lines.push(AUTH.state === 'in' ? `Signed in: ${AUTH.name} (${AUTH.email})` : 'Signed in: NOT SIGNED IN (no signal at check time)');
   if (c.mileage) lines.push(`Mileage: ${c.mileage}`);
   lines.push('');
 
@@ -5474,6 +5743,34 @@ function showAdminHome() {
     body.appendChild(who);
   }
 
+  const src = document.createElement('p');
+  src.style.cssText = 'font-size:12px;color:var(--text-muted);margin-bottom:8px;';
+  const ls = APP.listSource || {};
+  src.textContent = ls.from === 'shared'
+    ? `Shared list ${APP.data.version || ''}, last saved ${ls.at ? new Date(ls.at).toLocaleString() : ''} by ${ls.by || 'unknown'}. Saves go to every device.`
+    : ls.from === 'pending'
+      ? 'Your last save has not reached the shared list yet. It sends by itself when there is signal.'
+      : `List ${APP.data.version || ''} from GitHub. Your first save starts the shared list for every device.`;
+  body.appendChild(src);
+
+  if (APP.legacyEdits) {
+    const old = document.createElement('div');
+    old.className = 'err-box';
+    old.style.cssText = 'margin-bottom:12px;padding:12px;';
+    old.innerHTML = `<b>Old edits on this device.</b> Before 2.24, admin edits only lived on the device they were made on, and they are not used any more. Send them to the shared list, or throw them away.
+      <div style="display:flex;gap:8px;margin-top:10px;"><button class="admin-btn primary" type="button" id="legacy-send">Send to shared list</button><button class="admin-btn" type="button" id="legacy-clear">Throw away</button></div>`;
+    body.appendChild(old);
+    old.querySelector('#legacy-send').addEventListener('click', async () => {
+      if (!confirm('This replaces those units on the shared list with the old copy saved on this device. Any newer changes to those units (like the 2.23 airway bag) would be lost. Send anyway?')) return;
+      const units = mergeLegacyEdits();
+      const r = await pushSharedList('Old device edits: ' + units.join(', '));
+      if (r.ok) { localStorage.removeItem('equipcheck_overrides_v1'); APP.legacyEdits = false; alert('Sent ' + units.join(', ') + ' to the shared list.'); }
+      else alert('Could not send: ' + r.why);
+      showAdminHome();
+    });
+    old.querySelector('#legacy-clear').addEventListener('click', clearAllOverrides);
+  }
+
   const intro = document.createElement('p');
   intro.className = 'picker-intro';
   intro.textContent = 'Pick an ambulance to edit its inventory.';
@@ -5503,12 +5800,10 @@ function showAdminHome() {
     <textarea id="admin-email-notes" placeholder="Why these changes? e.g. 'New Hurst battery spare added to all rigs per Chief'" style="width:100%;min-height:70px;padding:10px;border:1.5px solid var(--border);border-radius:8px;font-family:inherit;font-size:14px;background:var(--white);margin-bottom:10px;"></textarea>
     <button class="admin-btn" type="button" id="admin-export-btn">Download units.json</button>
     <button class="admin-btn" type="button" id="admin-email-btn">📧 Email changes to admin</button>
-    <button class="admin-btn danger" type="button" id="admin-clear-btn">Clear all overrides</button>
   `;
   body.appendChild(actions);
   document.getElementById('admin-export-btn').addEventListener('click', exportUnitsJson);
   document.getElementById('admin-email-btn').addEventListener('click', emailOverridesDiff);
-  document.getElementById('admin-clear-btn').addEventListener('click', clearAllOverrides);
 
   showScreen('admin-home');
 }
@@ -5542,10 +5837,16 @@ function showAdminAmb(unitId) {
     <button class="admin-btn" type="button" id="admin-discard-btn">Discard</button>
   `;
   body.appendChild(actions);
-  document.getElementById('admin-save-btn').addEventListener('click', () => {
-    saveOverrides(ADMIN.unitId, ADMIN.draft);
+  document.getElementById('admin-save-btn').addEventListener('click', async () => {
+    const btn = document.getElementById('admin-save-btn');
+    btn.disabled = true; btn.textContent = 'Saving...';
+    const unitId = ADMIN.unitId;
+    APP.data.ambulanceCompartments[unitId] = ADMIN.draft;
     ADMIN.draft = null;  // clear so next ambulance picks fresh
-    alert(`Saved changes to ${ADMIN.unitId}. They'll show up on this device immediately. Tap "Download units.json" on the admin home to share the changes with other devices.`);
+    const r = await pushSharedList(`${unitId} edited`);
+    alert(r.ok
+      ? `Saved ${unitId} for every device. Crews get it the next time they open the app.`
+      : `Saved ${unitId} on this device. It could not reach the shared list (${r.why}), so it will send by itself next time you open the app with signal.`);
     showAdminHome();
   });
   document.getElementById('admin-discard-btn').addEventListener('click', () => {
@@ -5701,7 +6002,7 @@ function exportUnitsJson() {
   a.download = 'units.json';
   a.click();
   URL.revokeObjectURL(url);
-  setTimeout(() => alert('Downloaded units.json. Upload this to the GitHub repo to share these changes with the whole crew.'), 50);
+  setTimeout(() => alert('Downloaded the current list. Edits already reach every device through the shared list, so this is a backup copy (or send it to Doug for the next build).'), 50);
 }
 
 /* ============================================================

@@ -2,13 +2,15 @@
 
 Equipment and property check submission tool for North Country EMS crews.
 
-**Version 2.22**
+**Version 2.24**
 
 ## Links
 
 - Live: [https://checks.northcountryems.org/](https://checks.northcountryems.org/)
 - Repo: [https://github.com/emaildougb/equipment-checker](https://github.com/emaildougb/equipment-checker)
 - Upload: [https://github.com/emaildougb/equipment-checker/upload/main](https://github.com/emaildougb/equipment-checker/upload/main)
+- Worker health: [https://ncems-checks.d-boyce.workers.dev/health](https://ncems-checks.d-boyce.workers.dev/health)
+- Cloudflare dashboard: [https://dash.cloudflare.com/](https://dash.cloudflare.com/) > Workers > `ncems-checks`
 
 ## Files (upload ALL of these)
 
@@ -18,6 +20,28 @@ Equipment and property check submission tool for North Country EMS crews.
 - `apple-touch-icon.png` : iOS home-screen + tab icon
 - `manifest.json` : standalone app-mode config
 - `README.md` : this file
+
+## Cloudflare (2.24)
+
+The Checker's data lives on Doug's Cloudflare account in its own Worker, `ncems-checks` (separate from `ncems-api`, which runs Incident Reports and the hub banner). Setup steps are in `WORKER_SETUP.md`, which ships in a separate zip with `worker.js`. Neither file goes on GitHub.
+
+- **Check records:** D1 database `ncems-checks-db`, table `checks`. Saved with the signed in email. Each record still goes to Firebase too (`firebaseUntil` in units.json turns that off once CG Staff reads from Cloudflare).
+- **Photos:** R2 bucket `ncems-check-photos`, by month and rig. If Cloudflare can't be reached, the photo goes to Cloudinary like before.
+- **Shared unit list:** admin edits save to the Worker (table `units`, every version kept) and every device gets them the next time the app opens. No more Download units.json and upload to GitHub. The newer list version wins between GitHub and the shared copy; on a tie the shared copy wins. Before Doug's Claude builds a new units.json, start from the shared copy (Download units.json on the admin page).
+- **Old device edits:** edits saved on one device before 2.24 are no longer applied (they were hiding newer list changes on that device). The admin page shows a banner to send them to the shared list or throw them away.
+- **No signal:** checks and an admin's list save wait on the device and send by themselves.
+- **Still on Firebase:** live share and known problems. They move when CG Staff does.
+
+## Sign in (2.23)
+
+Everyone signs in with their North Country EMS Microsoft account before a check. Only @northcountryems.org accounts get past the sign in screen.
+
+- Same app registration as the admin login (client ID in `MSAL_CONFIG`). In Entra, Enterprise applications, this app, Properties: **Assignment required must be No**, or crews get blocked by Microsoft.
+- The signed in name fills the Name box. Partners can still add their name.
+- Every report email has a "Signed in:" line, and every check record saved for CG Staff has `by` (email) and `byName`.
+- Shared iPads and iPhones: the home screen shows "Signed in as ... Switch user". The next person taps Switch user and picks or adds their own account.
+- If Microsoft sign in can't load at all (no signal), the crew can still do the check. The report says NOT SIGNED IN.
+- The hub's `?login_hint=` (or the saved `ncems_login_hint`) is passed to Microsoft so it suggests the right account.
 
 ## Admin access
 
@@ -69,6 +93,17 @@ When a crew opens a check, the app looks up every problem reported on earlier ch
 - These live in `units.json` under `sendRule` (`minPct`, `holdUntil`)
 
 ## Changelog
+
+### v2.24
+- Moved to Cloudflare: check records (D1) and photos (R2) go to the new `ncems-checks` Worker, with Firebase still written as a safety net
+- Shared unit list: admin saves reach every device; every version kept for roll back; admin page shows which list is in use
+- Old per-device admin edits no longer applied; banner to send or throw away
+- Needs the `ncems-checks` Worker set up (WORKER_SETUP.md). If it isn't up yet, nothing breaks
+
+### v2.23
+- Sign in for everyone with the NCEMS Microsoft account (sign in screen before home, Switch user on home, name fills in, signed in email on every report and check record)
+- Airway Bag (all 5 rigs, from Joseph Slack): C-MAC Kit and EZ IO Kit moved inside the Airway Bag; Airway Roll runs by tube size 2.5 to 8.5, then laryngoscope handles, blades, Magill, syringe, lube, OPA; "Larynoscope with two batteries and clean" is now "Laryngoscope handles operational and working"; ETT names cleaned up (EET# 8.5, ETT # 5.5, ETT # 6.5); Middle Airway Bag and Airway Adjunct Pocket reordered (best guess, waiting on Joseph to confirm)
+- units.json list version 2.23
 
 ### v2.22
 - Add photo (optional) button on every item marked as a problem: compartment items, bags, mechanical, fluids and under the hood rows, operational checks, tire pressure, main O2 and other unit checks. The photo uploads to Cloudinary like the walk-around photo and saves with the check. Remove photo takes it off
