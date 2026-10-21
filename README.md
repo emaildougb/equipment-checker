@@ -2,11 +2,7 @@
 
 Equipment and property check submission tool for North Country EMS crews.
 
-<<<<<<< HEAD
 **Version 2.27.1**
-=======
-**Version 2.27**
->>>>>>> f590528781784a8091af02db692f0f0e1ce62248
 
 ## Links
 
@@ -109,13 +105,10 @@ When a crew opens a check, the app looks up every problem reported on earlier ch
 
 ## Changelog
 
-<<<<<<< HEAD
 ### v2.27.1
 - Kit move sheet: the note box and buttons now use the app's font (a CSS slip in 2.27 showed the default typewriter font)
 
 
-=======
->>>>>>> f590528781784a8091af02db692f0f0e1ce62248
 ### v2.26
 - No more Firebase: live share (polls the Worker every 5 seconds while a check is open) and the known problems list read from the `ncems-checks` Worker; crews marking a known problem fixed saves there too
 - Check records go to Cloudflare only (the Firebase copy is turned off)
