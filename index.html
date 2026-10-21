@@ -1665,7 +1665,7 @@
    APP STATE
    ============================================================ */
 const APP = {
-  version: '2.25',
+  version: '2.26',
   data: null,        // loaded units.json
   screen: 'home',
   check: null,       // current in-progress check
@@ -1947,10 +1947,10 @@ async function retryPendingList() {
 
 function showAppInfo() { showWhatsNew(true); }
 const WHATS_NEW = [
+  ['All on North Country', 'Live share with your partner and the known problems list now come from the agency\'s own Cloudflare account too. Nothing changes in how you use them.'],
   ['Med Vault', 'A count over par now shows an error. It can never be over. Recount, and if it really is over, contact a BC right away.'],
   ['Mechanical & Lights', 'New All Normal button marks the whole list Normal. Every item stays on screen so you can look them over and change any that aren\'t.'],
   ['Tire pressure', 'Tire pressure is now required. You can\'t submit until it\'s answered.'],
-  ['Saved to North Country', 'Checks and photos now save to the agency\'s own Cloudflare account. Nothing changes in how you do the check.'],
 ];
 function showWhatsNew(force) {
   let seen = '';
@@ -1979,6 +1979,7 @@ async function boot() {
   // Handle MSAL redirect return first — catches ?code=/?state= on page load
   authWire();
   authBoot();
+  try { fetch(CHECKS_API_DEFAULT + '/usage/checker', { method: 'POST', keepalive: true }).catch(() => {}); } catch (e) {}
 
   document.getElementById('today-date').textContent =
     new Date().toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
@@ -4931,7 +4932,7 @@ function buildCheckLogRecord(c, crewLine, pct, held, detail) {
    Both use the record id, so a resend is an update, never a duplicate. */
 // Stays on until units.json (or the shared list) sets "firebaseUntil": "YYYY-MM-DD", once CG Staff reads from Cloudflare
 const FIREBASE_UNTIL = '9999-12-31';
-function firebaseStillOn() { return localDateStr() <= ((APP.data && APP.data.firebaseUntil) || FIREBASE_UNTIL); }
+function firebaseStillOn() { return false; }   // 2.26: everything is on Cloudflare, Firebase is no longer used
 function bare(r) { const o = Object.assign({}, r); delete o._cf; delete o._fb; return o; }
 async function pushCheckLog(records) {
   if (!records.length) return true;
@@ -5127,8 +5128,7 @@ async function livePush() {
   const payload = { unit: c.unitId, date: c.date, updatedAt: now, people: { [dev]: { name: who, at: now } } };
   if (Object.keys(changed).length) payload.s = changed;
   try {
-    const db = await fbReady();
-    await fbFs.setDoc(fbFs.doc(db, LIVE_COL, live.docId), payload, { merge: true });
+    await cfFetch('/live/' + encodeURIComponent(live.docId), { method: 'PUT', auth: true, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
   } catch (e) {
     // undo the "pushed" marks so the next change retries them
     Object.keys(changed).forEach(ek => delete live.pushed[liveDec(ek)]);
@@ -5212,12 +5212,16 @@ async function liveStart() {
   liveStop();
   live.docId = `${c.unitId}_${c.date}`;
   live.pushed = {}; live.localAt = {}; live.by = {}; live.people = {}; live.flagDev = {}; live.flagName = {};
-  try {
-    const db = await fbReady();
-    if (!APP.check || `${APP.check.unitId}_${APP.check.date}` !== live.docId) return;
-    live.unsub = fbFs.onSnapshot(fbFs.doc(db, LIVE_COL, live.docId), liveOnSnap, e => console.warn('Live share listen failed:', e));
-    livePush();
-  } catch (e) { console.warn('Live share unavailable:', e); }
+  // 2.26: Cloudflare. Ask for the partner's marks every 5 seconds while the check is open
+  const id = live.docId;
+  const pull = async () => {
+    if (live.docId !== id || document.hidden) return;
+    try { const r = await cfFetch('/live/' + encodeURIComponent(id), { auth: true, timeout: 8000 }); if (r && r.data && live.docId === id) liveOnSnap({ data: () => r.data }); }
+    catch (e) { /* no signal or not signed in: stay quiet */ }
+  };
+  live.unsub = (() => { const t = setInterval(pull, 5000); return () => clearInterval(t); })();
+  pull();
+  livePush();
 }
 function liveStop() {
   clearTimeout(live.timer);
@@ -5269,16 +5273,15 @@ async function knownLoad() {
   if (!c || c.type !== 'ambulance') return;
   const unit = c.unitId;
   try {
-    const db = await fbReady(), F = fbFs, since = Date.now() - 45 * 86400000;
-    const [cs, rs, ls] = await Promise.all([
-      F.getDocs(F.query(F.collection(db, 'vehicleChecks'), F.where('atMs', '>=', since))),
-      F.getDocs(F.collection(db, 'vehicleResolved')),
-      F.getDocs(F.collection(db, 'vehicleLinks')).catch(() => ({ forEach() {} }))
+    // 2.26: Cloudflare (this rig's last 45 days, plus what CG Staff marked fixed or linked)
+    const from = localDateStr(new Date(Date.now() - 45 * 86400000));
+    const [cr, sr] = await Promise.all([
+      cfFetch(`/checks?unit=${encodeURIComponent(unit)}&from=${from}`, { auth: true }),
+      cfFetch('/state?cols=vehicleResolved,vehicleLinks', { auth: true })
     ]);
-    const checks = [], resolved = {}, links = {};
-    cs.forEach(d => checks.push(d.data()));
-    rs.forEach(d => { const v = d.data(); if (v) resolved[v.checkId + '|' + v.label] = v; });
-    ls.forEach(d => { const v = d.data(); if (v) links[d.id] = v; });
+    const checks = (cr && cr.checks) || [], resolved = {}, links = {};
+    Object.values((sr && sr.state && sr.state.vehicleResolved) || {}).forEach(v => { if (v) resolved[v.checkId + '|' + v.label] = v; });
+    Object.entries((sr && sr.state && sr.state.vehicleLinks) || {}).forEach(([id, v]) => { if (v) links[id] = v; });
     if (!APP.check || APP.check.unitId !== unit) return;
     known.unit = unit;
     known.list = knownCompute(checks, resolved, links, unit);
@@ -5345,7 +5348,7 @@ async function knownMark(n, result) {
   liveRepaint([]);
   if (result === 'fixed') {
     const rec = { checkId: k.checkId, label: k.label, by: (c.initials || 'Crew').trim(), at: new Date().toISOString(), note: `Crew found it fixed at the ${c.unitName} check` };
-    try { const db = await fbReady(); await fbFs.setDoc(fbFs.doc(db, 'vehicleResolved', knownResKey(k.checkId, k.label)), rec); }
+    try { await cfFetch('/state/vehicleResolved/' + encodeURIComponent(knownResKey(k.checkId, k.label)), { method: 'PUT', auth: true, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ data: rec }) }); }
     catch (e) { console.warn('Fixed mark not sent yet; it also rides along with the check log', e); }
   }
 }

@@ -2,7 +2,7 @@
 
 Equipment and property check submission tool for North Country EMS crews.
 
-**Version 2.25**
+**Version 2.26**
 
 ## Links
 
@@ -93,6 +93,12 @@ When a crew opens a check, the app looks up every problem reported on earlier ch
 - These live in `units.json` under `sendRule` (`minPct`, `holdUntil`)
 
 ## Changelog
+
+### v2.26
+- No more Firebase: live share (polls the Worker every 5 seconds while a check is open) and the known problems list read from the `ncems-checks` Worker; crews marking a known problem fixed saves there too
+- Check records go to Cloudflare only (the Firebase copy is turned off)
+- Counts each app open on the Worker (usage, checker)
+- Needs Worker 1.1 (deployed 10/21)
 
 ### v2.25
 - Med Vault: a count over par is an error (red box: recount, contact a BC). It flags the item and goes to the very top of the report under Immediate Admin Review
