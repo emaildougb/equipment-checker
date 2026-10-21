@@ -323,6 +323,8 @@
     .narc-par { font-size: 12px; color: var(--muted); font-weight: 700; white-space: nowrap; }
     .narc-status { flex-basis: 100%; font-size: 13px; font-weight: 800; margin-top: 6px; }
     .narc-status.ok { color: var(--g-mid); } .narc-status.short { color: var(--warn); } .narc-status.low { color: var(--bad); }
+    .narc-status.over { color: #fff; background: var(--bad); padding: 8px 10px; border-radius: 8px; }
+    .narc-row.narc-over .narc-count { border-color: var(--bad); color: var(--bad); }
     .abc-row { display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin: 2px 0 8px; font-size: 12px; color: var(--muted); font-weight: 700; }
     .abc-btn { width: 46px; height: 46px; border-radius: 50%; border: 2px solid var(--g-mid); background: var(--white); color: var(--g-mid); font: 800 13px/1 inherit; letter-spacing: 0.02em; cursor: pointer; }
     .abc-btn.on { background: var(--g-mid); color: #fff; }
@@ -1663,7 +1665,7 @@
    APP STATE
    ============================================================ */
 const APP = {
-  version: '2.24',
+  version: '2.25',
   data: null,        // loaded units.json
   screen: 'home',
   check: null,       // current in-progress check
@@ -1945,10 +1947,10 @@ async function retryPendingList() {
 
 function showAppInfo() { showWhatsNew(true); }
 const WHATS_NEW = [
+  ['Med Vault', 'A count over par now shows an error. It can never be over. Recount, and if it really is over, contact a BC right away.'],
+  ['Mechanical & Lights', 'New All Normal button marks the whole list Normal. Every item stays on screen so you can look them over and change any that aren\'t.'],
+  ['Tire pressure', 'Tire pressure is now required. You can\'t submit until it\'s answered.'],
   ['Saved to North Country', 'Checks and photos now save to the agency\'s own Cloudflare account. Nothing changes in how you do the check.'],
-  ['One shared list', 'When an admin edits a rig\'s inventory, every phone and iPad gets it the next time the app opens.'],
-  ['Sign in', 'Everyone now signs in with their North Country EMS Microsoft account. Your name fills in for you. On a shared iPad, tap Switch user on the home screen.'],
-  ['Airway Bag', 'C-MAC and EZ IO kits now live inside the Airway Bag. The airway roll runs by tube size, and the middle bag and adjunct pocket are in a new order.'],
 ];
 function showWhatsNew(force) {
   let seen = '';
@@ -2822,7 +2824,9 @@ function renderWalkAroundSection() {
 }
 
 function renderMechanicalSection() {
-  let html = `<div class="section"><div class="section-head">Mechanical & Lights</div><div class="section-body">`;
+  let html = `<div class="section"><div class="section-head">Mechanical & Lights</div><div class="section-body">
+    <button type="button" class="comp-header-mark-btn" id="mech-all-btn" style="width:100%;margin-bottom:6px;" onclick="mechAllNormal()">✓ All Normal</button>
+    <div class="mech-all-note" id="mech-all-note" style="display:none;font-size:13px;color:var(--muted);margin:0 2px 10px;">Marked Normal. Look each one over below and tap Abnormal on anything that isn't.</div>`;
   APP.data.mechanicalChecks.forEach(item => {
     html += renderWNLRow(item, item, 'mechanical');
   });
@@ -2839,6 +2843,23 @@ function rowBuckets(c) {
   (APP.data.fluidChecks || []).forEach(i => { if (!isSealedTransmission(i)) out.push([i, c.fluids, 'fluids']); });
   (APP.data.underHoodChecks || []).forEach(i => out.push([i, (c.underHood = c.underHood || {}), 'underHood']));
   return out;
+}
+/* 2.25: one tap marks every unanswered Mechanical & Lights row Normal. Rows stay visible as a review list;
+   anything already marked Abnormal is left alone. Tire pressure is not included (it must be answered). */
+function mechAllNormal() {
+  document.querySelectorAll('#check-body .check-row[data-bucket="mechanical"]').forEach(row => {
+    if (row.querySelector('.check-btn.active')) return;
+    const b = row.querySelector('.check-btn[data-status="wnl"]'); if (b) b.click();
+  });
+  const n = document.getElementById('mech-all-note'); if (n) n.style.display = 'block';
+  mechAllPaint();
+}
+function mechAllPaint() {
+  const btn = document.getElementById('mech-all-btn'); if (!btn) return;
+  const rows = [...document.querySelectorAll('#check-body .check-row[data-bucket="mechanical"]')];
+  const done = rows.length && rows.every(r => r.querySelector('.check-btn.active'));
+  btn.textContent = done ? '✓ All answered' : '✓ All Normal';
+  btn.classList.toggle('all-done', !!done);
 }
 function rowIsBad(v) { return v && (v.status === 'bad' || v.status === 'over'); }
 function rowStatusText(v) { return v.status === 'wnl' ? 'Normal' : (v.status === 'over' ? 'OVERFILLED' : 'ABNORMAL'); }
@@ -2969,7 +2990,7 @@ function renderFuelSection() {
 function tireInnerHTML() {
   return `
         <div class="yn-row" data-tire>
-          <div class="yn-label">Is tire pressure between 75–85 PSI on all tires?</div>
+          <div class="yn-label">Is tire pressure between 75–85 PSI on all tires?<span class="req-star">*</span></div>
           <div class="yn-buttons">
             <button class="yn-btn yes" data-tire-yn="yes">Yes</button>
             <button class="yn-btn no" data-tire-yn="no">No</button>
@@ -3377,9 +3398,11 @@ function opCheckHTML(compName, bagName, itemName, label) {
 }
 
 function narcLow(count, par) { return count !== null && count !== '' && Number(count) <= par * 0.5; }
+function narcOver(count, par) { return count !== null && count !== '' && Number(count) > par; }   // 2.25: can never be over par
 function narcStatusText(count, par) {
   if (count === '' || count == null) return ['', ''];
   const n = Number(count), short = par - n;
+  if (narcOver(n, par)) return ['over', `⛔ Error: ${n} is over par (${par}). It can't be over. Recount, and if it really is over, contact a BC now.`];
   if (narcLow(n, par)) return ['low', `⚠ Not enough: ${n} of ${par} (short ${short}). Restock before the next call if you can.`];
   if (short > 0) return ['short', `Short ${short} (${n} of ${par})`];
   return ['ok', `✓ At par (${n} of ${par})`];
@@ -3648,7 +3671,7 @@ function wireCompartmentBody(safeId, comp) {
       if (v !== e.target.value) e.target.value = v;
       state.count = v;
       if (psiMin) state.psi = true;
-      state.status = v === '' ? null : (psiMin ? (Number(v) < psiMin ? 'abnormal' : 'complete') : (narcLow(v, par) ? 'abnormal' : 'complete'));
+      state.status = v === '' ? null : (psiMin ? (Number(v) < psiMin ? 'abnormal' : 'complete') : ((narcLow(v, par) || narcOver(v, par)) ? 'abnormal' : 'complete'));
       paintNarc(row, state);
       updateCompartmentCounts(safeId, comp);
       updateProgress(); saveAutosave();
@@ -3703,6 +3726,7 @@ function paintNarc(row, st) {
   const [cls, txt] = psiMin ? (cnt === '' || cnt == null ? ['', ''] : Number(cnt) < psiMin ? ['low', `⚠ Under ${psiMin} PSI. Swap the cylinder.`] : ['ok', `✓ ${cnt} PSI`]) : narcStatusText(cnt, par);
   const el = row.querySelector('.narc-status');
   if (el) { el.className = 'narc-status ' + cls; el.textContent = txt; }
+  row.classList.toggle('narc-over', cls === 'over');
   const inp = row.querySelector('.narc-count');
   if (inp && st && st.count != null && document.activeElement !== inp) inp.value = st.count;
   const det = row.querySelector('.item-detail');
@@ -3771,9 +3795,11 @@ function paintRequired() {
   root.querySelectorAll('.op-check-row[data-oxygen]').forEach(r => { const i = r.querySelector('#oxygen-psi'); pend(r, i && !i.value); });
   root.querySelectorAll('.op-check-row[data-cooler]').forEach(r => pend(r, !r.querySelector('[data-cooler-yn].active')));
   root.querySelectorAll('.narc-row').forEach(r => { const i = r.querySelector('input.narc-count'); pend(r, i && !i.value); });
+  root.querySelectorAll('.yn-row[data-tire]').forEach(r => pend(r, !(APP.check && APP.check.tireYN)));   // 2.25: tire pressure is mandatory
 }
 function paintSectionBadges() {
   try { paintRequired(); } catch (e) {}
+  try { mechAllPaint(); } catch (e) {}
   document.querySelectorAll('#check-body .section.collapsible').forEach(sec => {
     const b = sec.querySelector(':scope > .section-head .sec-badge'); if (!b) return;
     if (SEC_START_OPEN.test(sec.dataset.secTitle || '')) { b.textContent = ''; return; }   // compartments show their own counts
@@ -4504,7 +4530,7 @@ function collectFlaggedEls() {
   // Item rows marked ✗, not fixed
   root.querySelectorAll('.item-row').forEach(row => {
     if (row.querySelector('.item-btn.abnormal.active') && !row.querySelector('[data-fixed]:checked')) els.push(row);
-    if (row.querySelector('.narc-status.low') && !row.querySelector('[data-fixed]:checked')) els.push(row);
+    if (row.querySelector('.narc-status.low, .narc-status.over') && !row.querySelector('[data-fixed]:checked')) els.push(row);
   });
   // Op checks answered No, not fixed
   root.querySelectorAll('.op-check-row[data-op-comp]').forEach(row => {
@@ -4597,6 +4623,11 @@ function showSubmitModal() {
   if (!c) return;
   if (!c.initials) {
     alert('Please enter your name before submitting.');
+    return;
+  }
+  // 2.25: tire pressure must be answered before submitting
+  if (c.type === 'ambulance' && !c.tireYN) {
+    needsPopup('Tire pressure is required', [['Tire pressure: Yes or No', document.querySelector('#check-body .yn-row[data-tire]')]]);
     return;
   }
   // 2.18: Fixed on the spot needs nothing. 2.22: any problem still open or Unable to fix needs a short description. Photos are always optional.
@@ -5479,6 +5510,7 @@ function buildSummary() {
 
   // ── UNABLE TO FIX (very top — for immediate admin review) ──────────────
   const unfixList = collectUnableToFix();
+  collectNarcCounts(c).forEach(n => { if (n.count != null && narcOver(n.count, n.par)) unfixList.unshift(`${n.name} counted ${n.count}, par is ${n.par}. OVER PAR, cannot be over. BC contact needed`); });
   if (unfixList.length) {
     lines.push(divider);
     lines.push(`\uD83D\uDEA8  UNABLE TO FIX \u2014 IMMEDIATE ADMIN REVIEW (${unfixList.length})  \uD83D\uDEA8`);
@@ -5591,6 +5623,7 @@ function buildSummary() {
       narcs.forEach(n => {
         if (n.count == null) { lines.push(`  ${n.name}: not counted / ${n.par}`); return; }
         const short = n.par - n.count;
+        if (narcOver(n.count, n.par)) { lines.push(`  ${n.name}: ${n.count} / ${n.par} ⛔ OVER PAR. CANNOT BE OVER. BC CONTACT NEEDED`); return; }
         lines.push(`  ${n.name}: ${n.count} / ${n.par}${short > 0 ? ` (short ${short})` : ' ✓'}${narcLow(n.count, n.par) ? ' ⚠ NOT ENOUGH' : ''}`);
       });
       lines.push('');

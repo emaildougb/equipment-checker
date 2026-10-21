@@ -2,7 +2,7 @@
 
 Equipment and property check submission tool for North Country EMS crews.
 
-**Version 2.24**
+**Version 2.25**
 
 ## Links
 
@@ -93,6 +93,12 @@ When a crew opens a check, the app looks up every problem reported on earlier ch
 - These live in `units.json` under `sendRule` (`minPct`, `holdUntil`)
 
 ## Changelog
+
+### v2.25
+- Med Vault: a count over par is an error (red box: recount, contact a BC). It flags the item and goes to the very top of the report under Immediate Admin Review
+- Mechanical & Lights: All Normal button marks every unanswered row Normal; rows stay on screen as a review list and anything already Abnormal is left alone
+- Tire pressure is required: red star and red box until answered, and Submit stops until it is
+- Worker ncems-checks is live on the NCEMS Cloudflare account (health check green 10/21)
 
 ### v2.24
 - Moved to Cloudflare: check records (D1) and photos (R2) go to the new `ncems-checks` Worker, with Firebase still written as a safety net
