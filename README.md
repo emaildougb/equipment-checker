@@ -2,7 +2,7 @@
 
 Equipment and property check submission tool for North Country EMS crews.
 
-**Version 2.29**
+**Version 2.30**
 
 ## Links
 
@@ -32,15 +32,15 @@ Crews do checks on the shared agency iPhones and iPads, and every check is saved
 - The sign in screen says why: logged out, signed out after an hour with no activity, or signed out for shift change.
 - To change the timing without new code, add to units.json: `"autoSignOut": { "idleMinutes": 60, "shiftChange": "07:30" }`. Use `0` or `""` to turn a part off. Remember to build units.json from the shared copy once one exists.
 
-## Haptics (2.28)
+## Haptics (2.28, everywhere since 2.30)
 
-Taps on buttons (check marks, Normal/Abnormal, Yes/No, sections, Submit and so on) give a small buzz. iPhones and iPads: Safari has no vibrate, so the app taps a hidden switch style checkbox, which gives the system haptic on iOS 18 and newer (older iOS just stays silent). Android uses `navigator.vibrate`, with a double buzz for problem taps. To turn it off, add `"haptics": false` to units.json.
+The phone buzzes on almost anything you can tap: buttons, links, the logo flip, checkboxes and their labels, photo buttons, section and compartment headers, the bottom progress bar and popups. It also buzzes when you finish typing a number (mileage, narc counts, PSI, fridge temp) or pick from a list, and gives a small tick for each spot an item passes while you drag it in Reorder. Events have their own buzz on Android: success when a check is sent, error for a narc count over par or a required item missing, a double buzz for problem taps. iPhones and iPads use the system haptic from a hidden switch checkbox (iOS 18 and newer) and only have the one style; older iOS stays silent. A label and its checkbox only buzz once. To turn it off, add `"haptics": false` to units.json.
 
 ## Kit moves (2.27)
 
 Trusted crew put kit items in the order they really sit. Doug approves every move before it reaches anyone else.
 
-- **Who can move:** Josh Robertson (j.robertson) and Joseph Slack (j.slack). **Who approves:** Doug (d.boyce). Both lists live in the Worker (`DEFAULT_MOVERS`, `DEFAULT_APPROVERS` in worker.js 1.2). To change them without new code, add `MOVERS` or `APPROVERS` (comma separated emails) under the Worker's Settings, Variables and Secrets.
+- **Who can move:** since 10/22 the Worker's `MOVERS` variable lists Doug, Derek Langdon, Dennis Madler, Stephen Schutts, Lyndsey Maylone, Josh Robertson and Joseph Slack (it replaces the built in Josh and Joseph). **Who approves:** Doug (d.boyce). Both lists live in the Worker (`DEFAULT_MOVERS`, `DEFAULT_APPROVERS` in worker.js 1.2). To change them without new code, add `MOVERS` or `APPROVERS` (comma separated emails) under the Worker's Settings, Variables and Secrets.
 - **Mover:** open a check, open a compartment or bag, tap **↕ Reorder**. Hold ≡ and drag (one long drag goes as far as you want; hold near the top or bottom edge to scroll), use the arrows, or tap an item's number and type the spot to send it straight there. Tick other rigs that carry the exact same kit, add a note, **Send to Doug**. Needs signal.
 - **Doug:** gets an email (EmailJS) with the new and old order and a link to `?moves=1`. Opening the Checker signed in as Doug shows a blue "kit moves waiting" banner. **Approve** saves the new order to the shared list (table `units`, note "Kit move by ...") for every device. **Turn down** takes an optional reason. Either way the mover gets an email back.
 - **Safe:** a move only changes order, never adds or removes items. If a rig's kit changed since the move was sent, that rig is skipped and the decision says so. Checks in progress are not affected (marks are kept by item name).
@@ -52,7 +52,7 @@ Trusted crew put kit items in the order they really sit. Doug approves every mov
 The Checker's data lives on Doug's Cloudflare account in its own Worker, `ncems-checks` (separate from `ncems-api`, which runs Incident Reports and the hub banner). Setup steps are in `WORKER_SETUP.md`, which ships in a separate zip with `worker.js`. Neither file goes on GitHub.
 
 - **Check records:** D1 database `ncems-checks-db`, table `checks`. Saved with the signed in email. Each record still goes to Firebase too (`firebaseUntil` in units.json turns that off once CG Staff reads from Cloudflare).
-- **Photos:** R2 bucket `ncems-check-photos`, by month and rig. If Cloudflare can't be reached, the photo goes to Cloudinary like before.
+- **Photos:** R2 bucket `ncems-check-photos`, by month and rig. Since 2.30 there is no Cloudinary: the app tries R2 twice, and if both fail the photo stays on the phone with the check (the crew sees a warning, and it is left out of the report and record).
 - **Shared unit list:** admin edits save to the Worker (table `units`, every version kept) and every device gets them the next time the app opens. No more Download units.json and upload to GitHub. The newer list version wins between GitHub and the shared copy; on a tie the shared copy wins. Before Doug's Claude builds a new units.json, start from the shared copy (Download units.json on the admin page).
 - **Old device edits:** edits saved on one device before 2.24 are no longer applied (they were hiding newer list changes on that device). The admin page shows a banner to send them to the shared list or throw them away.
 - **No signal:** checks and an admin's list save wait on the device and send by themselves.
@@ -119,6 +119,12 @@ When a crew opens a check, the app looks up every problem reported on earlier ch
 - These live in `units.json` under `sendRule` (`minPct`, `holdUntil`)
 
 ## Changelog
+
+### v2.30
+- Haptics everywhere: links, logo flip, labels and checkboxes, photo buttons, headers, progress bar and popups; a buzz when a number is entered; a tick per spot while dragging in Reorder; success buzz when a check is sent; error buzz for narc over par and for a required item missing. A label and its checkbox only buzz once
+- Lyndsey Maylone's admin address fixed (l.maylone, was l.malone), so the logo flip admin login works for her
+- Photos: Cloudinary removed. R2 is tried twice; if it still fails the photo stays on the phone with a warning, and a device only photo is never put in the report email (a photo link could have been a huge data link there)
+- Kit movers are now set by the Worker's MOVERS variable (added 10/22): Doug, Derek, Dennis, Stephen Schutts, Lyndsey Maylone, Josh, Joseph. No app change needed for that
 
 ### v2.29
 - Kit reorder: dragging now keeps going until you let go. On iPhone the drag let go after every single spot because the row holding the grip moved in the page; the list now holds the finger instead. Faster scroll when you hold near the top or bottom edge

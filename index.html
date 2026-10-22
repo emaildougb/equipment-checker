@@ -1726,7 +1726,7 @@
    APP STATE
    ============================================================ */
 const APP = {
-  version: '2.29',
+  version: '2.30',
   data: null,        // loaded units.json
   screen: 'home',
   check: null,       // current in-progress check
@@ -1748,7 +1748,7 @@ const ADMIN_EMAILS = [
   'b.shirley@northcountryems.org',  // Bryce Shirley, Chief
   'c.andrus@northcountryems.org',   // Chuck Andrus
   'k.reid@northcountryems.org',     // Kim Reid
-  'l.malone@northcountryems.org',   // Lindsay Malone
+  'l.maylone@northcountryems.org',  // Lyndsey Maylone (2.30: was l.malone, a typo)
   's.schutts@northcountryems.org',  // Stephen Schutts
   'j.robertson@northcountryems.org', // J. Robertson
 ];
@@ -1947,14 +1947,21 @@ function authWire() {
    get a double buzz on Android; iPhone only has the one style.
    Turn off in units.json with "haptics": false.
    ============================================================ */
-const HAPTIC_TAP = 'button, .unit-btn, .home-btn, .fixed-check, .unfix-check, .section-head, .compartment-head';
+// 2.30: anything you can tap buzzes, not just buttons
+const HAPTIC_TAP = 'a, button, label, select, summary, input[type=checkbox], input[type=radio], input[type=file], [onclick], [role=button], .unit-btn, .home-btn, .section-head, .compartment-head, .logo-flip-wrap, #status-bar, .wn-scrim';
 const HAPTIC_WARN = '.check-btn.bad, .item-btn.abnormal, .yn-btn.no, .kb-broken, [data-unfixed]';
+const HAPTIC_PATTERN = { tap: 12, tick: 6, warn: [18, 60, 18], error: [30, 60, 30, 60, 30], success: [15, 40, 40] };
+const HAPTIC_STATE = { last: 0 };
 function hapticsOn() { return !(APP.data && APP.data.haptics === false); }
 function haptic(kind) {
   if (!hapticsOn()) return;
+  // one tap can fire two clicks (a label and its checkbox); only buzz once
+  const now = Date.now();
+  if ((kind === 'tap' || kind === 'tick') && now - HAPTIC_STATE.last < 60) return;
+  HAPTIC_STATE.last = now;
   try {
     if (typeof navigator.vibrate === 'function') {
-      navigator.vibrate(kind === 'warn' ? [18, 60, 18] : 12);
+      navigator.vibrate(HAPTIC_PATTERN[kind] || 12);
       return;
     }
     const label = document.createElement('label');
@@ -1978,6 +1985,27 @@ function hapticsWire() {
     if (!el || el.disabled) return;
     haptic(t.closest(HAPTIC_WARN) ? 'warn' : 'tap');
   }, true);
+  // Finished typing a number (mileage, narc count, PSI, fridge temp) or picked from a list
+  document.addEventListener('change', e => {
+    const t = e.target;
+    if (!t || !t.matches) return;
+    if (t.matches('.narc-count')) {
+      const row = t.closest('[data-par]');
+      const par = row ? Number(row.dataset.par) : NaN;
+      if (t.value !== '' && !isNaN(par) && Number(t.value) > par) { haptic('error'); return; }
+      haptic('tap'); return;
+    }
+    if (t.matches('input[type=number], select')) haptic('tap');
+  }, true);
+  // Something required is missing: error buzz. Check sent: success buzz.
+  if (typeof needsPopup === 'function') {
+    const np = needsPopup;
+    needsPopup = function () { haptic('error'); return np.apply(this, arguments); };
+  }
+  if (typeof showSuccess === 'function') {
+    const ss = showSuccess;
+    showSuccess = function () { haptic('success'); return ss.apply(this, arguments); };
+  }
 }
 
 /* ============================================================
@@ -2178,12 +2206,10 @@ async function retryPendingList() {
 
 function showAppInfo() { showWhatsNew(true); }
 const WHATS_NEW = [
-  ['Log out', 'New Log out button on the home screen, next to Switch user. The iPhones and iPads are shared, so log out when you finish your checks.'],
-  ['Auto sign out', 'The Checker signs you out after an hour with nobody using it, and at shift change (7:30 AM). A check you started stays saved on the device.'],
-  ['Medication Kit', 'Every rig\'s Medication Kit is now in the order it really sits in the kit (thanks, Joseph Slack).'],
-  ['Haptics', 'Your phone gives a little buzz when you tap a button. iPhones and iPads need iOS 18 or newer.'],
-  ['Kit reorder', 'Dragging an item now keeps going until you let go. You can also tap an item\'s number and type the spot to send it to.'],
-  ['Fixed', 'The empty blue bar above the Ambulances button is gone.'],
+  ['More buzz', 'Your phone now buzzes on almost anything you tap, when you finish typing a number, and with a tick for each spot while you drag an item in Reorder. A sent check and a missing required item each have their own buzz.'],
+  ['Kit reorder', 'All three BCs, Steve Schutts and Lyndsey Maylone can now reorder kits too, along with Josh and Joseph.'],
+  ['Photos', 'If a photo can\'t upload, the app tells you and keeps it on the phone instead of failing.'],
+  ['Log out', 'Log out button on the home screen, and the app signs you out after an hour with no use and at shift change (7:30 AM).'],
 ];
 function showWhatsNew(force) {
   let seen = '';
@@ -4570,6 +4596,7 @@ function addIssuePhotoButtons() {
         APP.check.issuePhotos = APP.check.issuePhotos || {};
         APP.check.issuePhotos[key] = { url: r.url, type: r.type, label: (APP.check.unitName ? APP.check.unitName + ' ' : '') + label };
         paintIssuePhoto(det); saveAutosave();
+        if (r.type !== 'url') prev.insertAdjacentHTML('beforeend', '<div style="font-size:12px;color:var(--warn);margin-top:4px;">⚠ Could not upload (no signal?). On this phone only, not in the report. Try again later or describe it.</div>');
       } catch (err) { prev.innerHTML = '<span style="color:var(--bad)">Photo upload failed. Try again, or just describe it.</span>'; }
     });
     paintIssuePhoto(det);
@@ -4582,41 +4609,29 @@ function addIssuePhotoButtons() {
 })();
 
 /* ============================================================
-   PHOTOS — Cloudinary upload (falls back to base64 if not configured)
+   PHOTOS: Cloudflare R2 (2.30: Cloudinary removed; if R2 fails the photo stays on the device)
    ============================================================ */
 async function uploadPhoto(file, label) {
-  // 2.24: Cloudflare R2 first (kept with the check record), Cloudinary if that fails
-  try {
-    const unit = (APP.check && (APP.check.unitId || APP.check.unitName)) || 'unit';
-    const type = /^image\//.test(file.type || '') ? file.type : 'image/jpeg';
-    const r = await cfFetch(`/photos?unit=${encodeURIComponent(unit)}&label=${encodeURIComponent(label || 'photo')}`,
-      { method: 'POST', auth: true, headers: { 'Content-Type': type }, body: file, timeout: 60000 });
-    if (r && r.url) return { url: r.url, type: 'url', store: 'r2' };
-  } catch (e) {
-    console.warn('Cloudflare photo upload failed, trying Cloudinary:', e);
+  // 2.30: Cloudflare R2 only (Cloudinary is retired). One retry, then the photo stays on
+  // this device with the check (shown in the app, left out of the report and record).
+  const unit = (APP.check && (APP.check.unitId || APP.check.unitName)) || 'unit';
+  const type = /^image\//.test(file.type || '') ? file.type : 'image/jpeg';
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const r = await cfFetch(`/photos?unit=${encodeURIComponent(unit)}&label=${encodeURIComponent(label || 'photo')}`,
+        { method: 'POST', auth: true, headers: { 'Content-Type': type }, body: file, timeout: 60000 });
+      if (r && r.url) return { url: r.url, type: 'url', store: 'r2' };
+    } catch (e) {
+      console.warn('Photo upload failed' + (attempt ? '' : ', trying once more') + ':', e);
+    }
+    if (!attempt) await new Promise(res => setTimeout(res, 1500));
   }
-  const cfg = APP.data.cloudinary;
-  if (cfg && cfg.cloudName && cfg.cloudName !== 'YOUR_CLOUD_NAME' && cfg.uploadPreset && cfg.uploadPreset !== 'YOUR_UPLOAD_PRESET') {
-    // Upload to Cloudinary, get back a URL
-    const form = new FormData();
-    form.append('file', file);
-    form.append('upload_preset', cfg.uploadPreset);
-    const res = await fetch(`https://api.cloudinary.com/v1_1/${cfg.cloudName}/image/upload`, {
-      method: 'POST',
-      body: form,
-    });
-    if (!res.ok) throw new Error('Cloudinary upload failed: ' + res.status);
-    const data = await res.json();
-    return { url: data.secure_url, type: 'url' };
-  } else {
-    // Fallback: base64 (works but bloats email)
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = ev => resolve({ url: ev.target.result, type: 'base64' });
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  }
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = ev => resolve({ url: ev.target.result, type: 'base64', local: true });
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 }
 
 async function handlePhoto(e, target, previewId) {
@@ -4636,7 +4651,7 @@ async function handlePhoto(e, target, previewId) {
       if (result.type === 'url') {
         preview.innerHTML = `<a href="${result.url}" target="_blank" style="font-size:13px;color:var(--info);">📷 Photo uploaded ↗</a><br><img class="photo-preview" src="${result.url}" style="max-width:200px;max-height:150px;border-radius:6px;border:1px solid var(--border);margin-top:4px;" />`;
       } else {
-        preview.innerHTML = `<img class="photo-preview" src="${result.url}" style="max-width:200px;max-height:150px;border-radius:6px;border:1px solid var(--border);" /><div style="font-size:11px;color:var(--warn);margin-top:4px;">⚠ Cloudinary not configured — photo in email body (may fail on large files)</div>`;
+        preview.innerHTML = `<img class="photo-preview" src="${result.url}" style="max-width:200px;max-height:150px;border-radius:6px;border:1px solid var(--border);" /><div style="font-size:12px;color:var(--warn);margin-top:4px;">⚠ Photo could not upload (no signal?). It is on this phone only and won't be in the report. Take it again when you have signal, or describe it in the notes.</div>`;
       }
     }
   } catch(err) {
@@ -5780,9 +5795,9 @@ function buildSummary() {
     if (c.walkAround?.notes) {
       lines.push('Walk-Around Notes:');
       lines.push('  ' + c.walkAround.notes);
-      if (c.walkAround?.photo?.url) lines.push(`  Photo: ${c.walkAround.photo.url}`);
+      if (c.walkAround?.photo?.type === 'url') lines.push(`  Photo: ${c.walkAround.photo.url}`);
       lines.push('');
-    } else if (c.walkAround?.photo?.url) { lines.push(`Walk-Around Photo: ${c.walkAround.photo.url}`); lines.push(''); }
+    } else if (c.walkAround?.photo?.type === 'url') { lines.push(`Walk-Around Photo: ${c.walkAround.photo.url}`); lines.push(''); }
 
     // Mechanical + Fluids
     [['Mechanical & Lights', c.mechanical, APP.data.mechanicalChecks],
@@ -5837,7 +5852,7 @@ function buildSummary() {
     if (c.cooler.answered) {
       let cl = `Cooler (39 to 48°F): ${c.cooler.ok ? 'Yes ✓' : 'Out of range ⚠'}`;
       if (!c.cooler.ok && c.cooler.reading) cl += `  Reading: ${c.cooler.reading}°F`;
-      if (c.cooler?.photo?.url) cl += `\n  Photo: ${c.cooler.photo.url}`;
+      if (c.cooler?.photo?.type === 'url') cl += `\n  Photo: ${c.cooler.photo.url}`;
       lines.push(cl); lines.push('');
     }
 
@@ -6531,8 +6546,8 @@ function moveWireSheet() {
       const others = [...list.children].filter(r => r !== row);
       let target = null;
       for (const r of others) { const b = r.getBoundingClientRect(); if (y < b.top + b.height / 2) { target = r; break; } }
-      if (target) { if (row.nextElementSibling !== target) list.insertBefore(row, target); }
-      else if (list.lastElementChild !== row) list.appendChild(row);
+      if (target) { if (row.nextElementSibling !== target) { list.insertBefore(row, target); haptic('tick'); } }
+      else if (list.lastElementChild !== row) { list.appendChild(row); haptic('tick'); }
     };
     const edge = () => {
       const box = scroller.getBoundingClientRect();
