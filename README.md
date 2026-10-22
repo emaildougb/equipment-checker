@@ -2,7 +2,7 @@
 
 Equipment and property check submission tool for North Country EMS crews.
 
-**Version 2.27.1**
+**Version 2.29**
 
 ## Links
 
@@ -21,12 +21,27 @@ Equipment and property check submission tool for North Country EMS crews.
 - `manifest.json` : standalone app-mode config
 - `README.md` : this file
 
+## Log out and auto sign out (2.28)
+
+Crews do checks on the shared agency iPhones and iPads, and every check is saved under whoever is signed in, so the Checker signs people out.
+
+- **Log out button** on the home screen next to Switch user. If a check is in progress it asks first; the check stays saved on the device either way.
+- **Idle:** signs out after 60 minutes with nobody touching the app (checked every 30 seconds and whenever the app comes back to the front).
+- **Shift change:** signs out anyone who signed in before the last 07:30 Pacific. If someone is actively tapping right at 07:30, it waits until they stop for 2 minutes.
+- **Sign out clears** this device's Microsoft sign in (and signs out at Microsoft when there is signal), the saved login hint, the saved name for the Name box and the kit mover cache. It does **not** clear checks in progress (autosave), held reports waiting for 11:00, or anything waiting to send.
+- The sign in screen says why: logged out, signed out after an hour with no activity, or signed out for shift change.
+- To change the timing without new code, add to units.json: `"autoSignOut": { "idleMinutes": 60, "shiftChange": "07:30" }`. Use `0` or `""` to turn a part off. Remember to build units.json from the shared copy once one exists.
+
+## Haptics (2.28)
+
+Taps on buttons (check marks, Normal/Abnormal, Yes/No, sections, Submit and so on) give a small buzz. iPhones and iPads: Safari has no vibrate, so the app taps a hidden switch style checkbox, which gives the system haptic on iOS 18 and newer (older iOS just stays silent). Android uses `navigator.vibrate`, with a double buzz for problem taps. To turn it off, add `"haptics": false` to units.json.
+
 ## Kit moves (2.27)
 
 Trusted crew put kit items in the order they really sit. Doug approves every move before it reaches anyone else.
 
 - **Who can move:** Josh Robertson (j.robertson) and Joseph Slack (j.slack). **Who approves:** Doug (d.boyce). Both lists live in the Worker (`DEFAULT_MOVERS`, `DEFAULT_APPROVERS` in worker.js 1.2). To change them without new code, add `MOVERS` or `APPROVERS` (comma separated emails) under the Worker's Settings, Variables and Secrets.
-- **Mover:** open a check, open a compartment or bag, tap **↕ Reorder**. Hold ≡ and drag, or use the arrows. Tick other rigs that carry the exact same kit, add a note, **Send to Doug**. Needs signal.
+- **Mover:** open a check, open a compartment or bag, tap **↕ Reorder**. Hold ≡ and drag (one long drag goes as far as you want; hold near the top or bottom edge to scroll), use the arrows, or tap an item's number and type the spot to send it straight there. Tick other rigs that carry the exact same kit, add a note, **Send to Doug**. Needs signal.
 - **Doug:** gets an email (EmailJS) with the new and old order and a link to `?moves=1`. Opening the Checker signed in as Doug shows a blue "kit moves waiting" banner. **Approve** saves the new order to the shared list (table `units`, note "Kit move by ...") for every device. **Turn down** takes an optional reason. Either way the mover gets an email back.
 - **Safe:** a move only changes order, never adds or removes items. If a rig's kit changed since the move was sent, that rig is skipped and the decision says so. Checks in progress are not affected (marks are kept by item name).
 - **Stored:** D1 table `moves` (who, when, rigs, kit, old and new order, note, status, who decided, when, why). Movers see their own moves from their banner.
@@ -104,6 +119,19 @@ When a crew opens a check, the app looks up every problem reported on earlier ch
 - These live in `units.json` under `sendRule` (`minPct`, `holdUntil`)
 
 ## Changelog
+
+### v2.29
+- Kit reorder: dragging now keeps going until you let go. On iPhone the drag let go after every single spot because the row holding the grip moved in the page; the list now holds the finger instead. Faster scroll when you hold near the top or bottom edge
+- Kit reorder: tap an item's number and type a spot (1 to N) to send it straight there, for moving big chunks without the arrows
+- units.json 2.29: Medication Kit on all five rigs (M25A, M25B, M19, M18, M14) in Joseph Slack's order from M25A (10/22). Positions 50 and 51 (22g IV, 24g IV) were off screen in his screenshots, so they are a best guess between 20g IV and 16g IV. Surgical Lube is still on M25B, M19, M18 and M14 (not M25A) and sits right after the APAP (spot 4, before Toradol), per Doug 10/22
+- Includes everything in 2.28 (2.28 was never uploaded)
+
+### v2.28
+- Log out button on the home screen next to Switch user
+- Auto sign out after 60 minutes with no activity, and at shift change (07:30 Pacific); a check in progress stays saved on the device
+- Sign in screen says why you were signed out
+- Haptics: a small buzz on button taps (iPhone/iPad via the iOS 18 switch haptic, Android via vibrate; double buzz on Android for problem taps). Off with `"haptics": false` in units.json
+- Fixed: an empty light blue bar showed above the Ambulances button for everyone (the kit moves banner ignored hidden)
 
 ### v2.27.1
 - Kit move sheet: the note box and buttons now use the app's font (a CSS slip in 2.27 showed the default typewriter font)

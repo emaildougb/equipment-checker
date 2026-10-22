@@ -1478,6 +1478,7 @@
     .mv-open-row { display: flex; justify-content: flex-end; margin: 2px 0 8px; }
     .mv-open { font-family: inherit; font-size: 13px; font-weight: 800; line-height: 1; color: var(--info); background: var(--white); border: 1.5px solid var(--info); border-radius: 999px; padding: 9px 14px; cursor: pointer; }
     .moves-banner { display: block; width: min(92%, 420px); margin: 10px auto 0; padding: 12px 14px; font-family: inherit; font-size: 15px; font-weight: 800; line-height: 1.3; color: var(--info); background: #E8F1F8; border: 2px solid var(--info); border-radius: 12px; cursor: pointer; text-align: center; }
+    .moves-banner[hidden] { display: none; }
     .moves-banner.mine { color: var(--g-dark); background: var(--g-pale); border-color: var(--g-mid); font-weight: 700; font-size: 14px; }
     .mv-overlay { position: fixed; inset: 0; z-index: 9000; background: rgba(15, 30, 15, 0.55); display: flex; align-items: flex-end; justify-content: center; }
     .mv-overlay[hidden] { display: none; }
@@ -1495,7 +1496,10 @@
     .mv-row.moved { border-color: var(--info); background: #F2F7FB; }
     .mv-row.dragging { border-color: var(--g-mid); box-shadow: 0 6px 18px rgba(0,0,0,.18); background: var(--g-pale); }
     .mv-grip { flex: none; width: 44px; align-self: stretch; display: flex; align-items: center; justify-content: center; font-size: 22px; color: var(--muted); cursor: grab; touch-action: none; }
-    .mv-num { flex: none; width: 24px; font-size: 12px; font-weight: 800; color: var(--muted); text-align: right; }
+    .mv-num { flex: none; min-width: 34px; height: 34px; padding: 0 4px; font-family: inherit; font-size: 13px; font-weight: 800; color: var(--g-mid); text-align: center; background: var(--white); border: 1.5px dashed var(--border); border-radius: 8px; cursor: pointer; }
+    .mv-row.dragging { position: relative; z-index: 2; }
+    .mv-row.just-moved { animation: mvFlash 0.9s ease-out; }
+    @keyframes mvFlash { from { background: #FFF3C4; } to { background: inherit; } }
     .mv-name { flex: 1; min-width: 0; font-size: 15px; font-weight: 600; color: var(--text); overflow-wrap: anywhere; }
     .mv-was { display: block; font-size: 11px; font-weight: 700; color: var(--info); }
     .mv-arrow { flex: none; width: 38px; height: 38px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--white); font-family: inherit; font-size: 15px; font-weight: 800; line-height: 1; color: var(--g-mid); cursor: pointer; }
@@ -1597,7 +1601,7 @@
   </div>
   <div class="logo-flip-hint" id="logo-flip-hint">Tap logo to flip</div>
   <div class="home-sub">Daily Apparatus Check</div>
-  <div class="who-strip" id="who-strip" hidden>Signed in as <b id="who-name"></b> · <button type="button" id="who-switch">Switch user</button></div>
+  <div class="who-strip" id="who-strip" hidden>Signed in as <b id="who-name"></b> · <button type="button" id="who-switch">Switch user</button> · <button type="button" id="who-logout">Log out</button></div>
   <button type="button" class="moves-banner" id="moves-banner" hidden></button>
   <div class="home-buttons">
     <button class="home-btn ambulances" id="home-btn-ambulances" type="button">
@@ -1722,7 +1726,7 @@
    APP STATE
    ============================================================ */
 const APP = {
-  version: '2.27.1',
+  version: '2.29',
   data: null,        // loaded units.json
   screen: 'home',
   check: null,       // current in-progress check
@@ -1874,6 +1878,8 @@ function setAuth(state, detail) {
     document.getElementById('who-name').textContent = AUTH.name;
     strip.hidden = false;
     gate.hidden = true;
+    autoOutNoteSignIn();
+    setTimeout(autoOutCheck, 0);
     if (typeof movesBoot === 'function') setTimeout(movesBoot, 0);
     return;
   }
@@ -1881,7 +1887,7 @@ function setAuth(state, detail) {
   if (typeof movesBanner === 'function') movesBanner();
   gate.hidden = false;
   if (state === 'out') {
-    msg.textContent = 'Sign in with your North Country EMS Microsoft account (the same one you use for NCEMS email) to start your check.';
+    msg.textContent = autoOutReason() + 'Sign in with your North Country EMS Microsoft account (the same one you use for NCEMS email) to start your check.';
     btn.hidden = false;
   } else if (state === 'wrong') {
     msg.textContent = 'That account (' + (detail || 'unknown') + ') is not a North Country EMS account. Sign in with your @northcountryems.org account.';
@@ -1925,6 +1931,172 @@ function authWire() {
     if (APP.check && hasUnsavedWork() && !confirm('A check is in progress on this device. Switch user anyway? It stays saved here.')) return;
     gateSignIn(true);
   });
+  document.getElementById('who-logout').addEventListener('click', () => {
+    if (APP.check && hasUnsavedWork() && !confirm('A check is in progress on this device. Log out anyway? It stays saved here.')) return;
+    signOutNow('button');
+  });
+  autoOutWire();
+  hapticsWire();
+}
+
+/* ============================================================
+   2.28 HAPTICS: a small buzz when crews tap a button
+   iPhone/iPad: Safari has no vibrate, but tapping a switch style checkbox
+   gives a system haptic (iOS 18 and newer). We click a hidden one.
+   Android: navigator.vibrate. Problem taps (Abnormal, X, No, Still broken)
+   get a double buzz on Android; iPhone only has the one style.
+   Turn off in units.json with "haptics": false.
+   ============================================================ */
+const HAPTIC_TAP = 'button, .unit-btn, .home-btn, .fixed-check, .unfix-check, .section-head, .compartment-head';
+const HAPTIC_WARN = '.check-btn.bad, .item-btn.abnormal, .yn-btn.no, .kb-broken, [data-unfixed]';
+function hapticsOn() { return !(APP.data && APP.data.haptics === false); }
+function haptic(kind) {
+  if (!hapticsOn()) return;
+  try {
+    if (typeof navigator.vibrate === 'function') {
+      navigator.vibrate(kind === 'warn' ? [18, 60, 18] : 12);
+      return;
+    }
+    const label = document.createElement('label');
+    label.setAttribute('aria-hidden', 'true');
+    label.style.display = 'none';
+    const input = document.createElement('input');
+    input.type = 'checkbox';
+    input.setAttribute('switch', '');
+    input.tabIndex = -1;
+    label.appendChild(input);
+    document.head.appendChild(label);
+    label.click();
+    document.head.removeChild(label);
+  } catch (e) {}
+}
+function hapticsWire() {
+  document.addEventListener('click', e => {
+    const t = e.target;
+    if (!t || !t.closest || t.closest('head')) return;
+    const el = t.closest(HAPTIC_TAP);
+    if (!el || el.disabled) return;
+    haptic(t.closest(HAPTIC_WARN) ? 'warn' : 'tap');
+  }, true);
+}
+
+/* ============================================================
+   2.28 LOG OUT AND AUTO SIGN OUT
+   Crews share the agency iPhones and iPads, and every check is saved under
+   whoever is signed in. So the Checker signs out:
+   - when someone taps Log out on the home screen
+   - after an hour with nobody touching it (idleMinutes)
+   - at shift change, 07:30 Pacific (shiftChange). If someone is tapping
+     right at 07:30, it waits until they stop for 2 minutes
+   A check in progress stays saved on the device (autosave) and anything
+   waiting to send still sends. Override in units.json with
+   "autoSignOut": { "idleMinutes": 60, "shiftChange": "07:30" }
+   (0 or "" turns that part off).
+   ============================================================ */
+const AUTO_OUT = { busy: false, lastWrite: 0 };
+const SIGNIN_AT_KEY = 'ep_signin_at', LAST_ACTIVE_KEY = 'ep_last_active', OUT_WHY_KEY = 'ep_signed_out_why';
+function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+function lsDel(k) { try { localStorage.removeItem(k); } catch (e) {} }
+function autoOutCfg() {
+  const c = (APP.data && APP.data.autoSignOut) || {};
+  return {
+    idleMinutes: c.idleMinutes === 0 ? 0 : (Number(c.idleMinutes) || 60),
+    shiftChange: c.shiftChange === '' ? '' : (c.shiftChange || '07:30')
+  };
+}
+function pacificParts(ms) {
+  const o = {};
+  new Intl.DateTimeFormat('en-US', { timeZone: 'America/Los_Angeles', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false })
+    .formatToParts(new Date(ms)).forEach(x => { o[x.type] = x.value; });
+  return { y: +o.year, m: +o.month, d: +o.day, h: (+o.hour) % 24, mi: +o.minute };
+}
+function pacificToMs(y, m, d, h, mi) {
+  const want = Date.UTC(y, m - 1, d, h, mi);
+  let g = want;
+  for (let i = 0; i < 3; i++) {
+    const p = pacificParts(g);
+    g += want - Date.UTC(p.y, p.m - 1, p.d, p.h, p.mi);
+  }
+  return g;
+}
+function lastShiftChange(now) {
+  const m = /^(\d{1,2}):(\d{2})$/.exec(autoOutCfg().shiftChange || '');
+  if (!m) return 0;
+  const hh = +m[1], mm = +m[2];
+  let p = pacificParts(now);
+  let t = pacificToMs(p.y, p.m, p.d, hh, mm);
+  if (t > now) { p = pacificParts(now - 86400000); t = pacificToMs(p.y, p.m, p.d, hh, mm); }
+  return t;
+}
+function autoOutNoteSignIn() {
+  let s = null;
+  try { s = JSON.parse(lsGet(SIGNIN_AT_KEY) || 'null'); } catch (e) {}
+  if (!s || s.email !== AUTH.email) {
+    lsSet(SIGNIN_AT_KEY, JSON.stringify({ email: AUTH.email, at: Date.now() }));
+    lsSet(LAST_ACTIVE_KEY, String(Date.now()));
+  } else if (!lsGet(LAST_ACTIVE_KEY)) {
+    lsSet(LAST_ACTIVE_KEY, String(Date.now()));
+  }
+  lsDel(OUT_WHY_KEY);
+}
+function autoOutMarkActive() {
+  if (AUTH.state !== 'in' || AUTO_OUT.busy) return;
+  const now = Date.now();
+  if (now - AUTO_OUT.lastWrite < 15000) return;
+  AUTO_OUT.lastWrite = now;
+  lsSet(LAST_ACTIVE_KEY, String(now));
+}
+function autoOutCheck() {
+  if (AUTH.state !== 'in' || AUTO_OUT.busy) return;
+  const now = Date.now(), cfg = autoOutCfg();
+  const last = Number(lsGet(LAST_ACTIVE_KEY)) || now;
+  let s = null;
+  try { s = JSON.parse(lsGet(SIGNIN_AT_KEY) || 'null'); } catch (e) {}
+  const at = (s && s.at) || now;
+  if (cfg.idleMinutes > 0 && now - last >= cfg.idleMinutes * 60000) return signOutNow('idle');
+  const sc = lastShiftChange(now);
+  if (sc && at < sc && now - last >= 2 * 60000) return signOutNow('shift');
+}
+function autoOutReason() {
+  const why = lsGet(OUT_WHY_KEY);
+  if (why === 'idle') return 'You were signed out after an hour with no activity. ';
+  if (why === 'shift') return 'You were signed out for shift change. ';
+  if (why === 'button') return 'You are logged out. ';
+  return '';
+}
+function signOutNow(why) {
+  if (AUTO_OUT.busy) return;
+  AUTO_OUT.busy = true;
+  const acct = msalAccount;
+  // Forget who was here so the next person starts clean. Checks in progress
+  // (autosave) and anything waiting to send are left alone.
+  [SIGNIN_AT_KEY, LAST_ACTIVE_KEY, 'ncems_login_hint', 'ncems_ep_initials', MOVES_ME_KEY].forEach(lsDel);
+  lsSet(OUT_WHY_KEY, why);
+  try { MOVES.me = null; } catch (e) {}
+  msalAccount = null;
+  AUTH.email = ''; AUTH.name = '';
+  // Save any check in progress (it reopens from the device next time that rig is picked), then go home
+  try { if (APP.check) saveAutosave(); } catch (e) {}
+  try { if (typeof liveStop === 'function') liveStop(); } catch (e) {}
+  if (APP.screen !== 'home') { APP.check = null; try { showScreen('home'); } catch (e) {} }
+  const finishLocal = () => { AUTO_OUT.busy = false; setAuth('out'); };
+  if (!msalApp) return finishLocal();
+  const req = { postLogoutRedirectUri: location.origin + location.pathname.replace(/index\.html$/, '') };
+  if (acct) req.account = acct;
+  const offline = navigator.onLine === false;
+  // No signal: clear this device's sign in without going to Microsoft.
+  if (offline) req.onRedirectNavigate = () => false;
+  msalApp.logoutRedirect(req).then(() => { if (offline) finishLocal(); }).catch(() => finishLocal());
+}
+function autoOutWire() {
+  ['pointerdown', 'touchstart', 'keydown', 'input'].forEach(ev =>
+    document.addEventListener(ev, autoOutMarkActive, { capture: true, passive: true }));
+  document.addEventListener('scroll', autoOutMarkActive, { capture: true, passive: true });
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') autoOutCheck(); });
+  window.addEventListener('pageshow', autoOutCheck);
+  window.addEventListener('focus', autoOutCheck);
+  setInterval(autoOutCheck, 30000);
 }
 
 /* ============================================================
@@ -2006,11 +2178,12 @@ async function retryPendingList() {
 
 function showAppInfo() { showWhatsNew(true); }
 const WHATS_NEW = [
-  ['Kit order', 'Josh Robertson and Joseph Slack can now drag items into the order they really sit in a kit. Doug approves each change before it shows up for everyone, so your list will start matching the bags.'],
-  ['All on North Country', 'Live share with your partner and the known problems list now come from the agency\'s own Cloudflare account too. Nothing changes in how you use them.'],
-  ['Med Vault', 'A count over par now shows an error. It can never be over. Recount, and if it really is over, contact a BC right away.'],
-  ['Mechanical & Lights', 'New All Normal button marks the whole list Normal. Every item stays on screen so you can look them over and change any that aren\'t.'],
-  ['Tire pressure', 'Tire pressure is now required. You can\'t submit until it\'s answered.'],
+  ['Log out', 'New Log out button on the home screen, next to Switch user. The iPhones and iPads are shared, so log out when you finish your checks.'],
+  ['Auto sign out', 'The Checker signs you out after an hour with nobody using it, and at shift change (7:30 AM). A check you started stays saved on the device.'],
+  ['Medication Kit', 'Every rig\'s Medication Kit is now in the order it really sits in the kit (thanks, Joseph Slack).'],
+  ['Haptics', 'Your phone gives a little buzz when you tap a button. iPhones and iPads need iOS 18 or newer.'],
+  ['Kit reorder', 'Dragging an item now keeps going until you let go. You can also tap an item\'s number and type the spot to send it to.'],
+  ['Fixed', 'The empty blue bar above the Ambulances button is gone.'],
 ];
 function showWhatsNew(force) {
   let seen = '';
@@ -6126,7 +6299,7 @@ function escapeAttr(s) {
       <button type="button" class="mv-x" id="mv-x" aria-label="Close">✕</button>
     </div>
     <div class="mv-scroll" id="mv-scroll">
-      <p class="mv-hint">Put the items in the order they really sit. Hold ≡ and drag, or use the arrows. Doug approves it before anyone else sees it.</p>
+      <p class="mv-hint">Put the items in the order they really sit. Hold ≡ and drag, use the arrows, or tap a number to send that item straight to a spot. Doug approves it before anyone else sees it.</p>
       <div class="mv-warn" id="mv-sheet-warn" hidden></div>
       <ol class="mv-list" id="mv-list"></ol>
       <div id="mv-rigs-wrap"><div class="mv-label">Same new order on</div><div class="mv-rigs" id="mv-rigs"></div></div>
@@ -6264,7 +6437,7 @@ function moveOpenSheet(unitId, compName, bagName) {
   list.innerHTML = before.map((n, i) => `
     <li class="mv-row" data-i="${i}" data-name="${escapeAttr(n)}">
       <span class="mv-grip" aria-hidden="true">≡</span>
-      <span class="mv-num"></span>
+      <button type="button" class="mv-num" data-mv-num aria-label="Move ${escapeAttr(n)} to a spot number"></button>
       <span class="mv-name">${escapeHTML(n)}<span class="mv-was"></span></span>
       <button type="button" class="mv-arrow" data-mv-up aria-label="Move ${escapeAttr(n)} up">▲</button>
       <button type="button" class="mv-arrow" data-mv-down aria-label="Move ${escapeAttr(n)} down">▼</button>
@@ -6308,6 +6481,23 @@ function moveRenumber() {
   document.getElementById('mv-send').disabled = changed === 0;
   document.getElementById('mv-reset').disabled = changed === 0;
 }
+function moveToSpot(row) {
+  const list = document.getElementById('mv-list');
+  const rows = [...list.children];
+  const now = rows.indexOf(row) + 1;
+  const ans = prompt(`Move "${row.dataset.name}" to which spot? (1 to ${rows.length}, now ${now})`, '');
+  if (ans === null) return;
+  let to = parseInt(String(ans).trim(), 10);
+  if (!to || isNaN(to)) return;
+  to = Math.max(1, Math.min(rows.length, to));
+  if (to === now) return;
+  const others = rows.filter(r => r !== row);
+  if (to > others.length) list.appendChild(row);
+  else list.insertBefore(row, others[to - 1]);
+  moveRenumber();
+  row.classList.remove('just-moved'); void row.offsetWidth; row.classList.add('just-moved');
+  try { row.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) {}
+}
 function moveSetMsg(text, kind) {
   const el = document.getElementById('mv-msg');
   el.textContent = text || '';
@@ -6318,19 +6508,23 @@ function moveWireSheet() {
   list.addEventListener('click', e => {
     const row = e.target.closest('.mv-row');
     if (!row) return;
+    if (e.target.closest('[data-mv-num]')) { moveToSpot(row); return; }
     if (e.target.closest('[data-mv-up]') && row.previousElementSibling) list.insertBefore(row, row.previousElementSibling);
     else if (e.target.closest('[data-mv-down]') && row.nextElementSibling) list.insertBefore(row.nextElementSibling, row);
     else return;
     moveRenumber();
   });
   // Drag with a finger or mouse on the ≡ grip. Pointer events work on iPhone, iPad and PC.
+  // 2.29: the pointer is held by the list itself, not the grip. Before, iPhone Safari let go
+  // of the drag every time the row moved one spot, so you had to keep grabbing it again.
   list.addEventListener('pointerdown', e => {
     const grip = e.target.closest('.mv-grip');
-    if (!grip) return;
+    if (!grip || MOVES.drag) return;
     const row = grip.closest('.mv-row');
     const scroller = document.getElementById('mv-scroll');
     e.preventDefault();
-    try { grip.setPointerCapture(e.pointerId); } catch (x) {}
+    const pid = e.pointerId;
+    try { list.setPointerCapture(pid); } catch (x) {}
     row.classList.add('dragging');
     let y = e.clientY, timer = null;
     const place = () => {
@@ -6342,23 +6536,30 @@ function moveWireSheet() {
     };
     const edge = () => {
       const box = scroller.getBoundingClientRect();
-      if (y < box.top + 50) { scroller.scrollTop -= 14; place(); }
-      else if (y > box.bottom - 50) { scroller.scrollTop += 14; place(); }
+      const zone = 70;
+      if (y < box.top + zone) { scroller.scrollTop -= Math.ceil((box.top + zone - y) / 4) + 4; place(); }
+      else if (y > box.bottom - zone) { scroller.scrollTop += Math.ceil((y - (box.bottom - zone)) / 4) + 4; place(); }
     };
     timer = setInterval(edge, 30);
-    const move = ev => { y = ev.clientY; place(); };
-    const up = () => {
+    const move = ev => { if (ev.pointerId !== pid) return; ev.preventDefault(); y = ev.clientY; place(); };
+    const up = ev => {
+      if (ev && ev.pointerId !== undefined && ev.pointerId !== pid) return;
       clearInterval(timer);
-      grip.removeEventListener('pointermove', move);
-      grip.removeEventListener('pointerup', up);
-      grip.removeEventListener('pointercancel', up);
+      window.removeEventListener('pointermove', move, true);
+      window.removeEventListener('pointerup', up, true);
+      window.removeEventListener('pointercancel', up, true);
+      try { list.releasePointerCapture(pid); } catch (x) {}
       row.classList.remove('dragging');
+      MOVES.drag = null;
       moveRenumber();
     };
-    grip.addEventListener('pointermove', move);
-    grip.addEventListener('pointerup', up);
-    grip.addEventListener('pointercancel', up);
+    MOVES.drag = { row, up };
+    window.addEventListener('pointermove', move, { capture: true, passive: false });
+    window.addEventListener('pointerup', up, true);
+    window.addEventListener('pointercancel', up, true);
   });
+  // iPhone: stop the page from scrolling under a finger that started on a grip
+  list.addEventListener('touchmove', e => { if (MOVES.drag) e.preventDefault(); }, { passive: false });
   document.getElementById('mv-x').addEventListener('click', moveCloseSheet);
   document.getElementById('mv-sheet').addEventListener('click', e => { if (e.target.id === 'mv-sheet') moveCloseSheet(); });
   document.getElementById('mv-reset').addEventListener('click', () => {
