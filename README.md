@@ -2,7 +2,7 @@
 
 Equipment and property check submission tool for North Country EMS crews.
 
-**Version 2.30**
+**Version 2.31**
 
 ## Links
 
@@ -119,6 +119,12 @@ When a crew opens a check, the app looks up every problem reported on earlier ch
 - These live in `units.json` under `sendRule` (`minPct`, `holdUntil`)
 
 ## Changelog
+
+### v2.31 (10/24/2026)
+- New top bar, the same as CG Staff: white bar, house button on the left goes to the NCEMS Hub, NCEMS logo, "NCEMS" in black and the app name in green, North Country EMS in gray, and the i button on the right for details. iPhone status bar set to default so the clock shows on the white bar
+- The bar shows on every screen; the screen headers (Back and the unit name) sit right under it. The home screen corner buttons are gone since the bar has them
+- What's new popup has a New top bar line
+- Changed index.html and README.md only (units.json not touched)
 
 ### v2.30
 - Haptics everywhere: links, logo flip, labels and checkboxes, photo buttons, headers, progress bar and popups; a buzz when a number is entered; a tick per spot while dragging in Reorder; success buzz when a check is sent; error buzz for narc over par and for a required item missing. A label and its checkbox only buzz once
