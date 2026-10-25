@@ -1842,7 +1842,7 @@
    APP STATE
    ============================================================ */
 const APP = {
-  version: '2.33',
+  version: '2.34',
   data: null,        // loaded units.json
   screen: 'home',
   check: null,       // current in-progress check
@@ -2240,6 +2240,7 @@ function autoOutWire() {
     document.addEventListener(ev, autoOutMarkActive, { capture: true, passive: true }));
   document.addEventListener('scroll', autoOutMarkActive, { capture: true, passive: true });
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') autoOutCheck(); });
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') checkForUpdate(false); });   // 2.34
   window.addEventListener('pageshow', autoOutCheck);
   window.addEventListener('focus', autoOutCheck);
   setInterval(autoOutCheck, 30000);
@@ -2550,8 +2551,33 @@ function fleetMaybeAsk() {
 }
 function fleetSkipToday() { try { localStorage.setItem(FL_SKIP, AUTH.email + '|' + (FLEET.data && FLEET.data.day)); } catch (e) {} fleetAskClose(); }
 
+/* 2.34 AUTO UPDATE: the home screen app on iPhone and iPad keeps the old page until it's
+   fully closed. When the app opens or comes back to the front (at most every 5 minutes), it
+   asks GitHub for the newest index.html and reloads itself if the version is newer. It never
+   reloads during a check, with a popup open, or off the home and list screens. */
+const UPD = { busy: false, last: 0 };
+function updSafeNow() {
+  if (APP.check || !['home', 'ambulance-picker', 'rescue-picker', 'success'].includes(APP.screen)) return false;
+  const open = ['fl-overlay', 'mv-sheet', 'mv-review', 'whatsnew'].some(id => { const el = document.getElementById(id); return el && !el.hidden; });
+  const modal = document.getElementById('submit-modal');
+  return !open && !(modal && !modal.classList.contains('hidden'));
+}
+async function checkForUpdate(force) {
+  if (UPD.busy || (!force && Date.now() - UPD.last < 5 * 60 * 1000) || !updSafeNow()) return;
+  UPD.busy = true; UPD.last = Date.now();
+  try {
+    const base = location.pathname.replace(/index\.html$/, '');
+    const r = await fetch(base + 'index.html?nc=' + Date.now(), { cache: 'no-store' });
+    const m = (await r.text()).match(/version: '([0-9.]+)',/);
+    if (m && verCmp(m[1], APP.version) > 0 && updSafeNow()) {
+      console.log('Newer Checker ' + m[1] + ', reloading');
+      location.replace(base + 'index.html?v=' + m[1]);
+    }
+  } catch (e) {} finally { UPD.busy = false; }
+}
 function showAppInfo() { showWhatsNew(true); }
 const WHATS_NEW = [
+  ['Updates itself', 'When a new version comes out, the app picks it up on its own the next time you open it. No more closing and reopening. It never updates in the middle of a check.'],
   ['Asks where you are', 'Right after you sign in, the app asks "Where are you today?" on its own. Chiefs and anyone not on a crew can tap "Not on a crew today".'],
   ['Where are you today?', 'After you sign in, pick your crew (M51, M52 or M54). The schedule suggests the right one. Your crew\'s main ambulance comes with it.'],
   ['Your ambulances', 'The Ambulances list shows the rigs your crew has today and whether each one is checked. Tap any other rig at your station to take it. If a spare shows up from the other station, tap it and answer "Is it here today?". If another crew already took a rig, you\'ll see who.'],
@@ -2634,6 +2660,8 @@ async function boot() {
   document.getElementById('home-btn-others').addEventListener('click', showRescuePicker);
   document.getElementById('fl-crew').addEventListener('click', () => fleetAsk(() => fleetHome()));
   fleetHome();
+  setTimeout(() => checkForUpdate(true), 4000);   // 2.34
+  setInterval(() => checkForUpdate(false), 5 * 60 * 1000);
 
   // Wire up the logo: click triggers admin spin + entry
   setupLogoAdminTrigger();

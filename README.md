@@ -2,7 +2,7 @@
 
 Equipment and property check submission tool for North Country EMS crews.
 
-**Version 2.33**
+**Version 2.34**
 
 ## Links
 
@@ -20,6 +20,10 @@ Equipment and property check submission tool for North Country EMS crews.
 - `apple-touch-icon.png` : iOS home-screen + tab icon
 - `manifest.json` : standalone app-mode config
 - `README.md` : this file
+
+## Auto update (2.34)
+
+The home screen app on agency iPhones and iPads kept showing the old version until it was fully closed. Now, when the app opens, comes back to the front, or every 5 minutes, it fetches the newest index.html from GitHub (no cache) and reloads itself if the version is newer. It never reloads during a check, with a popup or the kit move panel open, or off the home and list screens. Devices still on 2.33 or older need one last full close and reopen to get it.
 
 ## Where are you today and rig claims (2.32)
 
@@ -130,6 +134,10 @@ When a crew opens a check, the app looks up every problem reported on earlier ch
 - These live in `units.json` under `sendRule` (`minPct`, `holdUntil`)
 
 ## Changelog
+
+### v2.34 (10/24/2026)
+- Auto update: the app checks for a newer version when it opens, comes back to the front, and every 5 minutes, and reloads itself (never during a check or with a popup open)
+- Changed index.html and README.md only
 
 ### v2.33 (10/24/2026)
 - "Where are you today?" now pops up on its own right after sign in (after the What's new popup if that shows), instead of waiting for a tap on the crew card or Ambulances
