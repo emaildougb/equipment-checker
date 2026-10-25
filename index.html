@@ -1640,6 +1640,14 @@
     .fl-q-no { border: 1.5px solid var(--border); background: var(--white); color: var(--text); }
     .fl-all { display: block; margin: 18px auto 4px; border: 0; background: none; color: var(--muted); font-family: inherit; font-size: 13px; text-decoration: underline; cursor: pointer; padding: 8px; }
     .fl-skip { display: block; width: 100%; margin-top: 12px; height: 46px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--white); color: var(--muted); font-family: inherit; font-size: 15px; font-weight: 700; cursor: pointer; }
+    /* 2.37 just looking */
+    .look-note { background: #E8F1F8; color: #12395A; border: 2px solid var(--info); border-radius: 12px; padding: 12px 14px; font-size: 14px; line-height: 1.45; margin-bottom: 14px; }
+    .look-note button { margin-left: 4px; border: 0; background: var(--info); color: #fff; font-family: inherit; font-size: 13px; font-weight: 800; border-radius: 999px; padding: 6px 12px; cursor: pointer; }
+    .look-banner { display: none; position: sticky; top: 0; z-index: 30; background: var(--info); color: #fff; padding: 10px 14px; font-size: 14px; font-weight: 700; line-height: 1.35; text-align: center; }
+    .look-banner button { margin-left: 8px; border: 2px solid #fff; background: transparent; color: #fff; font-family: inherit; font-weight: 800; border-radius: 999px; padding: 4px 12px; cursor: pointer; }
+    #screen-check.look .look-banner { display: block; }
+    #screen-check.look .submit-wrap, #screen-check.look .photo-input, #screen-check.look input[type=file], #screen-check.look .mv-open-row { display: none !important; }
+    .fl-crew.looking { border-style: dashed; }
     .unit-btn.due-done { background: var(--g-pale); border-color: var(--g-mid); }
     .unit-btn.due-done .unit-meta { color: var(--g-mid); font-weight: 700; }
 </style>
@@ -1754,6 +1762,7 @@
     <button class="back-btn" onclick="confirmExitCheck()">← Back</button>
     <div class="header-title" id="check-title">Check</div>
   </div>
+  <div class="look-banner" id="look-banner">Just looking. Nothing here is saved, sent or counted. <button type="button" onclick="goHome()">Done</button></div>
   <div class="form-wrap" id="check-body"></div>
 </div>
 
@@ -1842,7 +1851,7 @@
    APP STATE
    ============================================================ */
 const APP = {
-  version: '2.36',
+  version: '2.37',
   data: null,        // loaded units.json
   screen: 'home',
   check: null,       // current in-progress check
@@ -2371,7 +2380,10 @@ function fleetHome() {
   if (AUTH.state !== 'in' || !FLEET.data) { card.hidden = true; return; }
   const mine = fleetMyCrew();
   card.hidden = false;
-  if (mine) {
+  card.classList.toggle('looking', fleetLooking());
+  if (fleetLooking()) {
+    card.innerHTML = `<span class="fl-crew-txt"><b>Just looking</b><span>Open any rig to look around. Nothing is saved, sent or counted.</span></span><span class="fl-crew-chg">Pick crew</span>`;
+  } else if (mine) {
     const ci = fleetCrewInfo(mine) || {};
     const rigs = (FLEET.data.rigs || []).filter(r => r.claim && r.claim.crew === mine).map(r => r.rig);
     card.innerHTML = `<span class="fl-crew-big">${escapeHTML(mine)}</span><span class="fl-crew-txt"><b>Station ${escapeHTML(ci.station || '')}</b><span>${rigs.length ? 'Your ambulances: ' + escapeHTML(rigs.join(', ')) : 'Tap Ambulances to pick your rigs'}</span></span><span class="fl-crew-chg">Change</span>`;
@@ -2404,7 +2416,7 @@ function fleetAsk(then) {
     const ci = fleetCrewInfo(c) || {};
     return `<button type="button" class="fl-crewbtn${c === best ? ' on' : ''}" onclick="fleetPick('${c}')"><b>${c}</b><span>Station ${escapeHTML(ci.station || '')}</span></button>`;
   }).join('') + '</div>';
-  h += `<button type="button" class="fl-skip" onclick="fleetSkipToday()">Not on a crew today (just looking)</button>`;
+  h += `<button type="button" class="fl-skip" onclick="fleetJustLook()">Just looking (look around, nothing is saved)</button>`;
   h += `<div class="fl-foot">Your crew sets which ambulances it has at the station, then you start the checks. Picked wrong? Change it from the top of the Ambulances list.</div>`;
   document.getElementById('fl-sheet').innerHTML = h;
   document.getElementById('fl-overlay').hidden = false;
@@ -2412,6 +2424,7 @@ function fleetAsk(then) {
 function fleetAskClose() { document.getElementById('fl-overlay').hidden = true; FLEET.then = null; }
 async function fleetPick(crew) {
   if (FLEET.busy) return;
+  try { localStorage.removeItem(FL_SKIP); } catch (e) {}   // 2.37: picking a crew ends just looking
   FLEET.busy = true;
   const sheet = document.getElementById('fl-sheet');
   sheet.classList.add('fl-wait');
@@ -2444,6 +2457,7 @@ async function showAmbulancePicker() {
   if (!FLEET.data) { list.innerHTML = '<p class="picker-intro">Loading today\'s ambulances...</p>'; showScreen('ambulance-picker'); }
   const d = await fleetLoad(true);
   if (!d) return showAmbulancePickerAll();
+  if (fleetLooking()) { showAmbulancePickerAll(); document.getElementById('ambulance-picker-list').insertAdjacentHTML('afterbegin', lookBanner()); return; }   // 2.37
   if (!d.me.crew) { if (APP.screen !== 'ambulance-picker') showScreen('ambulance-picker'); renderFleetPicker(); return fleetAsk(() => renderFleetPicker()); }
   renderFleetPicker();
   if (APP.screen !== 'ambulance-picker') showScreen('ambulance-picker');
@@ -2549,7 +2563,31 @@ function fleetMaybeAsk() {
   if (skip === AUTH.email + '|' + d.day) return;
   fleetAsk(null);
 }
-function fleetSkipToday() { try { localStorage.setItem(FL_SKIP, AUTH.email + '|' + (FLEET.data && FLEET.data.day)); } catch (e) {} fleetAskClose(); }
+function fleetSkipToday() { fleetJustLook(); }
+/* 2.37 JUST LOOKING: "Just looking" takes you off any crew for today (Worker 1.3.1, crew NONE) and turns on
+   look around mode on this device for the rest of the check day. Any rig can be opened; nothing is saved,
+   sent, shared live or counted, and photo, kit move and known problem buttons are hidden. Picking a crew ends it. */
+function fleetLooking() {
+  if (AUTH.state !== 'in') return false;
+  let s = ''; try { s = localStorage.getItem(FL_SKIP) || ''; } catch (e) {}
+  const day = (FLEET.data && FLEET.data.day) || '';
+  return !!day && s === AUTH.email + '|' + day;
+}
+async function fleetJustLook() {
+  try { localStorage.setItem(FL_SKIP, AUTH.email + '|' + (FLEET.data && FLEET.data.day)); } catch (e) {}
+  const had = fleetMyCrew();
+  document.getElementById('fl-overlay').hidden = true; FLEET.then = null;
+  if (had) {
+    try { await fleetPost('/fleet/signin', { crew: 'NONE' }); } catch (e) { console.warn('Could not clear crew:', e && e.message); }
+  }
+  haptic('success');
+  fleetHome();
+  if (APP.screen === 'ambulance-picker') showAmbulancePicker();
+  else if (APP.screen === 'rescue-picker') showRescuePicker();
+}
+function lookBanner() {
+  return '<div class="look-note"><b>Just looking.</b> Open any rig to look around. Nothing is saved, sent or counted. <button type="button" onclick="fleetAsk(() => fleetHome())">Pick a crew</button></div>';
+}
 
 /* 2.34 AUTO UPDATE: the home screen app on iPhone and iPad keeps the old page until it's
    fully closed. When the app opens or comes back to the front (at most every 5 minutes), it
@@ -2579,6 +2617,7 @@ const FLEET_HEALTH_URL = 'https://cgstaff.northcountryems.org/#fleet';   // 2.35
 const FLEET_HEALTH_STAFF = ['d.boyce@northcountryems.org', 'd.langdon@northcountryems.org', 'd.madler@northcountryems.org', 'b.shirley@northcountryems.org', 'c.andrus@northcountryems.org', 'k.reid@northcountryems.org'];
 function showAppInfo() { showWhatsNew(true); }
 const WHATS_NEW = [
+  ['Just looking', 'Tap "Just looking" on the Where are you today? screen to look around any rig without doing a check. Nothing is saved, sent or counted, and it takes you off any crew you picked. Pick a crew any time to do a real check.'],
   ['Updates itself', 'When a new version comes out, the app picks it up on its own the next time you open it. No more closing and reopening. It never updates in the middle of a check.'],
   ['Asks where you are', 'Right after you sign in, the app asks "Where are you today?" on its own. Chiefs and anyone not on a crew can tap "Not on a crew today".'],
   ['Where are you today?', 'After you sign in, pick your crew (M51, M52 or M54). The schedule suggests the right one. Your crew\'s main ambulance comes with it.'],
@@ -2945,6 +2984,7 @@ function showScreen(id) {
   window.scrollTo(0, 0);
   APP.screen = id;
   document.getElementById('status-bar').classList.toggle('visible', id === 'check');
+  document.getElementById('screen-check').classList.toggle('look', id === 'check' && !!(APP.check && APP.check.look));   // 2.37
 }
 
 function goHome() {
@@ -2966,7 +3006,7 @@ function confirmExitCheck() {
 }
 
 function hasUnsavedWork() {
-  if (!APP.check) return false;
+  if (!APP.check || APP.check.look) return false;
   const c = APP.check;
   return !!(c.initials || c.mileage || c.walkAround?.notes ||
             Object.keys(c.mechanical || {}).length ||
@@ -3026,6 +3066,7 @@ function showRescuePicker() {
   list.innerHTML = '';
   const freshFleet = !!FLEET.data && Date.now() - FLEET.at < 20000;
   list.insertAdjacentHTML('beforeend', `<div class="fl-bar" style="margin-bottom:12px"><span>${escapeHTML(flDayLabel())}</span></div>`);
+  if (fleetLooking()) list.insertAdjacentHTML('beforeend', lookBanner());   // 2.37
 
   if (dueToday.length > 0) {
     const banner = document.createElement('div');
@@ -3102,7 +3143,7 @@ function autosaveKey(c) {
 
 function saveAutosave() {
   const c = APP.check;
-  if (!c) return;
+  if (!c || c.look) return;   // 2.37: just looking saves nothing
   try {
     // Strip the heavy _comps reference and any base64 photo blobs before saving
     const slim = JSON.parse(JSON.stringify(c, (k, v) => {
@@ -3230,6 +3271,7 @@ function startAmbulanceCheck(unitId) {
     unitName: amb.name,
     fridgeC: !!amb.fridgeC,   // 2.36: this rig's fridge reads in Celsius (units list, ambulances[].fridgeC)
     defOk: !!amb.defOk,       // 2.36: no DEF gauge, just OK or Low (ambulances[].defOk)
+    look: fleetLooking(),     // 2.37: just looking, nothing is saved or sent
     date: localDateStr(),
     initials: getSavedInitials(),
     mileage: '',
@@ -3267,10 +3309,12 @@ function startAmbulanceCheck(unitId) {
   renderAmbulanceCheck();
   showScreen('check');
   updateProgress();
-  restoreAutosave();    // restore any in-progress check for this unit+date
-  liveStart();          // share progress with a partner checking the same rig
+  if (!APP.check.look) {   // 2.37: just looking skips the saved copy, live share and known problems
+    restoreAutosave();    // restore any in-progress check for this unit+date
+    liveStart();          // share progress with a partner checking the same rig
+  }
   known.unit = null; known.list = [];
-  knownLoad();          // problems from earlier checks that nobody has fixed yet
+  if (!APP.check.look) knownLoad();          // problems from earlier checks that nobody has fixed yet
 }
 
 function renderAmbulanceCheck() {
@@ -3341,6 +3385,7 @@ function startRescueCheck(unitName) {
     mileage: '',
     rescueChecks: {},
     comments: '',
+    look: fleetLooking(),     // 2.37
   };
   renderRescueCheck();
   showScreen('check');
@@ -5279,6 +5324,7 @@ function computeCompletionPct() {
 function showSubmitModal() {
   const c = APP.check;
   if (!c) return;
+  if (c.look) { alert('Just looking, so nothing is sent. Pick your crew on the home screen to do a real check.'); return; }
   if (!c.initials) {
     alert('Please enter your name before submitting.');
     return;
@@ -5364,7 +5410,7 @@ async function flushPendingSubmissions() {
 
 async function submitCheck() {
   const c = APP.check;
-  if (!c) return;
+  if (!c || c.look) return;
 
   const btn = document.querySelector('.submit-btn');
   btn.disabled = true;

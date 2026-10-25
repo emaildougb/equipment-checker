@@ -2,7 +2,7 @@
 
 Equipment and property check submission tool for North Country EMS crews.
 
-**Version 2.36**
+**Version 2.37**
 
 ## Links
 
@@ -20,6 +20,14 @@ Equipment and property check submission tool for North Country EMS crews.
 - `apple-touch-icon.png` : iOS home-screen + tab icon
 - `manifest.json` : standalone app-mode config
 - `README.md` : this file
+
+## Just looking (2.37)
+
+"Just looking (look around, nothing is saved)" on the Where are you today? sheet:
+
+- Takes that person off any crew they picked for today (needs ncems-checks Worker 1.3.1, `POST /fleet/signin {crew: "NONE"}`), so they don't count as signed in on Fleet Health
+- Turns on look around mode on that device for the rest of the check day: the home card says Just looking, the Ambulances list is the plain list of every rig, and any rig or other unit opens with a blue "Just looking" bar. Nothing is saved on the device, nothing is sent, no live share with a partner, no known problem popup, and the Submit, photo and kit move buttons are hidden
+- Picking a crew (tap the card) ends it
 
 ## Per rig settings (2.36)
 
@@ -147,6 +155,10 @@ When a crew opens a check, the app looks up every problem reported on earlier ch
 - These live in `units.json` under `sendRule` (`minPct`, `holdUntil`)
 
 ## Changelog
+
+### v2.37 (10/25/2026)
+- Just looking: takes you off your crew for the day and lets anyone look around any rig without making a check (nothing saved, sent or counted)
+- Changed index.html and README.md only. Clearing the crew needs ncems-checks Worker 1.3.1
 
 ### v2.36 (10/25/2026)
 - M19 updates from Doug: fridge in Celsius (2 to 8 C), DEF is OK or Low (no gauge), new Interior Shelf compartment under the Fridge with the Nitrous Kit, Compartment B drip sets are now IV drip sets x6, triangle bandage and petrolatum gauze moved out of Compartment C (they're in B), Pass-Through is 2 rechargeable flashlights
