@@ -1842,7 +1842,11 @@
    APP STATE
    ============================================================ */
 const APP = {
+<<<<<<< HEAD
+  version: '2.36',
+=======
   version: '2.35',
+>>>>>>> a67ec741f469b1f333ab13fd747a3e1f280572f1
   data: null,        // loaded units.json
   screen: 'home',
   check: null,       // current in-progress check
@@ -3228,6 +3232,8 @@ function startAmbulanceCheck(unitId) {
     type: 'ambulance',
     unitId,
     unitName: amb.name,
+    fridgeC: !!amb.fridgeC,   // 2.36: this rig's fridge reads in Celsius (units list, ambulances[].fridgeC)
+    defOk: !!amb.defOk,       // 2.36: no DEF gauge, just OK or Low (ambulances[].defOk)
     date: localDateStr(),
     initials: getSavedInitials(),
     mileage: '',
@@ -3615,11 +3621,13 @@ function defRowHTML() {
   return `
     <div class="check-row" data-def-row>
       <div class="check-label" style="margin-bottom:8px;">DEF level</div>
-      <div class="fuel-picker" id="def-picker">
+      <div class="fuel-picker" id="def-picker">${APP.check && APP.check.defOk ? `
+        <button class="fuel-btn def-btn lvl-4 full" data-def="ok">OK<small>no gauge</small></button>
+        <button class="fuel-btn def-btn lvl-1" data-def="25">Low<small>add DEF</small></button>` : `
         <button class="fuel-btn def-btn lvl-1" data-def="25">¼<small>25%</small></button>
         <button class="fuel-btn def-btn lvl-2" data-def="50">½<small>50%</small></button>
         <button class="fuel-btn def-btn lvl-3" data-def="75">¾<small>75%</small></button>
-        <button class="fuel-btn def-btn lvl-4 full" data-def="100">Full<small>100%</small></button>
+        <button class="fuel-btn def-btn lvl-4 full" data-def="100">Full<small>100%</small></button>`}
       </div>
     </div>`;
 }
@@ -3712,12 +3720,15 @@ function oxygenInlineHTML() {
   `;
 }
 
+// 2.36: fridge units per rig (M19's fridge only shows Celsius, 2 to 8)
+function fridgeU(c) { c = c || APP.check; return c && c.fridgeC ? '°C' : '°F'; }
+function fridgeRange(c) { c = c || APP.check; return c && c.fridgeC ? '2°C and 8°C' : '39°F and 48°F'; }
 // Renders INSIDE the Fridge compartment body
 function coolerInlineHTML() {
   return `
     <div class="op-check-row" data-cooler style="display:block;">
       <div class="yn-row">
-        <div class="yn-label">🌡 Reading between 39°F and 48°F?</div>
+        <div class="yn-label">🌡 Reading between ${fridgeRange()}?</div>
         <div class="yn-buttons">
           <button class="yn-btn yes" data-cooler-yn="yes">Yes</button>
           <button class="yn-btn no" data-cooler-yn="no">No</button>
@@ -3729,7 +3740,7 @@ function coolerInlineHTML() {
         </div>
         <div class="meta-row">
           <label>Reading</label>
-          <input type="number" id="cooler-reading" placeholder="°F" step="0.1" />
+          <input type="number" id="cooler-reading" placeholder="${fridgeU()}" step="0.1" />
         </div>
         <div class="photo-input">
           <label for="cooler-photo">📷 Photo of thermometer</label>
@@ -4590,7 +4601,7 @@ function promptSpecialChecks(safeId, comp) {
   }
   // Fridge temp
   if (comp.name === 'Fridge' && !c.cooler?.answered) {
-    needs.push(['Fridge reading between 39 and 48°F? (Yes/No)', body.querySelector('[data-cooler]')]);
+    needs.push(['Fridge reading between ' + fridgeRange() + '? (Yes/No)', body.querySelector('[data-cooler]')]);
   }
 
   needs.push(...needsCounts(body, comp, null));
@@ -4641,11 +4652,18 @@ function markAllItemsAsComplete(safeId, compName, bagName, btn) {
    Kits (LifePak, Med Kit, Airway Bag, Ped I-Gels, Portable Suction, EZ IO, CMAC) get their own group. */
 const KIT_RE = /^(life ?pak|medication kit|airway bag|pediatric i-?gels|portable suction|ez ?-?io|c-?mac)/i;
 function sortComps(arr) {
-  return (arr || []).slice().sort((a, b) => {
+  const out = (arr || []).slice().sort((a, b) => {
     const ca = /^compartment\s/i.test(a.name), cb = /^compartment\s/i.test(b.name);
     if (ca !== cb) return ca ? -1 : 1;
     return a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' });
   });
+  // 2.36: a compartment with "after": "Fridge" sits right under that one (M19 Interior Shelf)
+  out.filter(x => x.after).forEach(x => {
+    out.splice(out.indexOf(x), 1);
+    const j = out.findIndex(y => y.name === x.after);
+    out.splice(j < 0 ? out.length : j + 1, 0, x);
+  });
+  return out;
 }
 function arrangeComps(comps) {
   const isKit = x => x.kit || KIT_RE.test(x.name || '');
@@ -5485,7 +5503,7 @@ function collectIssueLog() {
     if (c.def === '25') push('DEF at 25%', '', false, false, 's|def');
     if (c.tireYN === 'no') push('Tire pressure out of range', c.tireNotes, c.tireFixed, c.tireUnfixed, 's|tire');
     if (c.oxygenYN === 'no') push(`Main O2 at ${c.oxygenPsi} PSI (below ${oxygenMin()}, exchange)`, c.oxygenNotes, c.oxygenFixed, c.oxygenUnfixed, 's|o2');
-    if (c.cooler && c.cooler.answered && !c.cooler.ok) push('Cooler/Fridge out of range', c.cooler.reading ? c.cooler.reading + '°F' : '', false, false, 's|cooler');
+    if (c.cooler && c.cooler.answered && !c.cooler.ok) push('Cooler/Fridge out of range', c.cooler.reading ? c.cooler.reading + fridgeU(c) : '', false, false, 's|cooler');
     allComps(c).forEach(comp => {
       (comp.specialChecks || []).forEach(sc => { if (c.gurney?.[sc.label] === 'no') push(`${comp.name}: ${sc.label}`, '', false, false, `g|${sc.label}`); });
     });
@@ -6091,7 +6109,7 @@ function buildSummary() {
     // Cooler
     if (c.cooler.answered && !c.cooler.ok) {
       let fl = `  [ ABNORMAL ] Cooler/Fridge — out of range`;
-      if (c.cooler.reading) fl += `\n    Reading: ${c.cooler.reading}°F`;
+      if (c.cooler.reading) fl += `\n    Reading: ${c.cooler.reading}${fridgeU(c)}`;
       addFlag(fl);
     }
     // Operational checks
@@ -6215,7 +6233,7 @@ function buildSummary() {
 
     // Fuel + DEF
     if (c.fuel) { lines.push(`Fuel: ${c.fuel}${c.fuel !== 'Full' ? ' ⚠' : ''}`); }
-    if (c.def) { lines.push(`DEF: ${c.def}%${c.def === '25' ? ' ⚠' : ''}`); }
+    if (c.def) { lines.push(`DEF: ${c.def === 'ok' ? 'OK' : c.defOk && c.def === '25' ? 'Low' : c.def + '%'}${c.def === '25' ? ' ⚠' : ''}`); }
     if (c.fuel || c.def) lines.push('');
 
     // Tires
@@ -6243,8 +6261,8 @@ function buildSummary() {
 
     // Cooler
     if (c.cooler.answered) {
-      let cl = `Cooler (39 to 48°F): ${c.cooler.ok ? 'Yes ✓' : 'Out of range ⚠'}`;
-      if (!c.cooler.ok && c.cooler.reading) cl += `  Reading: ${c.cooler.reading}°F`;
+      let cl = `Cooler (${fridgeRange(c).replace(' and ', ' to ')}): ${c.cooler.ok ? 'Yes ✓' : 'Out of range ⚠'}`;
+      if (!c.cooler.ok && c.cooler.reading) cl += `  Reading: ${c.cooler.reading}${fridgeU(c)}`;
       if (c.cooler?.photo?.type === 'url') cl += `\n  Photo: ${c.cooler.photo.url}`;
       lines.push(cl); lines.push('');
     }

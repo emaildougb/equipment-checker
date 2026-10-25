@@ -2,7 +2,11 @@
 
 Equipment and property check submission tool for North Country EMS crews.
 
+<<<<<<< HEAD
+**Version 2.36**
+=======
 **Version 2.35**
+>>>>>>> a67ec741f469b1f333ab13fd747a3e1f280572f1
 
 ## Links
 
@@ -21,6 +25,18 @@ Equipment and property check submission tool for North Country EMS crews.
 - `manifest.json` : standalone app-mode config
 - `README.md` : this file
 
+<<<<<<< HEAD
+## Per rig settings (2.36)
+
+Set on an ambulance in the units list (`ambulances[]`):
+
+- `"fridgeC": true`: the fridge question and reading use Celsius, 2 to 8 C (M19, its fridge only shows C)
+- `"defOk": true`: no DEF gauge, so DEF is just OK or Low (M19). Low still flags like DEF at 25%
+
+On a compartment, `"after": "Fridge"` puts it right under that compartment instead of in A to Z order (M19 Interior Shelf).
+
+=======
+>>>>>>> a67ec741f469b1f333ab13fd747a3e1f280572f1
 ## Fleet Health link (2.35)
 
 The Fleet Health page lives in CG Staff (cgstaff.northcountryems.org/#fleet). For the CG Staff (Boyce, Langdon, Madler, Shirley, Andrus, Reid) the i panel shows an "Open Fleet Health (CG Staff)" button at the top. Everyone else sees the i panel as before.
@@ -139,6 +155,15 @@ When a crew opens a check, the app looks up every problem reported on earlier ch
 
 ## Changelog
 
+<<<<<<< HEAD
+### v2.36 (10/25/2026)
+- M19 updates from Doug: fridge in Celsius (2 to 8 C), DEF is OK or Low (no gauge), new Interior Shelf compartment under the Fridge with the Nitrous Kit, Compartment B drip sets are now IV drip sets x6, triangle bandage and petrolatum gauze moved out of Compartment C (they're in B), Pass-Through is 2 rechargeable flashlights
+- App: per rig `fridgeC` and `defOk` settings, compartment `after` setting
+- List changes went into the shared unit list (D1) through the admin save, not units.json on GitHub
+- Changed index.html and README.md only
+
+=======
+>>>>>>> a67ec741f469b1f333ab13fd747a3e1f280572f1
 ### v2.35 (10/25/2026)
 - i panel: "Open Fleet Health (CG Staff)" button for the CG Staff, opens cgstaff.northcountryems.org/#fleet
 - Changed index.html and README.md only
