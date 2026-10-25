@@ -2,7 +2,7 @@
 
 Equipment and property check submission tool for North Country EMS crews.
 
-**Version 2.30**
+**Version 2.36**
 
 ## Links
 
@@ -20,6 +20,34 @@ Equipment and property check submission tool for North Country EMS crews.
 - `apple-touch-icon.png` : iOS home-screen + tab icon
 - `manifest.json` : standalone app-mode config
 - `README.md` : this file
+
+## Per rig settings (2.36)
+
+Set on an ambulance in the units list (`ambulances[]`):
+
+- `"fridgeC": true`: the fridge question and reading use Celsius, 2 to 8 C (M19, its fridge only shows C)
+- `"defOk": true`: no DEF gauge, so DEF is just OK or Low (M19). Low still flags like DEF at 25%
+
+On a compartment, `"after": "Fridge"` puts it right under that compartment instead of in A to Z order (M19 Interior Shelf).
+
+## Fleet Health link (2.35)
+
+The Fleet Health page lives in CG Staff (cgstaff.northcountryems.org/#fleet). For the CG Staff (Boyce, Langdon, Madler, Shirley, Andrus, Reid) the i panel shows an "Open Fleet Health (CG Staff)" button at the top. Everyone else sees the i panel as before.
+
+## Auto update (2.34)
+
+The home screen app on agency iPhones and iPads kept showing the old version until it was fully closed. Now, when the app opens, comes back to the front, or every 5 minutes, it fetches the newest index.html from GitHub (no cache) and reloads itself if the version is newer. It never reloads during a check, with a popup or the kit move panel open, or off the home and list screens. Devices still on 2.33 or older need one last full close and reopen to get it.
+
+## Where are you today and rig claims (2.32)
+
+Needs the ncems-checks Worker 1.3 (/fleet routes). If the Worker can't be reached, or nobody is signed in, the old plain lists still work.
+
+- **Home:** big date, and a crew card. Right after sign in (2.33) it pops up "Where are you today?" on its own; "Not on a crew today (just looking)" skips it for that person for the rest of the check day on that device The schedule (Derek's feed, through the Worker) suggests the crew. Pick M51, M52 or M54
+- **Your crew's primary comes with it** when it's at your station, in service and nobody has it yet: M51 gets M25A, M54 gets M19, M52 gets M25B
+- **Ambulances list:** banner "All ambulances must be checked daily for mission readiness." Then your crew's rigs with their check status (checked at 75% or more, partly checked, in progress, not checked yet), rigs still open at your station ("Take it"), rigs at other stations (tap, then "Is M18 at Station 51 today?"; Yes moves it to your station and the app remembers that), rigs another crew already took (shows who), and out of service rigs at the bottom. "Give back" frees a rig for another crew. A plain list of every ambulance is at the bottom
+- **Other Units:** today's date, each unit shows its check day ("Checked on Sundays"), and a due unit turns green once it's checked today
+- **Picture slots:** each ambulance row has a picture spot. Add `"photo": "m25a.jpg"` to an ambulance in units.json (and upload the picture) to show it; until then it shows the shop number
+- Check day runs 07:30 to 07:30 Pacific, set in the Worker
 
 ## Log out and auto sign out (2.28)
 
@@ -119,6 +147,39 @@ When a crew opens a check, the app looks up every problem reported on earlier ch
 - These live in `units.json` under `sendRule` (`minPct`, `holdUntil`)
 
 ## Changelog
+
+### v2.36 (10/25/2026)
+- M19 updates from Doug: fridge in Celsius (2 to 8 C), DEF is OK or Low (no gauge), new Interior Shelf compartment under the Fridge with the Nitrous Kit, Compartment B drip sets are now IV drip sets x6, triangle bandage and petrolatum gauze moved out of Compartment C (they're in B), Pass-Through is 2 rechargeable flashlights
+- App: per rig `fridgeC` and `defOk` settings, compartment `after` setting
+- List changes went into the shared unit list (D1) through the admin save, not units.json on GitHub
+- Changed index.html and README.md only
+
+### v2.35 (10/25/2026)
+- i panel: "Open Fleet Health (CG Staff)" button for the CG Staff, opens cgstaff.northcountryems.org/#fleet
+- Changed index.html and README.md only
+
+### v2.34 (10/24/2026)
+- Auto update: the app checks for a newer version when it opens, comes back to the front, and every 5 minutes, and reloads itself (never during a check or with a popup open)
+- Changed index.html and README.md only
+
+### v2.33 (10/24/2026)
+- "Where are you today?" now pops up on its own right after sign in (after the What's new popup if that shows), instead of waiting for a tap on the crew card or Ambulances
+- New "Not on a crew today (just looking)" button for chiefs and anyone not on a crew; skips the question for the rest of the check day on that device
+- Changed index.html and README.md only
+
+### v2.32 (10/24/2026)
+- "Where are you today?" crew pick after sign in, suggested from the schedule, with the crew's primary ambulance claimed automatically
+- New Ambulances list: mission readiness banner, today's date and crew, your rigs with check status, take open rigs, move a spare to your station, see rigs other crews took, out of service rigs listed, give back a rig, plain list fallback
+- Other Units shows each unit's check day and turns a due unit green once it's checked
+- Picture slot on each ambulance row (photo field in units.json)
+- What's new popup lists the changes
+- Changed index.html and README.md only (units.json not touched). Needs ncems-checks Worker 1.3
+
+### v2.31 (10/24/2026)
+- New top bar, the same as CG Staff: white bar, house button on the left goes to the NCEMS Hub, NCEMS logo, "NCEMS" in black and the app name in green, North Country EMS in gray, and the i button on the right for details. iPhone status bar set to default so the clock shows on the white bar
+- The bar shows on every screen; the screen headers (Back and the unit name) sit right under it. The home screen corner buttons are gone since the bar has them
+- What's new popup has a New top bar line
+- Changed index.html and README.md only (units.json not touched)
 
 ### v2.30
 - Haptics everywhere: links, logo flip, labels and checkboxes, photo buttons, headers, progress bar and popups; a buzz when a number is entered; a tick per spot while dragging in Reorder; success buzz when a check is sent; error buzz for narc over par and for a required item missing. A label and its checkbox only buzz once
