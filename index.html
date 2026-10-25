@@ -1578,6 +1578,69 @@
 .home { padding-top:calc(76px + env(safe-area-inset-top)) !important; }
 .header { top:calc(64px + env(safe-area-inset-top)) !important; padding-top:14px !important; }
 
+
+    /* ===== 2.32 fleet: date, crew, claims ===== */
+    .fl-date { font-size: clamp(22px, 6.4vw, 28px); font-weight: 800; color: var(--white); letter-spacing: -0.01em; margin: 2px 0 8px; flex-shrink: 0; text-align: center; }
+    .fl-crew { display: flex; align-items: center; gap: 12px; width: min(100%, 480px); margin: 0 auto 12px; padding: 12px 14px; border-radius: 14px; border: 2px solid rgba(255,255,255,0.85); background: rgba(255,255,255,0.14); color: var(--white); font-family: inherit; text-align: left; cursor: pointer; flex-shrink: 0; position: relative; z-index: 2; }
+    .fl-crew[hidden] { display: none; }
+    .fl-crew-big { font-size: 26px; font-weight: 800; line-height: 1; }
+    .fl-crew-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+    .fl-crew-txt b { font-size: 16px; }
+    .fl-crew-txt span { font-size: 13px; opacity: 0.9; }
+    .fl-crew-chg { font-size: 13px; font-weight: 800; text-decoration: underline; flex-shrink: 0; }
+    .fl-overlay { position: fixed; inset: 0; z-index: 9100; background: rgba(15,30,15,0.55); display: flex; align-items: flex-end; justify-content: center; }
+    .fl-overlay[hidden] { display: none; }
+    .fl-sheet { background: var(--bg); width: 100%; max-width: 520px; max-height: 94vh; overflow-y: auto; border-radius: 18px 18px 0 0; padding: 18px 16px calc(18px + env(safe-area-inset-bottom)); box-shadow: 0 -6px 30px rgba(0,0,0,.25); }
+    .fl-sheet.fl-wait { opacity: 0.6; pointer-events: none; }
+    .fl-sheet-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 12px; }
+    .fl-sheet-head h2 { margin: 2px 0 0; font-size: 22px; color: var(--g-deep); }
+    .fl-sheet-date { font-size: 14px; color: var(--muted); font-weight: 700; }
+    .fl-x { border: 0; background: var(--g-pale); color: var(--g-deep); font-weight: 800; border-radius: 8px; padding: 6px 10px; font-size: 15px; cursor: pointer; }
+    .fl-sug { background: var(--white); border-radius: 14px; padding: 16px; box-shadow: inset 0 0 0 2px var(--g-mid); display: flex; flex-direction: column; gap: 8px; }
+    .fl-sug-lbl, .fl-sug-note { font-size: 14px; color: var(--muted); line-height: 1.4; }
+    .fl-sug-row { display: flex; align-items: baseline; gap: 10px; }
+    .fl-sug-crew { font-size: 34px; font-weight: 800; color: var(--g-mid); }
+    .fl-sug-st { font-size: 17px; font-weight: 700; color: var(--text); }
+    .fl-go { height: 52px; border: 0; border-radius: 12px; background: var(--g-mid); color: var(--white); font-family: inherit; font-size: 17px; font-weight: 800; cursor: pointer; }
+    .fl-sub { font-size: 14px; font-weight: 700; color: var(--muted); margin: 16px 0 8px; }
+    .fl-crews { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 8px; }
+    .fl-crewbtn { display: flex; flex-direction: column; gap: 3px; padding: 14px 10px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--white); color: var(--text); font-family: inherit; text-align: left; cursor: pointer; }
+    .fl-crewbtn b { font-size: 22px; color: var(--g-mid); }
+    .fl-crewbtn span { font-size: 13px; color: var(--muted); }
+    .fl-crewbtn.on { border-color: var(--g-mid); box-shadow: inset 0 0 0 1px var(--g-mid); }
+    .fl-foot { font-size: 13px; color: var(--muted); line-height: 1.45; margin-top: 14px; }
+    .fl-mission { background: var(--g-deep); color: var(--white); border-radius: 12px; padding: 12px 14px; font-size: 15px; font-weight: 800; line-height: 1.35; text-align: center; margin-bottom: 12px; }
+    .fl-bar { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; font-size: 16px; font-weight: 800; color: var(--g-deep); margin-bottom: 4px; }
+    .fl-chip { border: 1.5px solid var(--g-mid); background: var(--white); color: var(--g-deep); border-radius: 999px; padding: 8px 12px; font-family: inherit; font-size: 13px; font-weight: 800; cursor: pointer; }
+    .fl-rowwrap { margin-bottom: 12px; }
+    .fl-rowwrap .unit-btn { margin-bottom: 0; }
+    .unit-btn.fl-row { gap: 12px; justify-content: flex-start; padding: 14px; }
+    .fl-row-main { flex: 1; min-width: 0; }
+    .fl-pic { width: 56px; height: 56px; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
+    .fl-pic-none { display: flex; align-items: center; justify-content: center; background: var(--g-pale); color: var(--g-mid); font-size: 17px; font-weight: 800; }
+    .fl-meta { display: flex; flex-direction: column; gap: 3px; margin-top: 3px; }
+    .fl-tag { font-size: 13px; font-weight: 700; color: var(--g-mid); }
+    .fl-tag.soft { color: var(--muted); font-weight: 600; }
+    .fl-tag.bad { color: var(--bad); }
+    .fl-st { font-size: 13px; font-weight: 700; }
+    .fl-st.ok { color: var(--g-mid); }
+    .fl-st.part, .fl-st.prog { color: var(--warn); }
+    .fl-st.none { color: var(--bad); }
+    .fl-mine { border-color: var(--g-mid); box-shadow: inset 0 0 0 1px var(--g-mid); }
+    .fl-taken, .fl-oos { opacity: 0.75; }
+    .fl-oos { background: #F1F1F1; }
+    .fl-take { flex-shrink: 0; font-size: 14px; font-weight: 800; color: var(--white); background: var(--g-mid); border-radius: 999px; padding: 8px 12px; }
+    .fl-take.ghost { color: var(--info); background: #E8F1F8; }
+    .fl-give { display: block; margin: 4px 4px 0 auto; border: 0; background: none; color: var(--muted); font-family: inherit; font-size: 13px; font-weight: 700; text-decoration: underline; cursor: pointer; padding: 6px 4px; }
+    .fl-q { background: var(--white); border: 2px solid var(--info); border-top: 0; border-radius: 0 0 14px 14px; margin-top: -8px; padding: 16px 14px 12px; }
+    .fl-q-t { font-size: 16px; font-weight: 800; color: var(--text); margin-bottom: 10px; }
+    .fl-q-b { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .fl-q-yes, .fl-q-no { height: 44px; border-radius: 10px; font-family: inherit; font-size: 15px; font-weight: 800; cursor: pointer; }
+    .fl-q-yes { border: 0; background: var(--info); color: var(--white); }
+    .fl-q-no { border: 1.5px solid var(--border); background: var(--white); color: var(--text); }
+    .fl-all { display: block; margin: 18px auto 4px; border: 0; background: none; color: var(--muted); font-family: inherit; font-size: 13px; text-decoration: underline; cursor: pointer; padding: 8px; }
+    .unit-btn.due-done { background: var(--g-pale); border-color: var(--g-mid); }
+    .unit-btn.due-done .unit-meta { color: var(--g-mid); font-weight: 700; }
 </style>
 </head>
 <body>
@@ -1612,6 +1675,9 @@
     <button type="button" class="wn-btn" onclick="closeWhatsNew()">Got it</button>
   </div>
 </div>
+
+<!-- ============ 2.32 WHERE ARE YOU TODAY ============ -->
+<div class="fl-overlay" id="fl-overlay" hidden onclick="if(event.target===this)fleetAskClose()"><div class="fl-sheet" id="fl-sheet" role="dialog" aria-label="Where are you today?"></div></div>
 
 <!-- ============ SIGN IN GATE (2.23) ============ -->
 <div class="signin-gate" id="signin-gate">
@@ -1649,6 +1715,8 @@
   <div class="logo-flip-hint" id="logo-flip-hint">Tap logo to flip</div>
   <div class="home-sub">Daily Apparatus Check</div>
   <div class="who-strip" id="who-strip" hidden>Signed in as <b id="who-name"></b> · <button type="button" id="who-switch">Switch user</button> · <button type="button" id="who-logout">Log out</button></div>
+  <div class="fl-date" id="fl-date"></div>
+  <button type="button" class="fl-crew" id="fl-crew" hidden></button>
   <button type="button" class="moves-banner" id="moves-banner" hidden></button>
   <div class="home-buttons">
     <button class="home-btn ambulances" id="home-btn-ambulances" type="button">
@@ -1773,7 +1841,7 @@
    APP STATE
    ============================================================ */
 const APP = {
-  version: '2.31',
+  version: '2.32',
   data: null,        // loaded units.json
   screen: 'home',
   check: null,       // current in-progress check
@@ -1928,9 +1996,11 @@ function setAuth(state, detail) {
     autoOutNoteSignIn();
     setTimeout(autoOutCheck, 0);
     if (typeof movesBoot === 'function') setTimeout(movesBoot, 0);
+    setTimeout(() => fleetLoad(true), 0);
     return;
   }
   strip.hidden = true;
+  try { fleetReset(); } catch (e) {}
   if (typeof movesBanner === 'function') movesBanner();
   gate.hidden = false;
   if (state === 'out') {
@@ -2251,8 +2321,226 @@ async function retryPendingList() {
   if (r.ok) console.log('Sent the saved unit list to the shared copy');
 }
 
+
+/* ============================================================
+   2.32 FLEET: "Where are you today?", rig claims, mission readiness
+   Talks to the ncems-checks Worker 1.3 /fleet routes. If the Worker
+   can't be reached, or nobody is signed in, the old lists still work.
+   ============================================================ */
+const FLEET = { data: null, at: 0, busy: false, open: null };
+const FLEET_CREWS = ['M51', 'M52', 'M54'];
+function flTime(iso) { try { return new Date(iso).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }); } catch (e) { return ''; } }
+function flDayLabel(ymd) {
+  try { const d = ymd ? new Date(ymd + 'T12:00:00') : new Date(); return d.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }); } catch (e) { return ''; }
+}
+function flPlural(day) { return day + 's'; }
+function flOthersDays(unit) {
+  const rot = (APP.data && APP.data.rescueRotation) || {};
+  return DAY_NAMES.filter(d => (rot[d] || []).includes(unit));
+}
+async function fleetLoad(force) {
+  if (AUTH.state !== 'in') { FLEET.data = null; return null; }
+  if (!force && FLEET.data && Date.now() - FLEET.at < 20000) return FLEET.data;
+  try {
+    FLEET.data = await cfFetch('/fleet/today', { auth: true, timeout: 8000 });
+    FLEET.at = Date.now();
+  } catch (e) {
+    console.warn('Fleet not available:', e && e.message);
+    if (!FLEET.data) return null;
+  }
+  fleetHome();
+  return FLEET.data;
+}
+async function fleetPost(path, body) {
+  const r = await cfFetch(path, { method: 'POST', auth: true, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {}), timeout: 10000 });
+  if (r && r.ok && r.day) { FLEET.data = r; FLEET.at = Date.now(); fleetHome(); }
+  return r;
+}
+function fleetMyCrew() { return FLEET.data && FLEET.data.me ? FLEET.data.me.crew : ''; }
+function fleetCrewInfo(c) { return (FLEET.data && FLEET.data.crews && FLEET.data.crews[c]) || null; }
+
+/* home: big date and the crew card */
+function fleetHome() {
+  const dEl = document.getElementById('fl-date');
+  if (dEl) dEl.textContent = flDayLabel(FLEET.data && FLEET.data.day);
+  const card = document.getElementById('fl-crew');
+  if (!card) return;
+  if (AUTH.state !== 'in' || !FLEET.data) { card.hidden = true; return; }
+  const mine = fleetMyCrew();
+  card.hidden = false;
+  if (mine) {
+    const ci = fleetCrewInfo(mine) || {};
+    const rigs = (FLEET.data.rigs || []).filter(r => r.claim && r.claim.crew === mine).map(r => r.rig);
+    card.innerHTML = `<span class="fl-crew-big">${escapeHTML(mine)}</span><span class="fl-crew-txt"><b>Station ${escapeHTML(ci.station || '')}</b><span>${rigs.length ? 'Your ambulances: ' + escapeHTML(rigs.join(', ')) : 'Tap Ambulances to pick your rigs'}</span></span><span class="fl-crew-chg">Change</span>`;
+  } else {
+    const sch = FLEET.data.me && FLEET.data.me.scheduled;
+    card.innerHTML = `<span class="fl-crew-txt"><b>Where are you today?</b><span>${sch ? 'The schedule has you on ' + escapeHTML(sch) + '. Tap to confirm.' : 'Tap to pick your crew.'}</span></span><span class="fl-crew-chg">Pick</span>`;
+  }
+}
+
+/* "Where are you today?" sheet */
+function fleetAsk(then) {
+  FLEET.then = then || null;
+  const d = FLEET.data || {};
+  const sch = d.me && d.me.scheduled;
+  const mine = fleetMyCrew();
+  const partners = c => ((fleetCrewInfo(c) || {}).people || []).filter(p => p.email !== AUTH.email).map(p => p.name);
+  let h = `<div class="fl-sheet-head"><div><div class="fl-sheet-date">${escapeHTML(flDayLabel(d.day))}</div><h2>Where are you today?</h2></div><button type="button" class="fl-x" onclick="fleetAskClose()" aria-label="Close">✕</button></div>`;
+  const best = mine || sch;
+  if (best && FLEET_CREWS.includes(best)) {
+    const ci = fleetCrewInfo(best) || {};
+    const with_ = partners(best);
+    const also = FLEET_CREWS.filter(c => c !== best && (fleetCrewInfo(c) || {}).station === ci.station && ((fleetCrewInfo(c) || {}).people || []).length);
+    h += `<div class="fl-sug"><div class="fl-sug-lbl">${mine ? 'You picked' : 'The schedule has you on'}</div>
+      <div class="fl-sug-row"><span class="fl-sug-crew">${escapeHTML(best)}</span><span class="fl-sug-st">Station ${escapeHTML(ci.station || '')}</span></div>
+      ${with_.length ? `<div class="fl-sug-note">With ${escapeHTML(with_.join(' and '))}.${also.length ? ' ' + escapeHTML(also.join(', ')) + ' is also at Station ' + escapeHTML(ci.station) + ' today.' : ''}</div>` : ''}
+      <button type="button" class="fl-go" onclick="fleetPick('${best}')">Yes, I'm on ${escapeHTML(best)}</button></div>
+      <div class="fl-sub">Somewhere else? Pick your crew</div>`;
+  }
+  h += '<div class="fl-crews">' + FLEET_CREWS.map(c => {
+    const ci = fleetCrewInfo(c) || {};
+    return `<button type="button" class="fl-crewbtn${c === best ? ' on' : ''}" onclick="fleetPick('${c}')"><b>${c}</b><span>Station ${escapeHTML(ci.station || '')}</span></button>`;
+  }).join('') + '</div>';
+  h += `<div class="fl-foot">Your crew sets which ambulances it has at the station, then you start the checks. Picked wrong? Change it from the top of the Ambulances list.</div>`;
+  document.getElementById('fl-sheet').innerHTML = h;
+  document.getElementById('fl-overlay').hidden = false;
+}
+function fleetAskClose() { document.getElementById('fl-overlay').hidden = true; FLEET.then = null; }
+async function fleetPick(crew) {
+  if (FLEET.busy) return;
+  FLEET.busy = true;
+  const sheet = document.getElementById('fl-sheet');
+  sheet.classList.add('fl-wait');
+  try {
+    await fleetPost('/fleet/signin', { crew });
+    // the crew's primary comes with it, if it's at the station, in service and nobody has it yet
+    const ci = fleetCrewInfo(crew) || {};
+    const p = (FLEET.data.rigs || []).find(r => r.rig === ci.primary);
+    if (p && !p.claim && !p.oos && p.station === ci.station) {
+      try { await fleetPost('/fleet/claim', { crew, rig: p.rig }); } catch (e) {}
+    }
+    haptic('success');
+    const then = FLEET.then;
+    document.getElementById('fl-overlay').hidden = true;
+    FLEET.then = null;
+    if (then) then(); else if (APP.screen === 'ambulance-picker') renderFleetPicker();
+  } catch (e) {
+    haptic('error');
+    alert('Could not save your crew: ' + (e.message || e));
+  } finally {
+    FLEET.busy = false;
+    sheet.classList.remove('fl-wait');
+  }
+}
+
+/* Ambulances: claim screen and list in one */
+async function showAmbulancePicker() {
+  if (AUTH.state !== 'in') return showAmbulancePickerAll();
+  const list = document.getElementById('ambulance-picker-list');
+  if (!FLEET.data) { list.innerHTML = '<p class="picker-intro">Loading today\'s ambulances...</p>'; showScreen('ambulance-picker'); }
+  const d = await fleetLoad(true);
+  if (!d) return showAmbulancePickerAll();
+  if (!d.me.crew) { if (APP.screen !== 'ambulance-picker') showScreen('ambulance-picker'); renderFleetPicker(); return fleetAsk(() => renderFleetPicker()); }
+  renderFleetPicker();
+  if (APP.screen !== 'ambulance-picker') showScreen('ambulance-picker');
+}
+function flStatus(r) {
+  if (r.check) {
+    const ok = r.check.pct >= 75;
+    return `<span class="fl-st ${ok ? 'ok' : 'part'}">${ok ? '✓ Checked' : 'Partly checked'} ${r.check.pct}% · ${escapeHTML(r.check.byName || r.check.by || '')} ${escapeHTML(flTime(r.check.at))}</span>`;
+  }
+  if (r.inProgress || unitsWithProgressToday()[r.rig]) return '<span class="fl-st prog">● Check in progress</span>';
+  return '<span class="fl-st none">Not checked yet</span>';
+}
+function flPic(id) {
+  const a = (APP.data.ambulances || []).find(x => x.id === id) || {};
+  if (a.photo) return `<img class="fl-pic" src="${escapeHTML(a.photo)}" alt="">`;
+  return `<span class="fl-pic fl-pic-none" aria-hidden="true">${escapeHTML(String(id).replace(/^M/, ''))}</span>`;
+}
+function flPrimaryOf(rig) {
+  const d = FLEET.data; if (!d) return '';
+  return FLEET_CREWS.find(c => (d.crews[c] || {}).primary === rig) || '';
+}
+function renderFleetPicker() {
+  const d = FLEET.data, list = document.getElementById('ambulance-picker-list');
+  if (!d) return;
+  const mine = d.me.crew, ci = fleetCrewInfo(mine) || {}, st = ci.station || '';
+  const rigs = d.rigs || [];
+  const known = new Set((APP.data.ambulances || []).map(a => a.id));
+  const use = rigs.filter(r => known.has(r.rig));
+  const myRigs = use.filter(r => !r.oos && r.claim && r.claim.crew === mine);
+  const open = use.filter(r => !r.oos && !r.claim && r.station === st);
+  const taken = use.filter(r => !r.oos && r.claim && r.claim.crew !== mine);
+  const away = use.filter(r => !r.oos && !r.claim && r.station !== st);
+  const oos = use.filter(r => r.oos);
+  const row = (r, kind) => {
+    const prim = flPrimaryOf(r.rig);
+    let meta = '', right = '<div class="unit-btn-arrow">→</div>', extra = '';
+    if (kind === 'mine') meta = (prim === mine ? `<span class="fl-tag">${escapeHTML(mine)} primary</span>` : '') + flStatus(r);
+    if (kind === 'open') { meta = `<span class="fl-tag soft">${prim ? escapeHTML(prim) + ' primary' : 'Spare'} · nobody has it yet</span>`; right = '<span class="fl-take">Take it</span>'; }
+    if (kind === 'taken') meta = `<span class="fl-tag soft">${escapeHTML(r.claim.crew)} has it (${escapeHTML(r.claim.byName || r.claim.by || '')})</span>` + flStatus(r);
+    if (kind === 'away') {
+      meta = `<span class="fl-tag soft">${prim ? escapeHTML(prim) + ' primary' : 'Spare'} · last at Station ${escapeHTML(r.station || '?')}</span>`;
+      right = '<span class="fl-take ghost">Here?</span>';
+      if (FLEET.open === r.rig) extra = `<div class="fl-q"><div class="fl-q-t">Is ${escapeHTML(r.rig)} at Station ${escapeHTML(st)} today?</div><div class="fl-q-b"><button type="button" class="fl-q-yes" data-yes="${escapeHTML(r.rig)}">Yes, it's here</button><button type="button" class="fl-q-no" data-no="1">No</button></div></div>`;
+    }
+    if (kind === 'oos') meta = `<span class="fl-tag bad">Out of service${r.oos.reason ? ': ' + escapeHTML(r.oos.reason) : ''}</span>`;
+    return `<div class="fl-rowwrap"><button type="button" class="unit-btn fl-row fl-${kind}" data-rig="${escapeHTML(r.rig)}" data-kind="${kind}">
+      ${flPic(r.rig)}<div class="fl-row-main"><div>${escapeHTML(r.rig)}</div><div class="fl-meta">${meta}</div></div>${right}</button>
+      ${kind === 'mine' ? `<button type="button" class="fl-give" data-give="${escapeHTML(r.rig)}">Give back ${escapeHTML(r.rig)}</button>` : ''}${extra}</div>`;
+  };
+  let h = `<div class="fl-mission">All ambulances must be checked daily for mission readiness.</div>
+    <div class="fl-bar"><span>${escapeHTML(flDayLabel(d.day))}</span><button type="button" class="fl-chip" id="fl-chg">${mine ? escapeHTML(mine) + ' · Station ' + escapeHTML(st) + ' · Change' : 'Pick your crew'}</button></div>`;
+  h += `<div class="section-label">Your ambulances today</div>`;
+  h += myRigs.length ? myRigs.map(r => row(r, 'mine')).join('') : `<p class="picker-intro">${mine ? 'Nothing picked yet. Tap an ambulance below to take it for ' + escapeHTML(mine) + ' today.' : 'Pick your crew first, then your ambulances.'}</p>`;
+  if (open.length) h += `<div class="section-label">Also at Station ${escapeHTML(st)}? Tap to take it</div>` + open.map(r => row(r, 'open')).join('');
+  if (away.length) h += `<div class="section-label">At other stations</div>` + away.map(r => row(r, 'away')).join('');
+  if (taken.length) h += `<div class="section-label">Taken by another crew</div>` + taken.map(r => row(r, 'taken')).join('');
+  if (oos.length) h += `<div class="section-label">Out of service</div>` + oos.map(r => row(r, 'oos')).join('');
+  h += `<button type="button" class="fl-all" id="fl-all">Show the plain list of every ambulance</button>`;
+  list.innerHTML = h;
+  document.getElementById('fl-chg').onclick = () => fleetAsk(() => renderFleetPicker());
+  document.getElementById('fl-all').onclick = () => showAmbulancePickerAll();
+  list.querySelectorAll('.fl-row').forEach(b => b.addEventListener('click', () => fleetRowTap(b.dataset.rig, b.dataset.kind)));
+  list.querySelectorAll('[data-give]').forEach(b => b.addEventListener('click', () => fleetGive(b.dataset.give)));
+  list.querySelectorAll('[data-yes]').forEach(b => b.addEventListener('click', () => fleetClaim(b.dataset.yes, true)));
+  list.querySelectorAll('[data-no]').forEach(b => b.addEventListener('click', () => { FLEET.open = null; renderFleetPicker(); }));
+}
+function fleetRowTap(rig, kind) {
+  const r = (FLEET.data.rigs || []).find(x => x.rig === rig) || {};
+  if (kind === 'mine') return startAmbulanceCheck(rig);
+  if (kind === 'open') return fleetClaim(rig, false);
+  if (kind === 'away') { FLEET.open = FLEET.open === rig ? null : rig; return renderFleetPicker(); }
+  if (kind === 'taken') { if (confirm(`${rig} is with ${r.claim.crew} today. Open the check anyway?`)) startAmbulanceCheck(rig); return; }
+  if (kind === 'oos') { if (confirm(`${rig} is out of service. Open a check anyway?`)) startAmbulanceCheck(rig); }
+}
+async function fleetClaim(rig, here) {
+  if (FLEET.busy) return;
+  FLEET.busy = true;
+  try {
+    await fleetPost('/fleet/claim', { crew: fleetMyCrew(), rig, here: !!here });
+    FLEET.open = null;
+    haptic('success');
+  } catch (e) {
+    haptic('error');
+    alert(e.message || String(e));
+    await fleetLoad(true);
+  } finally { FLEET.busy = false; }
+  renderFleetPicker();
+}
+async function fleetGive(rig) {
+  if (!confirm(`Give ${rig} back so another crew can take it?`)) return;
+  try { await fleetPost('/fleet/unclaim', { rig }); } catch (e) { alert(e.message || String(e)); await fleetLoad(true); }
+  renderFleetPicker();
+}
+function fleetReset() { FLEET.data = null; FLEET.at = 0; FLEET.open = null; fleetHome(); }
+
 function showAppInfo() { showWhatsNew(true); }
 const WHATS_NEW = [
+  ['Where are you today?', 'After you sign in, pick your crew (M51, M52 or M54). The schedule suggests the right one. Your crew\'s main ambulance comes with it.'],
+  ['Your ambulances', 'The Ambulances list shows the rigs your crew has today and whether each one is checked. Tap any other rig at your station to take it. If a spare shows up from the other station, tap it and answer "Is it here today?". If another crew already took a rig, you\'ll see who.'],
+  ['Out of service', 'Rigs a chief marked out of service show at the bottom of the list.'],
+  ['Other Units', 'Each unit shows which day it gets checked, and a due unit turns green once it\'s done today.'],
   ['New top bar', 'Same top bar as the other NCEMS apps. The house takes you to the NCEMS Hub and the i shows app details, on every screen.'],
   ['More buzz', 'Your phone now buzzes on almost anything you tap, when you finish typing a number, and with a tick for each spot while you drag an item in Reorder. A sent check and a missing required item each have their own buzz.'],
   ['Kit reorder', 'All three BCs, Steve Schutts and Lyndsey Maylone can now reorder kits too, along with Josh and Joseph.'],
@@ -2327,6 +2615,8 @@ async function boot() {
   // Wire up home buttons via addEventListener (robust on mobile)
   document.getElementById('home-btn-ambulances').addEventListener('click', showAmbulancePicker);
   document.getElementById('home-btn-others').addEventListener('click', showRescuePicker);
+  document.getElementById('fl-crew').addEventListener('click', () => fleetAsk(() => fleetHome()));
+  fleetHome();
 
   // Wire up the logo: click triggers admin spin + entry
   setupLogoAdminTrigger();
@@ -2644,7 +2934,7 @@ function hasUnsavedWork() {
 /* ============================================================
    AMBULANCE PICKER
    ============================================================ */
-function showAmbulancePicker() {
+function showAmbulancePickerAll() {   // 2.32: the plain list (no sign in, Worker down, or asked for)
   const list = document.getElementById('ambulance-picker-list');
   list.innerHTML = '';
   const intro = document.createElement('p');
@@ -2685,6 +2975,8 @@ function showRescuePicker() {
   const rest = allRescue.filter(u => !dueToday.includes(u));
 
   list.innerHTML = '';
+  const freshFleet = !!FLEET.data && Date.now() - FLEET.at < 20000;
+  list.insertAdjacentHTML('beforeend', `<div class="fl-bar" style="margin-bottom:12px"><span>${escapeHTML(flDayLabel())}</span></div>`);
 
   if (dueToday.length > 0) {
     const banner = document.createElement('div');
@@ -2700,11 +2992,11 @@ function showRescuePicker() {
     dueToday.forEach(u => {
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'unit-btn due-today';
+      btn.className = 'unit-btn ' + (flRescueCheck(u) ? 'due-done' : 'due-today');
       btn.innerHTML = `
         <div>
           <div>${escapeHTML(u)}</div>
-          <div class="unit-meta">Due today</div>
+          <div class="unit-meta">${flRescueDoneText(u)}</div>
         </div>
         <div class="unit-btn-arrow">→</div>
       `;
@@ -2730,7 +3022,7 @@ function showRescuePicker() {
     btn.innerHTML = `
       <div>
         <div>${escapeHTML(u)}</div>
-        <div class="unit-meta">Optional</div>
+        <div class="unit-meta">${escapeHTML(flRescueDays(u))}</div>
       </div>
       <div class="unit-btn-arrow">→</div>
     `;
@@ -2739,7 +3031,11 @@ function showRescuePicker() {
   });
 
   showScreen('rescue-picker');
+  if (!freshFleet && AUTH.state === 'in') fleetLoad(false).then(d => { if (d && APP.screen === 'rescue-picker') showRescuePicker(); });
 }
+function flRescueCheck(u) { const d = FLEET.data; const x = d && (d.due || []).find(r => r.rig === u); return x && x.check && x.check.pct >= 75 ? x.check : null; }
+function flRescueDoneText(u) { const c = flRescueCheck(u); return c ? escapeHTML('✓ Checked today ' + c.pct + '% · ' + (c.byName || c.by || '') + ' ' + flTime(c.at)) : 'Due today'; }
+function flRescueDays(u) { const days = flOthersDays(u); return days.length ? 'Checked on ' + days.map(flPlural).join(' and ') : 'No set day. Check as needed'; }
 
 /* ============================================================
    START AMBULANCE CHECK
@@ -6036,6 +6332,7 @@ function buildSummary() {
 }
 
 function showSuccess(summary, queued = false) {
+  FLEET.at = 0;   // 2.32: fresh check status on the lists
   const c = APP.check;
   document.getElementById('success-body').innerHTML = `
     <div class="success-icon">${queued ? '🕔' : (summary.flagCount === 0 ? '✅' : '⚠️')}</div>

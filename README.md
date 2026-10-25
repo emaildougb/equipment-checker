@@ -2,7 +2,7 @@
 
 Equipment and property check submission tool for North Country EMS crews.
 
-**Version 2.31**
+**Version 2.32**
 
 ## Links
 
@@ -20,6 +20,17 @@ Equipment and property check submission tool for North Country EMS crews.
 - `apple-touch-icon.png` : iOS home-screen + tab icon
 - `manifest.json` : standalone app-mode config
 - `README.md` : this file
+
+## Where are you today and rig claims (2.32)
+
+Needs the ncems-checks Worker 1.3 (/fleet routes). If the Worker can't be reached, or nobody is signed in, the old plain lists still work.
+
+- **Home:** big date, and a crew card. First time each day it asks "Where are you today?" The schedule (Derek's feed, through the Worker) suggests the crew. Pick M51, M52 or M54
+- **Your crew's primary comes with it** when it's at your station, in service and nobody has it yet: M51 gets M25A, M54 gets M19, M52 gets M25B
+- **Ambulances list:** banner "All ambulances must be checked daily for mission readiness." Then your crew's rigs with their check status (checked at 75% or more, partly checked, in progress, not checked yet), rigs still open at your station ("Take it"), rigs at other stations (tap, then "Is M18 at Station 51 today?"; Yes moves it to your station and the app remembers that), rigs another crew already took (shows who), and out of service rigs at the bottom. "Give back" frees a rig for another crew. A plain list of every ambulance is at the bottom
+- **Other Units:** today's date, each unit shows its check day ("Checked on Sundays"), and a due unit turns green once it's checked today
+- **Picture slots:** each ambulance row has a picture spot. Add `"photo": "m25a.jpg"` to an ambulance in units.json (and upload the picture) to show it; until then it shows the shop number
+- Check day runs 07:30 to 07:30 Pacific, set in the Worker
 
 ## Log out and auto sign out (2.28)
 
@@ -119,6 +130,14 @@ When a crew opens a check, the app looks up every problem reported on earlier ch
 - These live in `units.json` under `sendRule` (`minPct`, `holdUntil`)
 
 ## Changelog
+
+### v2.32 (10/24/2026)
+- "Where are you today?" crew pick after sign in, suggested from the schedule, with the crew's primary ambulance claimed automatically
+- New Ambulances list: mission readiness banner, today's date and crew, your rigs with check status, take open rigs, move a spare to your station, see rigs other crews took, out of service rigs listed, give back a rig, plain list fallback
+- Other Units shows each unit's check day and turns a due unit green once it's checked
+- Picture slot on each ambulance row (photo field in units.json)
+- What's new popup lists the changes
+- Changed index.html and README.md only (units.json not touched). Needs ncems-checks Worker 1.3
 
 ### v2.31 (10/24/2026)
 - New top bar, the same as CG Staff: white bar, house button on the left goes to the NCEMS Hub, NCEMS logo, "NCEMS" in black and the app name in green, North Country EMS in gray, and the i button on the right for details. iPhone status bar set to default so the clock shows on the white bar
