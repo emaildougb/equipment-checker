@@ -2,7 +2,7 @@
 
 Equipment and property check submission tool for North Country EMS crews.
 
-**Version 2.34**
+**Version 2.35**
 
 ## Links
 
@@ -20,6 +20,10 @@ Equipment and property check submission tool for North Country EMS crews.
 - `apple-touch-icon.png` : iOS home-screen + tab icon
 - `manifest.json` : standalone app-mode config
 - `README.md` : this file
+
+## Fleet Health link (2.35)
+
+The Fleet Health page lives in CG Staff (cgstaff.northcountryems.org/#fleet). For the CG Staff (Boyce, Langdon, Madler, Shirley, Andrus, Reid) the i panel shows an "Open Fleet Health (CG Staff)" button at the top. Everyone else sees the i panel as before.
 
 ## Auto update (2.34)
 
@@ -134,6 +138,10 @@ When a crew opens a check, the app looks up every problem reported on earlier ch
 - These live in `units.json` under `sendRule` (`minPct`, `holdUntil`)
 
 ## Changelog
+
+### v2.35 (10/25/2026)
+- i panel: "Open Fleet Health (CG Staff)" button for the CG Staff, opens cgstaff.northcountryems.org/#fleet
+- Changed index.html and README.md only
 
 ### v2.34 (10/24/2026)
 - Auto update: the app checks for a newer version when it opens, comes back to the front, and every 5 minutes, and reloads itself (never during a check or with a popup open)

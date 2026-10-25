@@ -1842,7 +1842,7 @@
    APP STATE
    ============================================================ */
 const APP = {
-  version: '2.34',
+  version: '2.35',
   data: null,        // loaded units.json
   screen: 'home',
   check: null,       // current in-progress check
@@ -2575,6 +2575,8 @@ async function checkForUpdate(force) {
     }
   } catch (e) {} finally { UPD.busy = false; }
 }
+const FLEET_HEALTH_URL = 'https://cgstaff.northcountryems.org/#fleet';   // 2.35
+const FLEET_HEALTH_STAFF = ['d.boyce@northcountryems.org', 'd.langdon@northcountryems.org', 'd.madler@northcountryems.org', 'b.shirley@northcountryems.org', 'c.andrus@northcountryems.org', 'k.reid@northcountryems.org'];
 function showAppInfo() { showWhatsNew(true); }
 const WHATS_NEW = [
   ['Updates itself', 'When a new version comes out, the app picks it up on its own the next time you open it. No more closing and reopening. It never updates in the middle of a check.'],
@@ -2596,7 +2598,9 @@ function showWhatsNew(force) {
   const el = document.getElementById('whatsnew');
   document.getElementById('wn-ver').textContent = 'Version ' + APP.version + (APP.data && APP.data.version && APP.data.version !== APP.version ? ' (list ' + APP.data.version + ')' : '');
   document.getElementById('wn-title').textContent = seen && seen !== APP.version ? 'Updated to ' + APP.version : "What's new";
-  document.getElementById('wn-list').innerHTML = WHATS_NEW.map(([t, d]) => `<li><b>${escapeHTML(t)}</b><span>${escapeHTML(d)}</span></li>`).join('');
+  // 2.35: CG Staff get a Fleet Health link at the top (the page lives in CG Staff)
+  const fleetLink = AUTH.state === 'in' && FLEET_HEALTH_STAFF.includes(AUTH.email) ? `<li><a href="${FLEET_HEALTH_URL}" target="_blank" rel="noopener" style="display:block;padding:12px 14px;border-radius:12px;background:var(--g-deep);color:#fff;font-weight:800;text-decoration:none;text-align:center">Open Fleet Health (CG Staff) &#8594;</a></li>` : '';
+  document.getElementById('wn-list').innerHTML = fleetLink + WHATS_NEW.map(([t, d]) => `<li><b>${escapeHTML(t)}</b><span>${escapeHTML(d)}</span></li>`).join('');
   el.hidden = false;
 }
 function closeWhatsNew() {
