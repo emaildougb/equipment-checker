@@ -2,7 +2,7 @@
 
 Equipment and property check submission tool for North Country EMS crews.
 
-**Version 2.37**
+**Version 2.38**
 
 ## Links
 
@@ -25,9 +25,9 @@ Equipment and property check submission tool for North Country EMS crews.
 
 "Just looking (look around, nothing is saved)" on the Where are you today? sheet:
 
-- Takes that person off any crew they picked for today (needs ncems-checks Worker 1.3.1, `POST /fleet/signin {crew: "NONE"}`), so they don't count as signed in on Fleet Health
+- 2.38 (Doug): it does **not** take them off the working list. Any crew they picked stays. No Worker change needed
 - Turns on look around mode on that device for the rest of the check day: the home card says Just looking, the Ambulances list is the plain list of every rig, and any rig or other unit opens with a blue "Just looking" bar. Nothing is saved on the device, nothing is sent, no live share with a partner, no known problem popup, and the Submit, photo and kit move buttons are hidden
-- Picking a crew (tap the card) ends it
+- Tapping the home card (or the button on the list) goes back to their crew, or lets them pick one, and ends it
 
 ## Per rig settings (2.36)
 
@@ -155,6 +155,10 @@ When a crew opens a check, the app looks up every problem reported on earlier ch
 - These live in `units.json` under `sendRule` (`minPct`, `holdUntil`)
 
 ## Changelog
+
+### v2.38 (10/25/2026)
+- Just looking keeps the person on their crew (Doug). The home card reads "Just looking · on M51" with "Back to M51"; tapping it goes back to real checks
+- Changed index.html and README.md only
 
 ### v2.37 (10/25/2026)
 - Just looking: takes you off your crew for the day and lets anyone look around any rig without making a check (nothing saved, sent or counted)

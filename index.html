@@ -1762,7 +1762,7 @@
     <button class="back-btn" onclick="confirmExitCheck()">← Back</button>
     <div class="header-title" id="check-title">Check</div>
   </div>
-  <div class="look-banner" id="look-banner">Just looking. Nothing here is saved, sent or counted. <button type="button" onclick="goHome()">Done</button></div>
+  <div class="look-banner" id="look-banner">Just looking. Nothing here is saved or sent. <button type="button" onclick="goHome()">Done</button></div>
   <div class="form-wrap" id="check-body"></div>
 </div>
 
@@ -1851,7 +1851,7 @@
    APP STATE
    ============================================================ */
 const APP = {
-  version: '2.37',
+  version: '2.38',
   data: null,        // loaded units.json
   screen: 'home',
   check: null,       // current in-progress check
@@ -2382,7 +2382,7 @@ function fleetHome() {
   card.hidden = false;
   card.classList.toggle('looking', fleetLooking());
   if (fleetLooking()) {
-    card.innerHTML = `<span class="fl-crew-txt"><b>Just looking</b><span>Open any rig to look around. Nothing is saved, sent or counted.</span></span><span class="fl-crew-chg">Pick crew</span>`;
+    card.innerHTML = `<span class="fl-crew-txt"><b>Just looking${mine ? ' · on ' + escapeHTML(mine) : ''}</b><span>Open any rig to look around. Nothing is saved or sent. ${mine ? 'Tap here to go back to ' + escapeHTML(mine) + ' and do checks.' : 'Tap here to pick your crew.'}</span></span><span class="fl-crew-chg">${mine ? 'Back to ' + escapeHTML(mine) : 'Pick crew'}</span>`;
   } else if (mine) {
     const ci = fleetCrewInfo(mine) || {};
     const rigs = (FLEET.data.rigs || []).filter(r => r.claim && r.claim.crew === mine).map(r => r.rig);
@@ -2564,8 +2564,8 @@ function fleetMaybeAsk() {
   fleetAsk(null);
 }
 function fleetSkipToday() { fleetJustLook(); }
-/* 2.37 JUST LOOKING: "Just looking" takes you off any crew for today (Worker 1.3.1, crew NONE) and turns on
-   look around mode on this device for the rest of the check day. Any rig can be opened; nothing is saved,
+/* 2.37 JUST LOOKING (2.38 Doug: keep them on the working list): "Just looking" turns on look around mode
+   on this device for the rest of the check day. Their crew pick, if any, stays as it is. Any rig can be opened; nothing is saved,
    sent, shared live or counted, and photo, kit move and known problem buttons are hidden. Picking a crew ends it. */
 function fleetLooking() {
   if (AUTH.state !== 'in') return false;
@@ -2575,18 +2575,15 @@ function fleetLooking() {
 }
 async function fleetJustLook() {
   try { localStorage.setItem(FL_SKIP, AUTH.email + '|' + (FLEET.data && FLEET.data.day)); } catch (e) {}
-  const had = fleetMyCrew();
   document.getElementById('fl-overlay').hidden = true; FLEET.then = null;
-  if (had) {
-    try { await fleetPost('/fleet/signin', { crew: 'NONE' }); } catch (e) { console.warn('Could not clear crew:', e && e.message); }
-  }
   haptic('success');
   fleetHome();
   if (APP.screen === 'ambulance-picker') showAmbulancePicker();
   else if (APP.screen === 'rescue-picker') showRescuePicker();
 }
 function lookBanner() {
-  return '<div class="look-note"><b>Just looking.</b> Open any rig to look around. Nothing is saved, sent or counted. <button type="button" onclick="fleetAsk(() => fleetHome())">Pick a crew</button></div>';
+  const mine = fleetMyCrew();
+  return '<div class="look-note"><b>Just looking.</b> Open any rig to look around. Nothing is saved or sent. <button type="button" onclick="fleetAsk(() => { fleetHome(); if (APP.screen === \'ambulance-picker\') showAmbulancePicker(); else if (APP.screen === \'rescue-picker\') showRescuePicker(); })">' + (mine ? 'Back to ' + escapeHTML(mine) : 'Pick a crew') + '</button></div>';
 }
 
 /* 2.34 AUTO UPDATE: the home screen app on iPhone and iPad keeps the old page until it's
@@ -2617,7 +2614,7 @@ const FLEET_HEALTH_URL = 'https://cgstaff.northcountryems.org/#fleet';   // 2.35
 const FLEET_HEALTH_STAFF = ['d.boyce@northcountryems.org', 'd.langdon@northcountryems.org', 'd.madler@northcountryems.org', 'b.shirley@northcountryems.org', 'c.andrus@northcountryems.org', 'k.reid@northcountryems.org'];
 function showAppInfo() { showWhatsNew(true); }
 const WHATS_NEW = [
-  ['Just looking', 'Tap "Just looking" on the Where are you today? screen to look around any rig without doing a check. Nothing is saved, sent or counted, and it takes you off any crew you picked. Pick a crew any time to do a real check.'],
+  ['Just looking', 'Tap "Just looking" on the Where are you today? screen to look around any rig without doing a check. Nothing is saved or sent. Tap the card on the home screen any time to go back to your crew and do real checks.'],
   ['Updates itself', 'When a new version comes out, the app picks it up on its own the next time you open it. No more closing and reopening. It never updates in the middle of a check.'],
   ['Asks where you are', 'Right after you sign in, the app asks "Where are you today?" on its own. Chiefs and anyone not on a crew can tap "Not on a crew today".'],
   ['Where are you today?', 'After you sign in, pick your crew (M51, M52 or M54). The schedule suggests the right one. Your crew\'s main ambulance comes with it.'],
