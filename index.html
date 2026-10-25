@@ -1639,6 +1639,7 @@
     .fl-q-yes { border: 0; background: var(--info); color: var(--white); }
     .fl-q-no { border: 1.5px solid var(--border); background: var(--white); color: var(--text); }
     .fl-all { display: block; margin: 18px auto 4px; border: 0; background: none; color: var(--muted); font-family: inherit; font-size: 13px; text-decoration: underline; cursor: pointer; padding: 8px; }
+    .fl-skip { display: block; width: 100%; margin-top: 12px; height: 46px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--white); color: var(--muted); font-family: inherit; font-size: 15px; font-weight: 700; cursor: pointer; }
     .unit-btn.due-done { background: var(--g-pale); border-color: var(--g-mid); }
     .unit-btn.due-done .unit-meta { color: var(--g-mid); font-weight: 700; }
 </style>
@@ -1841,7 +1842,7 @@
    APP STATE
    ============================================================ */
 const APP = {
-  version: '2.32',
+  version: '2.33',
   data: null,        // loaded units.json
   screen: 'home',
   check: null,       // current in-progress check
@@ -2349,6 +2350,7 @@ async function fleetLoad(force) {
     if (!FLEET.data) return null;
   }
   fleetHome();
+  fleetMaybeAsk();   // 2.33: ask right away
   return FLEET.data;
 }
 async function fleetPost(path, body) {
@@ -2401,6 +2403,7 @@ function fleetAsk(then) {
     const ci = fleetCrewInfo(c) || {};
     return `<button type="button" class="fl-crewbtn${c === best ? ' on' : ''}" onclick="fleetPick('${c}')"><b>${c}</b><span>Station ${escapeHTML(ci.station || '')}</span></button>`;
   }).join('') + '</div>';
+  h += `<button type="button" class="fl-skip" onclick="fleetSkipToday()">Not on a crew today (just looking)</button>`;
   h += `<div class="fl-foot">Your crew sets which ambulances it has at the station, then you start the checks. Picked wrong? Change it from the top of the Ambulances list.</div>`;
   document.getElementById('fl-sheet').innerHTML = h;
   document.getElementById('fl-overlay').hidden = false;
@@ -2534,9 +2537,22 @@ async function fleetGive(rig) {
   renderFleetPicker();
 }
 function fleetReset() { FLEET.data = null; FLEET.at = 0; FLEET.open = null; fleetHome(); }
+/* 2.33: pop the question up on its own after sign in (once the What's new popup is closed).
+   "Not on a crew today" stops it for that person for the rest of the check day on this device. */
+const FL_SKIP = 'fl_skip_v1';
+function fleetMaybeAsk() {
+  const d = FLEET.data;
+  if (!d || !d.me || AUTH.state !== 'in' || d.me.crew || APP.screen !== 'home') return;
+  if (!document.getElementById('whatsnew').hidden || !document.getElementById('fl-overlay').hidden) return;
+  let skip = ''; try { skip = localStorage.getItem(FL_SKIP) || ''; } catch (e) {}
+  if (skip === AUTH.email + '|' + d.day) return;
+  fleetAsk(null);
+}
+function fleetSkipToday() { try { localStorage.setItem(FL_SKIP, AUTH.email + '|' + (FLEET.data && FLEET.data.day)); } catch (e) {} fleetAskClose(); }
 
 function showAppInfo() { showWhatsNew(true); }
 const WHATS_NEW = [
+  ['Asks where you are', 'Right after you sign in, the app asks "Where are you today?" on its own. Chiefs and anyone not on a crew can tap "Not on a crew today".'],
   ['Where are you today?', 'After you sign in, pick your crew (M51, M52 or M54). The schedule suggests the right one. Your crew\'s main ambulance comes with it.'],
   ['Your ambulances', 'The Ambulances list shows the rigs your crew has today and whether each one is checked. Tap any other rig at your station to take it. If a spare shows up from the other station, tap it and answer "Is it here today?". If another crew already took a rig, you\'ll see who.'],
   ['Out of service', 'Rigs a chief marked out of service show at the bottom of the list.'],
@@ -2560,6 +2576,7 @@ function showWhatsNew(force) {
 function closeWhatsNew() {
   try { localStorage.setItem('ep_seen_version', APP.version); } catch (e) {}
   document.getElementById('whatsnew').hidden = true;
+  setTimeout(() => { try { fleetMaybeAsk(); } catch (e) {} }, 150);
 }
 
 const APP_TITLE = document.title;

@@ -2,7 +2,7 @@
 
 Equipment and property check submission tool for North Country EMS crews.
 
-**Version 2.32**
+**Version 2.33**
 
 ## Links
 
@@ -25,7 +25,7 @@ Equipment and property check submission tool for North Country EMS crews.
 
 Needs the ncems-checks Worker 1.3 (/fleet routes). If the Worker can't be reached, or nobody is signed in, the old plain lists still work.
 
-- **Home:** big date, and a crew card. First time each day it asks "Where are you today?" The schedule (Derek's feed, through the Worker) suggests the crew. Pick M51, M52 or M54
+- **Home:** big date, and a crew card. Right after sign in (2.33) it pops up "Where are you today?" on its own; "Not on a crew today (just looking)" skips it for that person for the rest of the check day on that device The schedule (Derek's feed, through the Worker) suggests the crew. Pick M51, M52 or M54
 - **Your crew's primary comes with it** when it's at your station, in service and nobody has it yet: M51 gets M25A, M54 gets M19, M52 gets M25B
 - **Ambulances list:** banner "All ambulances must be checked daily for mission readiness." Then your crew's rigs with their check status (checked at 75% or more, partly checked, in progress, not checked yet), rigs still open at your station ("Take it"), rigs at other stations (tap, then "Is M18 at Station 51 today?"; Yes moves it to your station and the app remembers that), rigs another crew already took (shows who), and out of service rigs at the bottom. "Give back" frees a rig for another crew. A plain list of every ambulance is at the bottom
 - **Other Units:** today's date, each unit shows its check day ("Checked on Sundays"), and a due unit turns green once it's checked today
@@ -130,6 +130,11 @@ When a crew opens a check, the app looks up every problem reported on earlier ch
 - These live in `units.json` under `sendRule` (`minPct`, `holdUntil`)
 
 ## Changelog
+
+### v2.33 (10/24/2026)
+- "Where are you today?" now pops up on its own right after sign in (after the What's new popup if that shows), instead of waiting for a tap on the crew card or Ambulances
+- New "Not on a crew today (just looking)" button for chiefs and anyone not on a crew; skips the question for the rest of the check day on that device
+- Changed index.html and README.md only
 
 ### v2.32 (10/24/2026)
 - "Where are you today?" crew pick after sign in, suggested from the schedule, with the crew's primary ambulance claimed automatically
