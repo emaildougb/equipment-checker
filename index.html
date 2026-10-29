@@ -1851,7 +1851,7 @@
    APP STATE
    ============================================================ */
 const APP = {
-  version: '2.38',
+  version: '2.39',
   data: null,        // loaded units.json
   screen: 'home',
   check: null,       // current in-progress check
@@ -2502,7 +2502,7 @@ function renderFleetPicker() {
       right = '<span class="fl-take ghost">Here?</span>';
       if (FLEET.open === r.rig) extra = `<div class="fl-q"><div class="fl-q-t">Is ${escapeHTML(r.rig)} at Station ${escapeHTML(st)} today?</div><div class="fl-q-b"><button type="button" class="fl-q-yes" data-yes="${escapeHTML(r.rig)}">Yes, it's here</button><button type="button" class="fl-q-no" data-no="1">No</button></div></div>`;
     }
-    if (kind === 'oos') meta = `<span class="fl-tag bad">Out of service${r.oos.reason ? ': ' + escapeHTML(r.oos.reason) : ''}</span>`;
+    if (kind === 'oos') { meta = `<span class="fl-tag bad">Out of service${r.oos.reason ? ': ' + escapeHTML(r.oos.reason) : ''}</span>`; right = '<span class="fl-take">Back in service</span>'; }
     return `<div class="fl-rowwrap"><button type="button" class="unit-btn fl-row fl-${kind}" data-rig="${escapeHTML(r.rig)}" data-kind="${kind}">
       ${flPic(r.rig)}<div class="fl-row-main"><div>${escapeHTML(r.rig)}</div><div class="fl-meta">${meta}</div></div>${right}</button>
       ${kind === 'mine' ? `<button type="button" class="fl-give" data-give="${escapeHTML(r.rig)}">Give back ${escapeHTML(r.rig)}</button>` : ''}${extra}</div>`;
@@ -2530,7 +2530,7 @@ function fleetRowTap(rig, kind) {
   if (kind === 'open') return fleetClaim(rig, false);
   if (kind === 'away') { FLEET.open = FLEET.open === rig ? null : rig; return renderFleetPicker(); }
   if (kind === 'taken') { if (confirm(`${rig} is with ${r.claim.crew} today. Open the check anyway?`)) startAmbulanceCheck(rig); return; }
-  if (kind === 'oos') { if (confirm(`${rig} is out of service. Open a check anyway?`)) startAmbulanceCheck(rig); }
+  if (kind === 'oos') return rtsOpen(rig);
 }
 async function fleetClaim(rig, here) {
   if (FLEET.busy) return;
@@ -2552,6 +2552,97 @@ async function fleetGive(rig) {
   renderFleetPicker();
 }
 function fleetReset() { FLEET.data = null; FLEET.at = 0; FLEET.open = null; fleetHome(); }
+/* ============================================================
+   2.39 BACK IN SERVICE: a crew puts an out of service rig back in service.
+   Needs: what fixed it (written), the BC who approved it (picked from the list),
+   and no open "Unable to fix" problem on that rig. Written to the rig's
+   vehicleStatus record (CG Staff reads the same record), with the fix note
+   and approver kept on it.
+   ============================================================ */
+const RTS_APPROVERS = ['Doug Boyce', 'Dennis Madler', 'Derek Langdon', 'Bryce Shirley'];
+let RTS = { rig: '', reason: '', unfixed: null, busy: false, loading: false };
+async function rtsOpenUnfixed(rig) {
+  const from = localDateStr(new Date(Date.now() - 45 * 86400000));
+  const [cr, sr] = await Promise.all([
+    cfFetch(`/checks?unit=${encodeURIComponent(rig)}&from=${from}`, { auth: true }),
+    cfFetch('/state?cols=vehicleResolved,vehicleLinks', { auth: true })
+  ]);
+  const resolved = {}, links = {};
+  Object.values((sr && sr.state && sr.state.vehicleResolved) || {}).forEach(v => { if (v) resolved[v.checkId + '|' + v.label] = v; });
+  Object.entries((sr && sr.state && sr.state.vehicleLinks) || {}).forEach(([id, v]) => { if (v) links[id] = v; });
+  return knownCompute((cr && cr.checks) || [], resolved, links, rig).filter(k => k.state === 'unfixed');
+}
+function rtsEl() {
+  let ov = document.getElementById('rts-overlay');
+  if (!ov) {
+    ov = document.createElement('div');
+    ov.id = 'rts-overlay'; ov.className = 'fl-overlay'; ov.hidden = true;
+    ov.innerHTML = '<div class="fl-sheet" id="rts-sheet" role="dialog" aria-label="Back in service"></div>';
+    ov.addEventListener('click', e => { if (e.target === ov) rtsClose(); });
+    document.body.appendChild(ov);
+  }
+  return ov;
+}
+function rtsClose() { rtsEl().hidden = true; RTS.busy = false; }
+async function rtsOpen(rig) {
+  const r = ((FLEET.data && FLEET.data.rigs) || []).find(x => x.rig === rig) || {};
+  RTS = { rig, reason: (r.oos && r.oos.reason) || '', unfixed: null, busy: false, loading: true };
+  rtsEl().hidden = false;
+  rtsRender();
+  try { RTS.unfixed = await rtsOpenUnfixed(rig); } catch (e) { RTS.unfixed = null; }
+  RTS.loading = false;
+  rtsRender();
+}
+function rtsRender() {
+  const sheet = document.getElementById('rts-sheet'); if (!sheet) return;
+  const rig = RTS.rig, esc = escapeHTML;
+  let h = `<div class="fl-mission">${esc(rig)}: back in service</div>`;
+  h += `<p class="picker-intro">Out of service: ${esc(RTS.reason || 'no reason given')}</p>`;
+  if (RTS.loading) {
+    h += `<p class="picker-intro">Checking the open problems on ${esc(rig)}...</p>`;
+  } else if (RTS.unfixed === null) {
+    h += `<p class="picker-intro">Can't reach the check log right now. Try again in a minute.</p>`;
+  } else if (RTS.unfixed.length) {
+    h += `<div class="section-label">Could not fix</div>`;
+    h += RTS.unfixed.map(k => `<div class="fl-tag bad" style="display:block;margin:4px 0">${esc(k.label)}${k.notes ? ' · ' + esc(k.notes) : ''} · ${esc(k.crew || 'crew')} ${k.at ? esc(new Date(k.at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })) : ''}</div>`).join('');
+    h += `<p class="picker-intro">A BC has to clear these before ${esc(rig)} can go back in service.</p>`;
+  } else {
+    h += `<label class="picker-intro" for="rts-fix"><b>What fixed it?</b></label>`;
+    h += `<textarea id="rts-fix" rows="3" maxlength="300" placeholder="Like: replaced the bender lift" style="width:100%;box-sizing:border-box;font:inherit;padding:8px;border-radius:8px;border:1px solid #ccc"></textarea>`;
+    h += `<label class="picker-intro" for="rts-bc" style="display:block;margin-top:10px"><b>Which BC approved it?</b></label>`;
+    h += `<select id="rts-bc" style="width:100%;font:inherit;padding:8px;border-radius:8px;border:1px solid #ccc"><option value="">Pick a BC</option>${RTS_APPROVERS.map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join('')}</select>`;
+    h += `<button type="button" class="fl-all" id="rts-go" style="margin-top:12px">${RTS.busy ? 'Saving...' : 'Put ' + esc(rig) + ' back in service'}</button>`;
+  }
+  h += `<button type="button" class="fl-all" id="rts-check" style="margin-top:8px">Open a check on ${esc(rig)} anyway</button>`;
+  h += `<button type="button" class="fl-all" id="rts-close" style="margin-top:8px">Close</button>`;
+  sheet.innerHTML = h;
+  const go = document.getElementById('rts-go'); if (go) go.onclick = rtsSubmit;
+  document.getElementById('rts-close').onclick = rtsClose;
+  document.getElementById('rts-check').onclick = () => { const rr = RTS.rig; rtsClose(); startAmbulanceCheck(rr); };
+}
+async function rtsSubmit() {
+  if (RTS.busy) return;
+  const fix = (document.getElementById('rts-fix') || {}).value || '';
+  const bc = (document.getElementById('rts-bc') || {}).value || '';
+  if (!fix.trim()) { alert('Write what fixed it first.'); return; }
+  if (!bc) { alert('Pick the BC who approved it.'); return; }
+  RTS.busy = true; rtsRender();
+  const at = new Date().toISOString();
+  const rec = { oos: false, reason: '', by: AUTH.name || AUTH.email || '', at,
+    returnedFrom: RTS.reason || '', fixNote: fix.trim(), approvedBy: bc, returnedBy: fleetMyCrew() || '' };
+  try {
+    await cfFetch('/state/vehicleStatus/' + encodeURIComponent(RTS.rig), { method: 'PUT', auth: true, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ data: rec }) });
+    haptic('success');
+    const rr = RTS.rig;
+    rtsClose();
+    await fleetLoad(true);
+    renderFleetPicker();
+    alert(rr + ' is back in service. Approved by ' + bc + '.');
+  } catch (e) {
+    RTS.busy = false; rtsRender();
+    alert('Did not save. ' + (e.message || e) + '. Try again, or ask Doug.');
+  }
+}
 /* 2.33: pop the question up on its own after sign in (once the What's new popup is closed).
    "Not on a crew today" stops it for that person for the rest of the check day on this device. */
 const FL_SKIP = 'fl_skip_v1';
@@ -2614,6 +2705,7 @@ const FLEET_HEALTH_URL = 'https://cgstaff.northcountryems.org/#fleet';   // 2.35
 const FLEET_HEALTH_STAFF = ['d.boyce@northcountryems.org', 'd.langdon@northcountryems.org', 'd.madler@northcountryems.org', 'b.shirley@northcountryems.org', 'c.andrus@northcountryems.org', 'k.reid@northcountryems.org'];
 function showAppInfo() { showWhatsNew(true); }
 const WHATS_NEW = [
+  ['Back in service', 'A rig that is out of service has a Back in service button on the Ambulances list. Write what fixed it, pick the BC who approved it, and it goes back in service. A rig with a Could not fix problem can\'t be cleared by a crew.'],
   ['Just looking', 'Tap "Just looking" on the Where are you today? screen to look around any rig without doing a check. Nothing is saved or sent. Tap the card on the home screen any time to go back to your crew and do real checks.'],
   ['Updates itself', 'When a new version comes out, the app picks it up on its own the next time you open it. No more closing and reopening. It never updates in the middle of a check.'],
   ['Asks where you are', 'Right after you sign in, the app asks "Where are you today?" on its own. Chiefs and anyone not on a crew can tap "Not on a crew today".'],
