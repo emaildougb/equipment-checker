@@ -2,7 +2,7 @@
 
 Equipment and property check submission tool for North Country EMS crews.
 
-**Version 2.38**
+**Version 2.40**
 
 ## Links
 
@@ -155,6 +155,13 @@ When a crew opens a check, the app looks up every problem reported on earlier ch
 - These live in `units.json` under `sendRule` (`minPct`, `holdUntil`)
 
 ## Changelog
+
+### v2.40 (10/29/2026)
+- Rig pictures: each ambulance shows a photo from the rigs folder (M25A, M25B, M19, M18, M14, Rescue 1, Rescue 3, Rescue 4, Rescue 7, Rescue 8, Rescue 51, SAR 51). Thumbnails are 76 by 57 on the Ambulances and Other Units lists. A photo field in units.json can override the default picture
+- Changed index.html and README.md only
+
+### v2.39 (10/29/2026)
+- Back in service: an out of service rig on the Ambulances list has a Back in service button. The crew writes what fixed it and picks the BC who approved it (Doug, Dennis, Derek or Bryce). A rig with a Could not fix problem can't be cleared. The rig's record in the ncems-checks Worker (vehicleStatus) is cleared with the fix note and approver kept on it, so CG Staff shows it in service.
 
 ### v2.38 (10/25/2026)
 - Just looking keeps the person on their crew (Doug). The home card reads "Just looking · on M51" with "Back to M51"; tapping it goes back to real checks
