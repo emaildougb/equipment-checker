@@ -2,7 +2,7 @@
 
 Equipment and property check submission tool for North Country EMS crews.
 
-**Version 2.40**
+**Version 2.41**
 
 ## Links
 
@@ -155,6 +155,11 @@ When a crew opens a check, the app looks up every problem reported on earlier ch
 - These live in `units.json` under `sendRule` (`minPct`, `holdUntil`)
 
 ## Changelog
+
+### v2.41 (10/29/2026)
+- Rig pictures now show on the Other Units list and on the plain ambulance list. 2.40 only added them to the Ambulances list, because those two screens build their own rows and were not calling flPic
+- New pic-row style so a picker row lays out as photo, then text, then the arrow
+- Changed index.html and README.md only
 
 ### v2.40 (10/29/2026)
 - Rig pictures: each ambulance shows a photo from the rigs folder (M25A, M25B, M19, M18, M14, Rescue 1, Rescue 3, Rescue 4, Rescue 7, Rescue 8, Rescue 51, SAR 51). Thumbnails are 76 by 57 on the Ambulances and Other Units lists. A photo field in units.json can override the default picture

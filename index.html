@@ -1614,6 +1614,8 @@
     .fl-chip { border: 1.5px solid var(--g-mid); background: var(--white); color: var(--g-deep); border-radius: 999px; padding: 8px 12px; font-family: inherit; font-size: 13px; font-weight: 800; cursor: pointer; }
     .fl-rowwrap { margin-bottom: 12px; }
     .fl-rowwrap .unit-btn { margin-bottom: 0; }
+    .unit-btn.pic-row { gap: 12px; padding: 14px; }
+    .unit-btn.pic-row .unit-btn-arrow { flex-shrink: 0; }
     .unit-btn.fl-row { gap: 12px; justify-content: flex-start; padding: 14px; }
     .fl-row-main { flex: 1; min-width: 0; }
     .fl-pic { width: 76px; height: 57px; border-radius: 10px; object-fit: cover; flex-shrink: 0; }
@@ -1851,7 +1853,7 @@
    APP STATE
    ============================================================ */
 const APP = {
-  version: '2.40',
+  version: '2.41',
   data: null,        // loaded units.json
   screen: 'home',
   check: null,       // current in-progress check
@@ -2728,6 +2730,7 @@ const FLEET_HEALTH_URL = 'https://cgstaff.northcountryems.org/#fleet';   // 2.35
 const FLEET_HEALTH_STAFF = ['d.boyce@northcountryems.org', 'd.langdon@northcountryems.org', 'd.madler@northcountryems.org', 'b.shirley@northcountryems.org', 'c.andrus@northcountryems.org', 'k.reid@northcountryems.org'];
 function showAppInfo() { showWhatsNew(true); }
 const WHATS_NEW = [
+  ['Rig pictures everywhere', 'Other Units and the plain ambulance list now show the rig photo too, the same as the Ambulances list.'],
   ['Rig pictures', 'Each ambulance now shows a photo of the actual rig on the Ambulances and Other Units lists.'],
   ['Back in service', 'A rig that is out of service has a Back in service button on the Ambulances list. Write what fixed it, pick the BC who approved it, and it goes back in service. A rig with a Could not fix problem can\'t be cleared by a crew.'],
   ['Just looking', 'Tap "Just looking" on the Where are you today? screen to look around any rig without doing a check. Nothing is saved or sent. Tap the card on the home screen any time to go back to your crew and do real checks.'],
@@ -3149,11 +3152,12 @@ function showAmbulancePickerAll() {   // 2.32: the plain list (no sign in, Worke
   APP.data.ambulances.forEach(amb => {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = 'unit-btn';
+    btn.className = 'unit-btn pic-row';
     const inProg = progress[amb.id];
     if (inProg) btn.classList.add('in-progress');
     btn.innerHTML = `
-      <div>
+      ${flPic(amb.id)}
+      <div class="fl-row-main">
         <div>${escapeHTML(amb.name)}</div>
         <div class="unit-meta">${escapeHTML(amb.type)}</div>
         ${inProg ? '<span class="progress-tag">● Check in progress today</span>' : ''}
@@ -3195,9 +3199,10 @@ function showRescuePicker() {
     dueToday.forEach(u => {
       const btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'unit-btn ' + (flRescueCheck(u) ? 'due-done' : 'due-today');
+      btn.className = 'unit-btn pic-row ' + (flRescueCheck(u) ? 'due-done' : 'due-today');
       btn.innerHTML = `
-        <div>
+        ${flPic(u)}
+        <div class="fl-row-main">
           <div>${escapeHTML(u)}</div>
           <div class="unit-meta">${flRescueDoneText(u)}</div>
         </div>
@@ -3221,9 +3226,10 @@ function showRescuePicker() {
   rest.forEach(u => {
     const btn = document.createElement('button');
     btn.type = 'button';
-    btn.className = 'unit-btn';
+    btn.className = 'unit-btn pic-row';
     btn.innerHTML = `
-      <div>
+      ${flPic(u)}
+      <div class="fl-row-main">
         <div>${escapeHTML(u)}</div>
         <div class="unit-meta">${escapeHTML(flRescueDays(u))}</div>
       </div>
