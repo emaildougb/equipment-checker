@@ -2,7 +2,7 @@
 
 Equipment and property check submission tool for North Country EMS crews.
 
-**Version 2.41**
+**Version 2.42**
 
 ## Links
 
@@ -155,6 +155,14 @@ When a crew opens a check, the app looks up every problem reported on earlier ch
 - These live in `units.json` under `sendRule` (`minPct`, `holdUntil`)
 
 ## Changelog
+
+### v2.42 (10/29/2026)
+- Narcotics, OK to stay at this level. A counted controlled item that is under par now shows an "OK to stay at this level" checkbox. Ticking it marks the item checked, so Restocked and Unable to restock are not needed and the item stays off the problem list
+- At or under half par the red warning box still shows, and its wording changed from "Not enough" to "UNDER HALF PAR". The email line changed the same way
+- Over par is still an error and the checkbox is not offered
+- Changing the count clears the checkbox, so the crew has to tick it again against the new number
+- The email adds "crew OK to stay at this level" on that item's line. The flag is stored as okLevel on each entry in the record's narcs array. No Worker change
+- Changed index.html and README.md only
 
 ### v2.41 (10/29/2026)
 - Rig pictures now show on the Other Units list and on the plain ambulance list. 2.40 only added them to the Ambulances list, because those two screens build their own rows and were not calling flPic

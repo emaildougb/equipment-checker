@@ -324,6 +324,9 @@
     .narc-status { flex-basis: 100%; font-size: 13px; font-weight: 800; margin-top: 6px; }
     .narc-status.ok { color: var(--g-mid); } .narc-status.short { color: var(--warn); } .narc-status.low { color: var(--bad); }
     .narc-status.over { color: #fff; background: var(--bad); padding: 8px 10px; border-radius: 8px; }
+    .narc-ok { flex-basis: 100%; display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 14px; font-weight: 700; color: var(--g-deep); cursor: pointer; }
+    .narc-ok input { width: 22px; height: 22px; flex-shrink: 0; accent-color: var(--g-mid); }
+    .narc-row.narc-okset .narc-ok { color: var(--g-mid); }
     .narc-row.narc-over .narc-count { border-color: var(--bad); color: var(--bad); }
     .abc-row { display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin: 2px 0 8px; font-size: 12px; color: var(--muted); font-weight: 700; }
     .abc-btn { width: 46px; height: 46px; border-radius: 50%; border: 2px solid var(--g-mid); background: var(--white); color: var(--g-mid); font: 800 13px/1 inherit; letter-spacing: 0.02em; cursor: pointer; }
@@ -1853,7 +1856,7 @@
    APP STATE
    ============================================================ */
 const APP = {
-  version: '2.41',
+  version: '2.42',
   data: null,        // loaded units.json
   screen: 'home',
   check: null,       // current in-progress check
@@ -2730,6 +2733,7 @@ const FLEET_HEALTH_URL = 'https://cgstaff.northcountryems.org/#fleet';   // 2.35
 const FLEET_HEALTH_STAFF = ['d.boyce@northcountryems.org', 'd.langdon@northcountryems.org', 'd.madler@northcountryems.org', 'b.shirley@northcountryems.org', 'c.andrus@northcountryems.org', 'k.reid@northcountryems.org'];
 function showAppInfo() { showWhatsNew(true); }
 const WHATS_NEW = [
+  ['Narcotics: OK to stay at this level', 'When a controlled count is under par, tick "OK to stay at this level" and the item counts as checked. You do not need Restocked or Unable to restock. At or under half par the red box still shows and now reads UNDER HALF PAR. Over par is still an error. Changing the count clears the tick, and the email says the crew was OK to stay at this level.'],
   ['Rig pictures everywhere', 'Other Units and the plain ambulance list now show the rig photo too, the same as the Ambulances list.'],
   ['Rig pictures', 'Each ambulance now shows a photo of the actual rig on the Ambulances and Other Units lists.'],
   ['Back in service', 'A rig that is out of service has a Back in service button on the Ambulances list. Write what fixed it, pick the BC who approved it, and it goes back in service. A rig with a Could not fix problem can\'t be cleared by a crew.'],
@@ -4229,7 +4233,7 @@ function narcStatusText(count, par) {
   if (count === '' || count == null) return ['', ''];
   const n = Number(count), short = par - n;
   if (narcOver(n, par)) return ['over', `⛔ Error: ${n} is over par (${par}). It can't be over. Recount, and if it really is over, contact a BC now.`];
-  if (narcLow(n, par)) return ['low', `⚠ Not enough: ${n} of ${par} (short ${short}). Restock before the next call if you can.`];
+  if (narcLow(n, par)) return ['low', `⚠ UNDER HALF PAR: ${n} of ${par} (short ${short}). Restock before the next call if you can.`];
   if (short > 0) return ['short', `Short ${short} (${n} of ${par})`];
   return ['ok', `✓ At par (${n} of ${par})`];
 }
@@ -4268,6 +4272,7 @@ function itemRowHTML(it, compName, bagName, idx) {
           <span class="narc-par">par ${it.qty}</span>
         </div>
         <div class="narc-status"></div>
+        <label class="narc-ok" style="display:none;"><input type="checkbox" data-oklevel /> OK to stay at this level</label>
       </div>
       <div class="item-detail" style="display:none;">
         <textarea placeholder="Anything to add? (who was notified, restock plan)"></textarea>
@@ -4497,7 +4502,26 @@ function wireCompartmentBody(safeId, comp) {
       if (v !== e.target.value) e.target.value = v;
       state.count = v;
       if (psiMin) state.psi = true;
-      state.status = v === '' ? null : (psiMin ? (Number(v) < psiMin ? 'abnormal' : 'complete') : ((narcLow(v, par) || narcOver(v, par)) ? 'abnormal' : 'complete'));
+      state.okLevel = false;                       // 2.42: a new count clears "OK to stay at this level"
+      state.status = narcStatusFor(v, par, psiMin, false);
+      paintNarc(row, state);
+      updateCompartmentCounts(safeId, comp);
+      updateProgress(); saveAutosave();
+    });
+
+    // 2.42: "OK to stay at this level" on a counted narcotic that is under par
+    const okBox = row.querySelector('[data-oklevel]');
+    if (okBox) okBox.addEventListener('change', e => {
+      const state = ensureItemState(compName, bagName, itemName);
+      const par = Number(row.dataset.par), psiMin = row.dataset.psi ? Number(row.dataset.psi) : 0;
+      if (!narcOkOffer(state.count, par, psiMin)) { e.target.checked = false; return; }
+      state.okLevel = e.target.checked;
+      if (state.okLevel) {                         // it counts as checked, so nothing is left to fix
+        state.fixed = false; state.unfixed = false;
+        if (fixedBox) fixedBox.checked = false;
+        const ub = detail.querySelector('[data-unfixed]'); if (ub) ub.checked = false;
+      }
+      state.status = narcStatusFor(state.count, par, psiMin, state.okLevel);
       paintNarc(row, state);
       updateCompartmentCounts(safeId, comp);
       updateProgress(); saveAutosave();
@@ -4551,12 +4575,39 @@ function paintNarc(row, st) {
   const cnt = st ? st.count : '';
   const [cls, txt] = psiMin ? (cnt === '' || cnt == null ? ['', ''] : Number(cnt) < psiMin ? ['low', `⚠ Under ${psiMin} PSI. Swap the cylinder.`] : ['ok', `✓ ${cnt} PSI`]) : narcStatusText(cnt, par);
   const el = row.querySelector('.narc-status');
-  if (el) { el.className = 'narc-status ' + cls; el.textContent = txt; }
+  if (el) { el.className = 'narc-status ' + cls; el.textContent = (txt && st && st.okLevel && !psiMin ? txt + ' Crew OK to stay at this level.' : txt); }
   row.classList.toggle('narc-over', cls === 'over');
+  paintNarcOk(row, st, par, psiMin, cnt);
   const inp = row.querySelector('.narc-count');
   if (inp && st && st.count != null && document.activeElement !== inp) inp.value = st.count;
   const det = row.querySelector('.item-detail');
   if (det) det.style.display = st && st.status === 'abnormal' ? 'block' : 'none';
+}
+
+/* 2.42: "OK to stay at this level" is offered on a counted narcotic that is under par
+   and not over par. Ticking it counts the item as checked, so no Restocked or Unable
+   to restock is needed. Changing the count clears it. */
+function narcOkOffer(cnt, par, psiMin) {
+  if (psiMin) return false;
+  if (cnt === '' || cnt == null) return false;
+  const n = Number(cnt);
+  return !narcOver(n, par) && n < par;
+}
+function paintNarcOk(row, st, par, psiMin, cnt) {
+  const lab = row.querySelector('.narc-ok');
+  if (!lab) return;
+  const offer = narcOkOffer(cnt, par, psiMin);
+  lab.style.display = offer ? 'flex' : 'none';
+  const box = lab.querySelector('[data-oklevel]');
+  if (box) box.checked = !!(offer && st && st.okLevel);
+  row.classList.toggle('narc-okset', !!(offer && st && st.okLevel));
+}
+function narcStatusFor(v, par, psiMin, okLevel) {
+  if (v === '') return null;
+  if (psiMin) return Number(v) < psiMin ? 'abnormal' : 'complete';
+  if (narcOver(v, par)) return 'abnormal';
+  if (narcLow(v, par) && !okLevel) return 'abnormal';
+  return 'complete';
 }
 
 function ensureItemState(compName, bagName, itemName) {
@@ -5716,7 +5767,7 @@ function collectNarcCounts(c) {
   (c._comps ? allComps(c) : []).forEach(comp => (comp.items || []).forEach(it => {
     if (!it.count) return;
     const st = c.compartments[comp.name]?.items?.[it.name];
-    out.push({ name: it.name, par: it.qty, count: st && st.count !== '' && st.count != null ? Number(st.count) : null });
+    out.push({ name: it.name, par: it.qty, count: st && st.count !== '' && st.count != null ? Number(st.count) : null, okLevel: !!(st && st.okLevel) });
   }));
   return out;
 }
@@ -6449,7 +6500,7 @@ function buildSummary() {
         if (n.count == null) { lines.push(`  ${n.name}: not counted / ${n.par}`); return; }
         const short = n.par - n.count;
         if (narcOver(n.count, n.par)) { lines.push(`  ${n.name}: ${n.count} / ${n.par} ⛔ OVER PAR. CANNOT BE OVER. BC CONTACT NEEDED`); return; }
-        lines.push(`  ${n.name}: ${n.count} / ${n.par}${short > 0 ? ` (short ${short})` : ' ✓'}${narcLow(n.count, n.par) ? ' ⚠ NOT ENOUGH' : ''}`);
+        lines.push(`  ${n.name}: ${n.count} / ${n.par}${short > 0 ? ` (short ${short})` : ' ✓'}${narcLow(n.count, n.par) ? ' ⚠ UNDER HALF PAR' : ''}${n.okLevel ? ' - crew OK to stay at this level' : ''}`);
       });
       lines.push('');
     }
