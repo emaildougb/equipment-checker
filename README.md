@@ -2,7 +2,7 @@
 
 Equipment and property check submission tool for North Country EMS crews.
 
-**Version 2.42**
+**Version 2.43**
 
 ## Links
 
@@ -155,6 +155,12 @@ When a crew opens a check, the app looks up every problem reported on earlier ch
 - These live in `units.json` under `sendRule` (`minPct`, `holdUntil`)
 
 ## Changelog
+
+### v2.43 (10/30/2026)
+- 48 hour attestation for ambulances. If the paramedic who submitted yesterday's check logs in today, app shows both rigs highlighted and asks 'Do you confirm both of these rigs that you checked the day before?'. Also asks 'Have you moved to another station today?' and 'Have you completed the narcotics inventory and signed the NARCLog?'. If yes to all, creates new records with yesterday's data, marks them attest48, stores original paramedic as attest48By, and gives the attester credit. Narcotics not copied (counted today per policy)
+- Equipment: C-Spine bags in all ambulances changed from 1 Blue + 2 Orange to 2 Blue + 1 Orange
+- Equipment: M19 notice updated: one headlight out on each side (one top / one bottom)
+- Changed index.html, units.json, README.md
 
 ### v2.42 (10/29/2026)
 - Narcotics, OK to stay at this level. A counted controlled item that is under par now shows an "OK to stay at this level" checkbox. Ticking it marks the item checked, so Restocked and Unable to restock are not needed and the item stays off the problem list
