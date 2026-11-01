@@ -2,7 +2,7 @@
 
 Equipment and property check submission tool for North Country EMS crews.
 
-**Version 2.43**
+**Version 2.44**
 
 ## Links
 
@@ -154,7 +154,20 @@ When a crew opens a check, the app looks up every problem reported on earlier ch
 - Under 75% after 11:00 AM: sends right away
 - These live in `units.json` under `sendRule` (`minPct`, `holdUntil`)
 
+## What counts as a problem (2.44)
+
+Doug 11/1: a check item is a problem (flag, email flag block, known problem popup for the next crew, CG Staff problem lists) only if it is a safety item or affects patient care or medication safety.
+
+- **Still problems:** lights, horn, engine oil and the other fluid rows, unsafe tires, cooler or fridge out of range (some medications must be replaced), crew or patient equipment, operational checks, narcotics **over** par
+- **Recorded, not problems:** fuel, DEF, main O2 PSI, narcotic counts under par, gurney checks, tire pressure. They show in the email under "NOTED (recorded, not a problem)" and in Full check, carry `minor: true` in the record's issues, need no description, and don't pop up as known problems
+- Rule lives in `issueMinor()` in index.html and matches CG Staff 1.31.1 `vehMinor()` (keys s|fuel, s|def, s|o2, s|tire, g|*; labels starting Fuel , DEF at , Main O2 at ; labels containing gurney, tire pressure, tire psi; narc labels ending (count N)). Change both together
+- Gurney checks are the Yes/No rows (`specialChecks`) on the Gurney compartment. Tire pressure is the single Yes/No question (key s|tire, label "Tire pressure out of range"). Portable O2 cylinder PSI rows are still problems
+
 ## Changelog
+
+### v2.44 (11/1/2026)
+- What counts as a problem (Doug): fuel, DEF, main O2 PSI, narcotic counts, gurney checks and tire pressure are recorded but no longer flagged, emailed as flags, carried as known problems or required to have a description. Cooler or fridge out of range stays a problem. Matches CG Staff 1.31.1
+- Changed index.html and README.md only
 
 ### v2.43 (10/30/2026)
 - 48 hour attestation for ambulances. If the paramedic who submitted yesterday's check logs in today, app shows both rigs highlighted and asks 'Do you confirm both of these rigs that you checked the day before?'. Also asks 'Have you moved to another station today?' and 'Have you completed the narcotics inventory and signed the NARCLog?'. If yes to all, creates new records with yesterday's data, marks them attest48, stores original paramedic as attest48By, and gives the attester credit. Narcotics not copied (counted today per policy)

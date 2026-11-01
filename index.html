@@ -1856,7 +1856,7 @@
    APP STATE
    ============================================================ */
 const APP = {
-  version: '2.43',
+  version: '2.44',
   data: null,        // loaded units.json
   screen: 'home',
   check: null,       // current in-progress check
@@ -2733,6 +2733,7 @@ const FLEET_HEALTH_URL = 'https://cgstaff.northcountryems.org/#fleet';   // 2.35
 const FLEET_HEALTH_STAFF = ['d.boyce@northcountryems.org', 'd.langdon@northcountryems.org', 'd.madler@northcountryems.org', 'b.shirley@northcountryems.org', 'c.andrus@northcountryems.org', 'k.reid@northcountryems.org'];
 function showAppInfo() { showWhatsNew(true); }
 const WHATS_NEW = [
+  ['Only real problems are flagged', 'Fuel, DEF, main O2, narcotic counts, gurney checks and tire pressure are still recorded on the check, but they no longer count as problems. Lights, horn, oil, unsafe tires, the fridge and crew or patient equipment still do.'],
   ['Narcotics: OK to stay at this level', 'When a controlled count is under par, tick "OK to stay at this level" and the item counts as checked. You do not need Restocked or Unable to restock. At or under half par the red box still shows and now reads UNDER HALF PAR. Over par is still an error. Changing the count clears the tick, and the email says the crew was OK to stay at this level.'],
   ['Rig pictures everywhere', 'Other Units and the plain ambulance list now show the rig photo too, the same as the Ambulances list.'],
   ['Rig pictures', 'Each ambulance now shows a photo of the actual rig on the Ambulances and Other Units lists.'],
@@ -5176,6 +5177,7 @@ function toggleCompartment(safeId) {
    ============================================================ */
 function needsDescription(x) {
   const k = x.key || '';
+  if (issueMinor(x)) return false;   // 2.44: not a problem, so no description needed
   if (/^s\|(fuel|def|cooler|o2)$/.test(k) || /^g\|/.test(k)) return false; // the reading or level says it
   if (/\((count|PSI) [^)]*\)/.test(x.label || '')) return false;          // narc counts and cylinder PSI say it
   return true;
@@ -5417,27 +5419,21 @@ function collectFlaggedEls() {
   // Item rows marked ✗, not fixed
   root.querySelectorAll('.item-row').forEach(row => {
     if (row.querySelector('.item-btn.abnormal.active') && !row.querySelector('[data-fixed]:checked')) els.push(row);
-    if (row.querySelector('.narc-status.low, .narc-status.over') && !row.querySelector('[data-fixed]:checked')) els.push(row);
+    if (row.querySelector('.narc-status.over')) els.push(row);   // 2.44: under par is not a problem, over par still is
   });
   // Op checks answered No, not fixed
   root.querySelectorAll('.op-check-row[data-op-comp]').forEach(row => {
     if (row.querySelector('[data-op-yn="no"].active') && !row.querySelector('[data-op-fixed]:checked')) els.push(row);
   });
-  // Oxygen / cooler / tires answered No (oxygen+tire honor their fixed boxes)
+  // 2.44: cooler answered No is still a problem. Main O2, tire pressure, fuel and DEF are not
   const oxyRow = root.querySelector('[data-oxygen]');
-  if (APP.check && APP.check.oxygenYN === 'no' && !APP.check.oxygenFixed) {
+  if (false && APP.check && APP.check.oxygenYN === 'no' && !APP.check.oxygenFixed) {
     if (oxyRow) els.push(oxyRow);
     else { const c1 = [...root.querySelectorAll('.compartment-card')].find(cd => (findCompartmentByName(cd.dataset.compartment)?.items || []).some(i => /ambulance main\s*o?0?2/i.test(i.name))); if (c1) els.push(c1); }
   }
   const coolNo = root.querySelector('[data-cooler-yn="no"].active');
   if (coolNo) els.push(coolNo.closest('.op-check-row') || coolNo);
   const tireNo = root.querySelector('[data-tire-yn="no"].active');
-  if (tireNo && !document.getElementById('tire-fixed')?.checked) els.push(tireNo.closest('.yn-row') || tireNo);
-  // Low fuel
-  const fuelBtn = root.querySelector('.fuel-btn[data-fuel].active:not(.full)');
-  const defBtn = root.querySelector('.def-btn.active[data-def="25"]');
-  if (defBtn) els.push(defBtn.closest('.check-row') || defBtn);
-  if (fuelBtn) els.push(fuelBtn.closest('.section') || fuelBtn);
   return els;
 }
 
@@ -5648,8 +5644,7 @@ function collectUnableToFix() {
       const v = b[item];
       if (rowIsBad(v) && v.unfixed) out.push(`${item}${v.status === 'over' ? ' (overfilled)' : ''}${v.notes ? ' \u2014 ' + v.notes : ''}`);
     });
-    if (c.tireYN === 'no' && c.tireUnfixed) out.push(`Tire pressure \u2014 out of range${c.tireNotes ? ' \u2014 ' + c.tireNotes : ''}`);
-    if (c.oxygenYN === 'no' && c.oxygenUnfixed) out.push(`Main O2 at ${c.oxygenPsi} PSI, needs exchange${c.oxygenNotes ? ' \u2014 ' + c.oxygenNotes : ''}`);
+    // 2.44: tire pressure and main O2 are noted, not problems
     Object.entries(c.opChecks || {}).forEach(([key, val]) => {
       if (val === 'no' && c.opUnfixed?.[key]) {
         const [cn, bn, inm] = key.split('||');
@@ -5712,6 +5707,19 @@ async function fbReady() {
 
 // Walk every abnormal item and tag it: fixed (crew fixed it on the spot),
 // unfixed (crew could not fix), open (left abnormal, no fix box checked)
+/* 2.44 (Doug 11/1): a problem is only a safety item or something that affects patient care or
+   medication safety. Fuel, DEF, main O2 PSI, narcotic counts, gurney checks and tire pressure are
+   still recorded and show in Full check, but are not problems: no flag, no known problem popup for
+   the next crew, no required description, and they carry minor: true on the record. Same rule as
+   CG Staff 1.31.1 vehMinor(). The cooler or fridge out of range stays a problem. */
+function issueMinor(i) {
+  const k = String((i && i.key) || ''), l = String((i && i.label) || '');
+  if (/^s\|(fuel|def|o2|tire)$/.test(k) || /^g\|/.test(k)) return true;
+  if (/^(Fuel |DEF at |Main O2 at )/i.test(l)) return true;
+  if (/gurney|tire pressure|tire psi/i.test(l)) return true;
+  if (/\(count \d+\)$/.test(l)) return true;   // narcotic counts
+  return false;
+}
 function collectIssueLog() {
   const c = APP.check; const out = [];
   if (!c) return out;
@@ -5719,6 +5727,7 @@ function collectIssueLog() {
     const o = { label, notes: notes || '', state: fixed ? 'fixed' : (unfixed ? 'unfixed' : 'open') };
     if (key) o.key = key;
     if (known) o.known = true;
+    if (issueMinor(o)) o.minor = true;   // 2.44
     const ph = key && c.issuePhotos && c.issuePhotos[key];
     if (ph && ph.type === 'url') o.photo = ph.url;
     out.push(o);
@@ -6244,7 +6253,7 @@ function knownCompute(checks, resolved, links, unit) {
   all.forEach(x => (x.issues || []).forEach(i => {
     const rk = x.id + '|' + i.label;
     if (i.state === 'fixed' || i.known || resolved[rk] || crewFixed[rk]) return;
-    if (/^(Fuel |DEF at )/i.test(i.label || '')) return;
+    if (i.minor || issueMinor(i)) return;   // 2.44: fuel, DEF, O2, narcs, gurney, tire pressure are not problems
     if (knownAppVer(x) < 216) {
       if (i.state === 'open' && x !== latest) return;
       if (i.state === 'unfixed' && recent6.indexOf(x) < 0) return;
@@ -6398,6 +6407,8 @@ function buildSummary() {
   const flagLines = [];
 
   function addFlag(line) { flagLines.push(line); flagCount++; }
+  const notedLines = [];   // 2.44: recorded, not a problem
+  function addNoted(line) { notedLines.push(line); }
 
   if (c.type === 'ambulance') {
     // Mechanical + Fluids
@@ -6411,25 +6422,25 @@ function buildSummary() {
       }
     });
     // Fuel + DEF
-    if (c.fuel && c.fuel !== 'Full') addFlag(`  [ LOW FUEL ] ${c.fuel} — not Full`);
-    if (c.def === '25') addFlag(`  [ LOW DEF ] 25%`);
+    if (c.fuel && c.fuel !== 'Full') addNoted(`  Fuel ${c.fuel} (not Full)`);
+    if (c.def === '25') addNoted(`  DEF at 25%`);
     // Tires
     if (c.tireYN === 'no' && !c.tireFixed) {
-      let fl = `  [ ABNORMAL ] Tire pressure — out of range`;
+      let fl = `  Tire pressure out of range`;
       if (c.tireNotes) fl += `\n    Notes: ${c.tireNotes}`;
-      addFlag(fl);
+      addNoted(fl);
     }
     // Oxygen
     if (c.oxygenYN === 'no' && !c.oxygenFixed) {
-      let fl = `  [ LOW O2 ] Main O2 at ${c.oxygenPsi} PSI, below ${oxygenMin()}, exchange the tank`;
+      let fl = `  Main O2 at ${c.oxygenPsi} PSI, below ${oxygenMin()}, exchange the tank`;
       if (c.oxygenNotes) fl += `\n    Notes: ${c.oxygenNotes}`;
-      addFlag(fl);
+      addNoted(fl);
     }
     // Gurney special checks
     allComps(c).forEach(comp => {
       if (!comp.specialChecks) return;
       comp.specialChecks.forEach(sc => {
-        if (c.gurney?.[sc.label] === 'no') addFlag(`  [ ABNORMAL ] ${comp.name} — ${sc.label}: No`);
+        if (c.gurney?.[sc.label] === 'no') addNoted(`  ${comp.name}: ${sc.label}: No`);
       });
     });
     // Cooler
@@ -6458,7 +6469,7 @@ function buildSummary() {
         if (st.status === 'abnormal' && !st.fixed) {
           let fl = `  [ ABNORMAL ] ${comp.name} — ${itemName}`;
           if (st.notes) fl += `\n    Notes: ${st.notes}`;
-          addFlag(fl);
+          if ((st.count != null && st.count !== '' && !st.psi)) addNoted(`  ${comp.name}: ${itemName} count ${st.count}${st.notes ? `\n    Notes: ${st.notes}` : ''}`); else addFlag(fl);   // 2.44: narc counts are noted
         }
       });
       (comp.bags || []).forEach(bag => {
@@ -6523,6 +6534,12 @@ function buildSummary() {
     lines.push(divider);
   }
   lines.push('');
+  if (notedLines.length) {   // 2.44
+    lines.push('NOTED (recorded, not a problem)');
+    lines.push(thinline);
+    notedLines.forEach(l => lines.push(l));
+    lines.push('');
+  }
 
   // ── DETAIL ─────────────────────────────────────────────────────────────
   lines.push('FULL CHECK DETAIL');
