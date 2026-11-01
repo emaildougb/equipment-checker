@@ -9393,11 +9393,6 @@
               "ctrl": false
             },
             {
-              "name": "Surgical Lube",
-              "qty": 3,
-              "ctrl": false
-            },
-            {
               "name": "Toradol",
               "qty": 1,
               "ctrl": false
@@ -9885,8 +9880,9 @@
               "items": [
                 {
                   "name": "Portable O2 With Quick Connect And Regulator",
-                  "qty": 1,
-                  "ctrl": false
+                  "ctrl": false,
+                  "psi": true,
+                  "qty": 1
                 },
                 {
                   "name": "BVM Adult",
@@ -12935,19 +12931,19 @@
   },
   "unitNotices": {
     "M25A": {
-      "text": "⚠ M25A: Must activate engine brake every time you drive",
+      "text": "\u26a0 M25A: Must activate engine brake every time you drive",
       "style": "warn"
     },
     "M25B": {
-      "text": "⚠ M25B: Must activate engine brake every time you drive",
+      "text": "\u26a0 M25B: Must activate engine brake every time you drive",
       "style": "warn"
     },
     "M19": {
-      "text": "⚠ M19: Must activate engine brake every time you drive",
+      "text": "\u26a0 M19: Must activate engine brake every time you drive",
       "style": "warn"
     },
     "M14": {
-      "text": "⚠ M14: Must activate engine brake every time you drive",
+      "text": "\u26a0 M14: Must activate engine brake every time you drive",
       "style": "warn"
     },
     "M18": {

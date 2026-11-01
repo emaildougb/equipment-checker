@@ -2,7 +2,7 @@
 
 Equipment and property check submission tool for North Country EMS crews.
 
-**Version 2.44**
+**Version 2.45**
 
 ## Links
 
@@ -164,6 +164,10 @@ Doug 11/1: a check item is a problem (flag, email flag block, known problem popu
 - Gurney checks are the Yes/No rows (`specialChecks`) on the Gurney compartment. Tire pressure is the single Yes/No question (key s|tire, label "Tire pressure out of range"). Portable O2 cylinder PSI rows are still problems
 
 ## Changelog
+
+### v2.45 (11/1/2026)
+- M18 med kit and airway bag corrected. Copied Joseph's correct layout from M25A (Medication Kit 76 items in order, Airway Bag 7 bags in order). Both orange ambulances now identical.
+- Changed units.json and README.md only
 
 ### v2.44 (11/1/2026)
 - What counts as a problem (Doug): fuel, DEF, main O2 PSI, narcotic counts, gurney checks and tire pressure are recorded but no longer flagged, emailed as flags, carried as known problems or required to have a description. Cooler or fridge out of range stays a problem. Matches CG Staff 1.31.1

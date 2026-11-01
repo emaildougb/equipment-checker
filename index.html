@@ -1856,7 +1856,7 @@
    APP STATE
    ============================================================ */
 const APP = {
-  version: '2.44',
+  version: '2.45',
   data: null,        // loaded units.json
   screen: 'home',
   check: null,       // current in-progress check
@@ -2733,6 +2733,7 @@ const FLEET_HEALTH_URL = 'https://cgstaff.northcountryems.org/#fleet';   // 2.35
 const FLEET_HEALTH_STAFF = ['d.boyce@northcountryems.org', 'd.langdon@northcountryems.org', 'd.madler@northcountryems.org', 'b.shirley@northcountryems.org', 'c.andrus@northcountryems.org', 'k.reid@northcountryems.org'];
 function showAppInfo() { showWhatsNew(true); }
 const WHATS_NEW = [
+  ['Med kit and Airway Bag - M18 corrected', 'Joseph organized the med kit and airway bag on M25A last week. M18 is now an exact copy of that layout, so both orange ambulances have identical organization.'],
   ['Only real problems are flagged', 'Fuel, DEF, main O2, narcotic counts, gurney checks and tire pressure are still recorded on the check, but they no longer count as problems. Lights, horn, oil, unsafe tires, the fridge and crew or patient equipment still do.'],
   ['Narcotics: OK to stay at this level', 'When a controlled count is under par, tick "OK to stay at this level" and the item counts as checked. You do not need Restocked or Unable to restock. At or under half par the red box still shows and now reads UNDER HALF PAR. Over par is still an error. Changing the count clears the tick, and the email says the crew was OK to stay at this level.'],
   ['Rig pictures everywhere', 'Other Units and the plain ambulance list now show the rig photo too, the same as the Ambulances list.'],
