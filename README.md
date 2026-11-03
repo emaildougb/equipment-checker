@@ -10,6 +10,7 @@ Equipment and property check submission tool for North Country EMS crews.
 - Repo: [https://github.com/emaildougb/equipment-checker](https://github.com/emaildougb/equipment-checker)
 - Upload: [https://github.com/emaildougb/equipment-checker/upload/main](https://github.com/emaildougb/equipment-checker/upload/main)
 - Worker health: [https://ncems-checks.d-boyce.workers.dev/health](https://ncems-checks.d-boyce.workers.dev/health)
+- Station check board: [https://checks.northcountryems.org/board.html](https://checks.northcountryems.org/board.html)
 - Cloudflare dashboard: [https://dash.cloudflare.com/](https://dash.cloudflare.com/) > Workers > `ncems-checks`
 
 ## Files (upload ALL of these)
@@ -163,7 +164,20 @@ Doug 11/1: a check item is a problem (flag, email flag block, known problem popu
 - Rule lives in `issueMinor()` in index.html and matches CG Staff 1.31.1 `vehMinor()` (keys s|fuel, s|def, s|o2, s|tire, g|*; labels starting Fuel , DEF at , Main O2 at ; labels containing gurney, tire pressure, tire psi; narc labels ending (count N)). Change both together
 - Gurney checks are the Yes/No rows (`specialChecks`) on the Gurney compartment. Tire pressure is the single Yes/No question (key s|tire, label "Tire pressure out of range"). Portable O2 cylinder PSI rows are still problems
 
+## Station check board (board.html 1.0, 11/3/2026)
+
+A screen for the station that shows how much of today's daily check is done. It's a separate page, so the Checker itself is unchanged.
+
+- Reads `GET /fleet/today` from the ncems-checks Worker every minute (no Worker change). Big done of due number and bar, a tile per ambulance (photo, crew and station, Checked / Partly checked / Check in progress / Not checked yet / Out of service with reason, first name and time) and a tile per other unit due today
+- Counting: ambulances not out of service plus today's rotation units; done at 75% or more; check day 07:30 to 07:30 Pacific (from the Worker)
+- All / Station 51 / Station 52 buttons (remembered on that screen, or `board.html?station=51`). Other units show under Station 51 (crew M51 checks them)
+- Sign in: same Microsoft app as the Checker (f3d031a6). Only accounts in `BOARD_USERS` at the top of the script can run it: d.boyce, d.langdon, d.madler for now. Add the station login there later. Needs the redirect URI `https://checks.northcountryems.org/board.html` (Single page application) on that Entra app
+- Stays signed in and refreshes its token on its own; if Microsoft asks for a sign in again it shows the sign in button. Keeps the screen awake where the browser allows it, and reloads itself once a day just after 07:30 to pick up a new board version
+
 ## Changelog
+
+### board.html 1.0 (11/3/2026)
+- New station check board page (see above). Added board.html and changed README.md only
 
 ### v2.45 (11/1/2026)
 - M18 med kit and airway bag corrected. Copied Joseph's correct layout from M25A (Medication Kit 76 items in order, Airway Bag 7 bags in order). Both orange ambulances now identical.
