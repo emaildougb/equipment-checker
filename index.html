@@ -334,6 +334,57 @@
     .comp-header-mark-btn.all-done, .comp-header-mark-btn.all-done:active { background: var(--g-pale) !important; color: var(--g-deep) !important; border: 1.5px solid var(--g-accent) !important; pointer-events: none; box-shadow: none; }
     .live-banner { display: none; margin: 10px 14px 0; padding: 10px 12px; border-radius: 10px; background: #EAF2F8; border: 1.5px solid var(--info); color: var(--text); font-size: 13px; line-height: 1.4; }
     .live-banner.on { display: block; }
+    .live-banner.off { background: var(--warn-bg); border-color: var(--warn); }
+    /* 2.46 */
+    .ck-toast { position: fixed; left: 16px; right: 16px; top: calc(78px + env(safe-area-inset-top)); z-index: 90; max-width: 520px; margin: 0 auto; background: var(--g-deep); color: #fff; border-radius: 12px; padding: 12px 14px; font-weight: 700; font-size: 15px; line-height: 1.35; text-align: center; box-shadow: 0 6px 24px rgba(0,0,0,.25); visibility: hidden; opacity: 0; transition: opacity .2s, visibility .2s; }
+    .ck-toast.on { visibility: visible; opacity: 1; }
+    .ck-search { position: relative; flex: 0 1 132px; min-width: 92px; }
+    #screen-check .header-title { font-size: 17px; line-height: 1.2; }
+    #screen-check .header-title .header-sub { display: block; }
+    .ck-search input { width: 100%; height: 40px; border: 0; border-radius: 10px; padding: 0 10px 0 30px; font: inherit; font-size: 16px; color: var(--text); background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%236B7B6B' stroke-width='2.2'%3E%3Ccircle cx='7' cy='7' r='5'/%3E%3Cpath d='m11 11 4 4'/%3E%3C/svg%3E") 9px center no-repeat; -webkit-appearance: none; }
+    .ck-search-res { position: absolute; right: 0; top: 46px; width: min(92vw, 380px); max-height: 62vh; overflow-y: auto; background: #fff; color: var(--text); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.28); z-index: 40; }
+    .ck-search-res button { display: block; width: 100%; text-align: left; border: 0; border-bottom: 1px solid var(--border); background: #fff; padding: 11px 13px; font: inherit; cursor: pointer; }
+    .ck-search-res button:active { background: var(--g-pale); }
+    .ck-search-res b { display: block; font-size: 15px; color: var(--text); }
+    .ck-search-res span { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .ck-search-none { padding: 12px 13px; color: var(--muted); font-size: 14px; }
+    .ck-hit { animation: ckhit 2.4s ease-out; }
+    @keyframes ckhit { 0%, 45% { box-shadow: 0 0 0 3px var(--warn); background: var(--warn-bg); } 100% { box-shadow: none; } }
+    .comp-info { margin: 6px 0 12px; font-size: 14px; line-height: 1.45; color: var(--text); }
+    .comp-info img { display: block; width: 100%; max-width: 520px; border-radius: 10px; border: 1px solid var(--border); background: #fff; margin-bottom: 8px; }
+    .comp-info p { margin: 0 0 8px; padding: 9px 11px; background: var(--g-pale); border-radius: 8px; }
+    .modal-partner { margin: 10px 0 0; padding: 10px 12px; border-radius: 10px; background: #EAF2F8; border: 1.5px solid var(--info); font-size: 14px; line-height: 1.4; text-align: left; }
+    .home-eq { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; width: 100%; max-width: 480px; margin: 12px auto 0; min-height: 60px; border-radius: 16px; border: 3px solid #fff; background: #A93434; color: #fff; font: inherit; font-size: 19px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; cursor: pointer; box-shadow: 0 6px 20px rgba(0,0,0,.3); }
+    .home-eq span { font-size: 12px; font-weight: 700; text-transform: none; letter-spacing: 0; opacity: .92; }
+    .eq-overlay { position: fixed; inset: 0; z-index: 80; background: rgba(0,0,0,.45); display: flex; align-items: flex-end; justify-content: center; }
+    .eq-overlay[hidden] { display: none; }
+    .eq-sheet { background: var(--bg); width: 100%; max-width: 560px; max-height: 94vh; overflow-y: auto; -webkit-overflow-scrolling: touch; border-radius: 18px 18px 0 0; padding: 18px 16px calc(18px + env(safe-area-inset-bottom)); box-shadow: 0 -6px 30px rgba(0,0,0,.25); }
+    .eq-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 6px; }
+    .eq-head h2 { margin: 0; font-size: 21px; color: var(--g-deep); }
+    .eq-sub { font-size: 13px; color: var(--muted); margin-top: 3px; font-weight: 700; }
+    .eq-x { border: 0; background: var(--g-pale); color: var(--g-deep); font-weight: 800; border-radius: 8px; padding: 6px 10px; font-size: 15px; cursor: pointer; }
+    .eq-q { margin: 16px 0 7px; font-size: 14px; font-weight: 800; color: var(--g-deep); }
+    .eq-q i { font-style: normal; color: var(--bad); }
+    .eq-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .eq-chip { border: 1.5px solid var(--border); background: #fff; color: var(--text); border-radius: 999px; padding: 9px 14px; font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; text-align: left; }
+    .eq-chip.on { background: var(--g-mid); border-color: var(--g-mid); color: #fff; }
+    .eq-sheet textarea, .eq-sheet input[type=date], .eq-sheet select { width: 100%; font: inherit; font-size: 16px; padding: 10px; border: 1.5px solid var(--border); border-radius: 10px; background: #fff; color: var(--text); }
+    .eq-sheet textarea { min-height: 88px; resize: vertical; }
+    .eq-photos { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+    .eq-photos img { width: 84px; height: 84px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); }
+    .eq-up { font-size: 13px; color: var(--muted); padding: 6px 0; }
+    .eq-go { display: block; width: 100%; height: 54px; margin-top: 18px; border: 0; border-radius: 12px; background: var(--g-mid); color: #fff; font: inherit; font-size: 17px; font-weight: 800; text-align: center; line-height: 54px; text-decoration: none; cursor: pointer; }
+    .eq-go:disabled { opacity: .55; }
+    .eq-alt { display: block; width: 100%; margin-top: 10px; min-height: 46px; line-height: 43px; border-radius: 12px; border: 1.5px solid var(--border); background: #fff; color: var(--g-deep); font: inherit; font-weight: 700; font-size: 15px; text-align: center; cursor: pointer; }
+    .eq-err { color: var(--bad); font-weight: 800; margin-top: 12px; font-size: 14px; }
+    .eq-note { font-size: 15px; line-height: 1.5; color: var(--text); margin-top: 8px; }
+    .eq-list { margin-top: 12px; }
+    .eq-list label { display: flex; align-items: center; gap: 12px; background: #fff; border: 1.5px solid var(--border); border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; font-weight: 700; font-size: 16px; cursor: pointer; }
+    .eq-list input { width: 24px; height: 24px; accent-color: var(--g-mid); flex-shrink: 0; }
+    .sw-rigs { display: flex; align-items: flex-end; gap: 10px; margin-top: 10px; }
+    .sw-rigs label { flex: 1; font-size: 13px; font-weight: 800; color: var(--muted); display: grid; gap: 4px; }
+    .sw-rigs span { padding-bottom: 12px; font-weight: 800; color: var(--muted); }
+    .sw-link { display: block; width: 100%; margin: 0 0 10px; padding: 10px 12px; border-radius: 10px; border: 1.5px dashed var(--g-mid); background: var(--g-pale); color: var(--g-deep); font: inherit; font-weight: 700; font-size: 14px; text-align: left; cursor: pointer; }
     .live-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: #2E9E5B; margin-right: 6px; animation: livepulse 1.6s infinite; }
     @keyframes livepulse { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
     .by-tag { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 10px; background: #EAF2F8; color: var(--info); font-size: 11px; font-weight: 800; vertical-align: middle; }
@@ -1740,6 +1791,7 @@
       <div class="home-btn-label">Other Units</div>
     </button>
   </div>
+  <button type="button" class="home-eq" id="home-btn-equip" onclick="eqOpen({})">Equipment Problem<span>LifePak 35 issue report</span></button>
   <div class="home-footer">v<span id="version-tag">2.1.0</span> · <span id="today-date"></span></div>
 </div>
 
@@ -1766,6 +1818,7 @@
   <div class="header">
     <button class="back-btn" onclick="confirmExitCheck()">← Back</button>
     <div class="header-title" id="check-title">Check</div>
+    <div class="ck-search" id="ck-search" hidden><input type="search" id="ck-search-in" placeholder="Search" autocomplete="off" enterkeyhint="search" aria-label="Search this rig"><div class="ck-search-res" id="ck-search-res" hidden></div></div>
   </div>
   <div class="look-banner" id="look-banner">Just looking. Nothing here is saved or sent. <button type="button" onclick="goHome()">Done</button></div>
   <div class="form-wrap" id="check-body"></div>
@@ -1827,12 +1880,15 @@
   <div class="form-wrap" id="admin-edit-body"></div>
 </div>
 
+<div class="eq-overlay" id="eq-overlay" hidden onclick="if(event.target===this)eqClose()"><div class="eq-sheet" id="eq-sheet" role="dialog" aria-label="Equipment problem"></div></div>
+
 <!-- ============ CONFIRMATION MODAL ============ -->
 <div class="modal-overlay hidden" id="submit-modal">
   <div class="modal-box">
     <h3>Submit Apparatus Check</h3>
     <p id="modal-body-text">By submitting, you confirm that you have checked all equipment and all items are complete as noted.</p>
     <div class="modal-warn" id="modal-incomplete-warn" style="display:none;"></div>
+    <div class="modal-partner" id="modal-partner-note" hidden>Your partner is checking this rig too. Their marks are included in this %. If they finish more, their submit will update it.</div>
     <div class="modal-actions">
       <button class="modal-cancel" id="modal-cancel-btn">Go Back</button>
       <button class="modal-confirm" id="modal-confirm-btn">Submit</button>
@@ -1856,7 +1912,7 @@
    APP STATE
    ============================================================ */
 const APP = {
-  version: '2.45',
+  version: '2.46',
   data: null,        // loaded units.json
   screen: 'home',
   check: null,       // current in-progress check
@@ -2388,6 +2444,7 @@ async function fleetLoad(force) {
   }
   fleetHome();
   fleetMaybeAsk();   // 2.33: ask right away
+  swMaybe();   // 2.46: moved into a different rig than yesterday?
   return FLEET.data;
 }
 async function fleetPost(path, body) {
@@ -2468,6 +2525,7 @@ async function fleetPick(crew) {
     document.getElementById('fl-overlay').hidden = true;
     FLEET.then = null;
     if (then) then(); else if (APP.screen === 'ambulance-picker') renderFleetPicker();
+    swMaybe();   // 2.46
   } catch (e) {
     haptic('error');
     alert('Could not save your crew: ' + (e.message || e));
@@ -2538,6 +2596,7 @@ function renderFleetPicker() {
   let h = `<div class="fl-mission">All ambulances must be checked daily for mission readiness.</div>
     <div class="fl-bar"><span>${escapeHTML(flDayLabel(d.day))}</span><button type="button" class="fl-chip" id="fl-chg">${mine ? escapeHTML(mine) + ' · Station ' + escapeHTML(st) + ' · Change' : 'Pick your crew'}</button></div>`;
   h += `<div class="section-label">Your ambulances today</div>`;
+  h += `<button type="button" class="sw-link" onclick="swOpen()">Switching rigs? What to bring over →</button>`;   // 2.46
   h += myRigs.length ? myRigs.map(r => row(r, 'mine')).join('') : `<p class="picker-intro">${mine ? 'Nothing picked yet. Tap an ambulance below to take it for ' + escapeHTML(mine) + ' today.' : 'Pick your crew first, then your ambulances.'}</p>`;
   if (open.length) h += `<div class="section-label">Also at Station ${escapeHTML(st)}? Tap to take it</div>` + open.map(r => row(r, 'open')).join('');
   if (away.length) h += `<div class="section-label">At other stations</div>` + away.map(r => row(r, 'away')).join('');
@@ -2567,6 +2626,7 @@ async function fleetClaim(rig, here) {
     await fleetPost('/fleet/claim', { crew: fleetMyCrew(), rig, here: !!here });
     FLEET.open = null;
     haptic('success');
+    swMaybe(rig);   // 2.46: took a rig this crew didn't have yesterday
   } catch (e) {
     haptic('error');
     alert(e.message || String(e));
@@ -2709,10 +2769,349 @@ function lookBanner() {
    fully closed. When the app opens or comes back to the front (at most every 5 minutes), it
    asks GitHub for the newest index.html and reloads itself if the version is newer. It never
    reloads during a check, with a popup open, or off the home and list screens. */
+/* ============================================================
+   2.46 (Doug 11/10/2026): Back saves, search this rig, sharing line,
+   two red tags on one bag, Yes/No checks with a picture (M18 LiquidSpring),
+   switching rigs checklist, Equipment Problem (LifePak 35 issue report).
+   ============================================================ */
+function hhmm(ms) { const d = new Date(ms || Date.now()); return String(d.getHours()).padStart(2, '0') + String(d.getMinutes()).padStart(2, '0'); }
+function mdy(ymd) { const [y, m, d] = String(ymd || localDateStr()).split('-'); return `${Number(m)}/${Number(d)}/${y}`; }
+
+/* ---------- small note at the top of the screen ---------- */
+function toast(msg, ms) {
+  let el = document.getElementById('ck-toast');
+  if (!el) { el = document.createElement('div'); el.id = 'ck-toast'; el.className = 'ck-toast'; el.setAttribute('role', 'status'); document.body.appendChild(el); }
+  el.textContent = msg; el.classList.add('on');
+  clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('on'), ms || 3500);
+}
+
+/* ---------- Back saves the check on this phone (no "Discard" question) ---------- */
+function leaveCheckSaved() {
+  const c = APP.check;
+  if (!c || c.look || !hasUnsavedWork()) return;
+  saveAutosave();
+  toast(`Saved. Your ${c.unitName} check will be here when you come back today.`);
+}
+// a check started before midnight still comes back until the 07:30 change
+function asPrevDay(c) {
+  const n = new Date();
+  if (n.getHours() * 60 + n.getMinutes() >= 7 * 60 + 30) return null;
+  const y = new Date(n.getTime() - 86400000);
+  try { return localStorage.getItem(AUTOSAVE_PREFIX + (c.unitId || c.unitName || 'unit') + '::' + localDateStr(y)); } catch (e) { return null; }
+}
+function repaintRescue() {
+  const c = APP.check; if (!c || c.type !== 'rescue') return;
+  const m = document.getElementById('rescue-mileage'); if (m) m.value = c.mileage || '';
+  const cm = document.getElementById('rescue-comments'); if (cm) cm.value = c.comments || '';
+  const ini = document.getElementById('rescue-initials'); if (ini) ini.value = c.initials || '';
+  document.querySelectorAll('.check-row[data-bucket="rescueChecks"]').forEach(row => {
+    const key = row.dataset.key, v = c.rescueChecks[key]; if (!v) return;
+    row.querySelectorAll('.check-btn').forEach(b => b.classList.toggle('active', !!v.status && b.dataset.status === v.status));
+    const det = document.getElementById('detail-' + key.replace(/[^a-zA-Z0-9]/g, '_'));
+    if (!det) return;
+    det.style.display = v.status === 'bad' ? 'block' : 'none';
+    const t = det.querySelector('textarea'); if (t) t.value = v.notes || '';
+    const f = det.querySelector('[data-fixed]'); if (f) f.checked = !!v.fixed;
+    const u = det.querySelector('[data-unfixed]'); if (u) u.checked = !!v.unfixed;
+  });
+}
+
+/* ---------- red tags: "redTag": 2 means two bags with two tag numbers ---------- */
+function redTagKeys(obj) {
+  const n = obj.redTag === true ? 1 : (Number(obj.redTag) || 0);
+  if (n <= 1) return n ? [{ key: obj.name, label: '' }] : [];
+  return Array.from({ length: n }, (_, i) => ({ key: `${obj.name} #${i + 1}`, label: `Bag ${i + 1}` }));
+}
+
+/* ---------- search this rig ---------- */
+function ckSearchSetup(on) {
+  const box = document.getElementById('ck-search'), inp = document.getElementById('ck-search-in'), res = document.getElementById('ck-search-res');
+  if (!box) return;
+  box.hidden = !on; inp.value = ''; res.hidden = true; res.innerHTML = '';
+  if (box.dataset.wired) return;
+  box.dataset.wired = '1';
+  inp.addEventListener('input', () => ckSearchShow(inp.value));
+  inp.addEventListener('focus', () => { if (inp.value) ckSearchShow(inp.value); });
+  inp.addEventListener('keydown', e => { if (e.key === 'Escape') { inp.value = ''; res.hidden = true; inp.blur(); } if (e.key === 'Enter') { const b = res.querySelector('button'); if (b) b.click(); } });
+  document.addEventListener('click', e => { if (!box.contains(e.target)) res.hidden = true; });
+}
+function ckSearchIndex() {
+  const c = APP.check, out = [];
+  if (!c || !c._comps) return out;
+  allComps(c).forEach(comp => {
+    out.push({ comp: comp.name, bag: '', item: '', kind: 'comp' });
+    (comp.items || []).forEach(it => out.push({ comp: comp.name, bag: '', item: it.name, kind: 'item' }));
+    (comp.bags || []).forEach(b => {
+      out.push({ comp: comp.name, bag: b.name, item: '', kind: 'bag' });
+      (b.items || []).forEach(it => out.push({ comp: comp.name, bag: b.name, item: it.name, kind: 'item' }));
+    });
+    (comp.ynChecks || []).forEach(q => out.push({ comp: comp.name, bag: '', item: q, kind: 'yn' }));
+  });
+  return out;
+}
+function ckSearchShow(q) {
+  const res = document.getElementById('ck-search-res');
+  const words = String(q || '').toLowerCase().split(/\s+/).filter(Boolean);
+  if (!words.length) { res.hidden = true; return; }
+  const hits = ckSearchIndex().filter(r => { const t = `${r.comp} ${r.bag} ${r.item}`.toLowerCase(); return words.every(w => t.includes(w)); });
+  hits.sort((a, b) => (a.kind === 'item' ? 0 : 1) - (b.kind === 'item' ? 0 : 1));
+  CKS.hits = hits.slice(0, 12);
+  res.innerHTML = CKS.hits.length ? CKS.hits.map((r, n) => {
+    const title = r.item || r.bag || r.comp;
+    const path = [r.comp, r.item ? r.bag : ''].filter(Boolean).join(' → ');
+    return `<button type="button" data-ck="${n}"><b>${escapeHTML(title)}</b>${path && title !== r.comp ? `<span>${escapeHTML(path)}</span>` : `<span>${r.kind === 'bag' ? 'Bag' : 'Compartment'}</span>`}</button>`;
+  }).join('') : `<div class="ck-search-none">Nothing on ${escapeHTML((APP.check && APP.check.unitName) || 'this rig')} matches "${escapeHTML(q)}".</div>`;
+  res.querySelectorAll('[data-ck]').forEach(b => b.addEventListener('click', () => { res.hidden = true; document.getElementById('ck-search-in').blur(); ckSearchGo(CKS.hits[Number(b.dataset.ck)]); }));
+  res.hidden = false;
+}
+const CKS = { hits: [] };
+function ckSearchGo(r) {
+  if (!r) return;
+  const card = [...document.querySelectorAll('.compartment-card')].find(x => x.dataset.compartment === r.comp);
+  if (!card) return;
+  const safeId = card.id.replace(/^comp-/, '');
+  const comp = findCompartmentByName(r.comp);
+  const body = document.getElementById('comp-body-' + safeId);
+  if (body && body.dataset.rendered !== 'true' && comp) renderCompartmentBody(safeId, comp);
+  card.classList.add('open');
+  let el = card;
+  if (r.kind === 'item') el = [...card.querySelectorAll('.item-row')].find(x => x.dataset.item === r.item && (x.dataset.bag || '') === r.bag) || card;
+  else if (r.kind === 'yn') el = [...card.querySelectorAll('.op-check-row[data-op-comp]')].find(x => x.dataset.opItem === r.item) || card;
+  else if (r.kind === 'bag') el = [...card.querySelectorAll('.bag-card')].find(x => x.dataset.bagName === r.bag) || card;
+  revealForPrompt(el);
+  if (el.classList.contains('bag-card')) el.classList.add('open');
+  haptic('tap');
+  setTimeout(() => {
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    el.classList.remove('ck-hit'); void el.offsetWidth; el.classList.add('ck-hit');
+  }, 80);
+}
+
+/* ---------- switching rigs: what to bring over ---------- */
+const SW_DEFAULT = ['IV pump', 'LifePak 35', 'LifePak 35 cables', 'LifePak 35 batteries'];
+function swItems() { return (APP.data && APP.data.switchRigItems) || SW_DEFAULT; }
+function swKey(rig, day) { return `sw_v1::${rig}::${day || localDateStr()}`; }
+/* Doug 11/10: compare with the rig this crew had the day before, from the server (Worker 1.4 /fleet/today "prev").
+   If the server has nothing for yesterday, compare with the crew's primary. Asked once per rig per day on a phone. */
+function swAskedKey(rig) { return `sw_asked_v1::${rig}::${(FLEET.data && FLEET.data.day) || localDateStr()}`; }
+function swFromFor(rig) {
+  const d = FLEET.data, mine = fleetMyCrew();
+  if (!d || !mine) return '';
+  const prev = ((d.prev && d.prev.claims) || []).filter(x => x.crew === mine).map(x => x.rig);
+  const before = prev.length ? prev : [(fleetCrewInfo(mine) || {}).primary].filter(Boolean);
+  if (!before.length || before.includes(rig)) return '';
+  const today = (d.rigs || []).filter(r => r.claim && r.claim.crew === mine).map(r => r.rig);
+  return before.find(r => !today.includes(r)) || before[0];
+}
+function swCheck() {
+  const d = FLEET.data, mine = fleetMyCrew();
+  if (!d || !mine || AUTH.state !== 'in' || fleetLooking() || APP.check) return;
+  if (['eq-overlay', 'fl-overlay', 'whatsnew'].some(id => { const el = document.getElementById(id); return el && !el.hidden; })) return;
+  for (const r of (d.rigs || []).filter(x => x.claim && x.claim.crew === mine)) {
+    let asked = ''; try { asked = localStorage.getItem(swAskedKey(r.rig)) || ''; } catch (e) {}
+    if (asked) continue;
+    const from = swFromFor(r.rig);
+    if (!from) continue;
+    try { localStorage.setItem(swAskedKey(r.rig), '1'); } catch (e) {}
+    eqSheet(`<div class="eq-head"><div><h2>Moving into ${escapeHTML(r.rig)}?</h2><div class="eq-sub">${escapeHTML(mine)} had ${escapeHTML(from)} ${d.prev && (d.prev.claims || []).some(x => x.crew === mine) ? 'yesterday' : 'as its primary'}</div></div><button type="button" class="eq-x" onclick="eqClose()" aria-label="Close">✕</button></div>
+      <div class="eq-note">Are you transferring into <b>${escapeHTML(r.rig)}</b> from <b>${escapeHTML(from)}</b>?</div>
+      <button type="button" class="eq-go" id="sw-yes">Yes, from ${escapeHTML(from)}</button>
+      <button type="button" class="eq-alt" onclick="eqClose()">No</button>`);
+    document.getElementById('sw-yes').addEventListener('click', () => swOpen(r.rig, from));
+    return;
+  }
+}
+function swMaybe() { setTimeout(() => { try { swCheck(); } catch (e) {} }, 300); }
+function swOpen(to, from) {
+  const rigs = ((APP.data && APP.data.ambulances) || []).map(a => a.id);
+  const mine = fleetMyCrew();
+  from = from || (fleetCrewInfo(mine) || {}).primary || rigs[0];
+  to = to || rigs.find(r => r !== from) || '';
+  let saved = null; try { saved = JSON.parse(localStorage.getItem(swKey(to)) || 'null'); } catch (e) {}
+  const opt = (sel) => rigs.map(r => `<option${r === sel ? ' selected' : ''}>${escapeHTML(r)}</option>`).join('');
+  const moved = n => saved && saved.from === from && (saved.items || []).some(x => x.name === n && x.moved);
+  eqSheet(`<div class="eq-head"><div><h2>Did you bring these over?</h2><div class="eq-sub">A reminder only. You still check the whole rig</div></div><button type="button" class="eq-x" onclick="eqClose()" aria-label="Close">✕</button></div>
+    <div class="sw-rigs"><label>From<select id="sw-from">${opt(from)}</select></label><span aria-hidden="true">→</span><label>To<select id="sw-to">${opt(to)}</select></label></div>
+    <div class="eq-list">${swItems().map((n, i) => `<label><input type="checkbox" data-sw="${i}"${moved(n) ? ' checked' : ''}> ${escapeHTML(n)}</label>`).join('')}</div>
+    <div class="eq-note">Ticked items go on your check for the new rig and in its email.</div>
+    <button type="button" class="eq-go" onclick="swSave()">Done</button>
+    <button type="button" class="eq-alt" onclick="eqClose()">Not now</button>`);
+}
+function swSave() {
+  const from = document.getElementById('sw-from').value, to = document.getElementById('sw-to').value;
+  const items = swItems().map((n, i) => ({ name: n, moved: !!document.querySelector(`[data-sw="${i}"]`).checked }));
+  try { localStorage.setItem(swKey(to), JSON.stringify({ from, to, items, at: Date.now(), by: AUTH.name || '' })); } catch (e) {}
+  haptic('success'); eqClose();
+  toast(`Saved. ${items.filter(x => x.moved).length} of ${items.length} items moved from ${from} to ${to}.`);
+}
+function swNoteFor(c) {
+  let s = null; try { s = JSON.parse(localStorage.getItem(swKey(c.unitId, c.date)) || 'null'); } catch (e) {}
+  if (!s || !s.items) return '';
+  return `SWITCHED RIGS: moved over from ${s.from} to ${s.to}${s.by ? ' by ' + s.by : ''} at ${hhmm(s.at)}\n` + s.items.map(x => `  ${x.moved ? '✓' : '✗ NOT moved:'} ${x.name}`).join('\n');
+}
+
+/* ---------- Equipment Problem (starts with the LifePak 35 issue report) ---------- */
+const EQUIP = [{
+  id: 'LP35', name: 'LifePak 35',
+  units: ['35-1', '35-2', '35-3', 'Not sure'],
+  cats: ['Device won\'t power on / unexpected shutdown', 'Screen / display problem', '12-lead capture or transmission failure', 'SpO2 / SpO2 sensor error',
+    'EtCO2 / capnography issue', 'NIBP error or bad reading', 'Defibrillator / pacing malfunction', 'Battery / charging problem',
+    'Data transfer / ESO sync issue', 'Cable / lead / connector failure', 'Software / firmware error or freeze', 'Other (describe below)'],
+  scope: ['Single unit', 'Multiple units', 'Not sure'],
+  times: ['Once', '2-3 times', '4 or more times'],
+  impact: ['No patient impact', 'Minor delay / workaround', 'Significant impact'],
+  reported: ['Yes', 'No', 'Not sure'],
+  // the "LIFEPAK 35 — Issue Report" Microsoft Form (Doug's, org only). Question ids for the pre-filled link
+  form: 'https://forms.office.com/Pages/ResponsePage.aspx?id=icA9FV4JIEqNEDkyGgrKCZLjiVjHWHdPsPGJbyEFNKZUMTM3SU84TVRBRUhHMDNUQllVTTFQSkJSSS4u',
+  q: { name: 'rab5569cc03fa466da3b87de2a4a891dc', date: 'rd4a9653ed5ed445683e3fd0315346141', unit: 're8c701b8d2e549eb8953b617808d11a0',
+    cats: 'r8e0f51029ce64466a6f00057b8e471a9', what: 'ra6a79e558b9e4a618456b616f4e21435', scope: 'r054b565f5279410d90211a5ee773016c',
+    times: 'rfd43bf73e447487bbd3eb15d66408fbe', impact: 'r9f760acb64dc4ceeba9cde6394d7b6b0', reported: 'rfe96d45419b3434d88e8dd6e85ffa4c7',
+    more: 'r7c14ab48ccaa468392599a82780d7921' }
+}];
+const EQ = { st: null };
+function eqSheet(html) {
+  const ov = document.getElementById('eq-overlay'), sh = document.getElementById('eq-sheet');
+  sh.innerHTML = html; ov.hidden = false; sh.scrollTop = 0;
+}
+function eqClose() { document.getElementById('eq-overlay').hidden = true; }
+function eqDef() { return EQUIP[0]; }
+function eqOpen(pre) {
+  pre = pre || {};
+  const e = eqDef();
+  let last = ''; try { last = pre.fromRig ? (localStorage.getItem('lp35_on_' + pre.fromRig) || '') : ''; } catch (x) {}
+  EQ.st = { equip: e.id, unit: pre.unit || last || '', date: localDateStr(), cats: [], what: pre.what || '', scope: '', times: '', impact: '', reported: '', more: '', photos: [], fromRig: pre.fromRig || '', sent: false, busy: false };
+  eqRender();
+}
+function eqChips(field, list, multi) {
+  const s = EQ.st;
+  return `<div class="eq-chips">${list.map(v => {
+    const on = multi ? s[field].includes(v) : s[field] === v;
+    return `<button type="button" class="eq-chip${on ? ' on' : ''}" data-eqf="${field}" data-eqv="${escapeAttr(v)}"${multi ? ' data-multi="1"' : ''}>${escapeHTML(v)}</button>`;
+  }).join('')}</div>`;
+}
+function eqRender(err) {
+  const s = EQ.st, e = eqDef();
+  eqSheet(`<div class="eq-head"><div><h2>Equipment Problem</h2><div class="eq-sub">${s.fromRig ? 'Found on the ' + escapeHTML(s.fromRig) + ' check · ' : ''}Goes to the ${escapeHTML(e.name)} issue report</div></div><button type="button" class="eq-x" onclick="eqClose()" aria-label="Close">✕</button></div>
+    <div class="eq-q">Equipment</div><div class="eq-chips">${EQUIP.map(x => `<span class="eq-chip${x.id === s.equip ? ' on' : ''}">${escapeHTML(x.name)}</span>`).join('')}</div>
+    <div class="eq-q">Which one? <i>*</i></div>${eqChips('unit', e.units)}
+    <div class="eq-q">When did it happen? <i>*</i></div><input type="date" id="eq-date" value="${escapeAttr(s.date)}" max="${localDateStr()}">
+    <div class="eq-q">What kind of problem? (pick all that fit) <i>*</i></div>${eqChips('cats', e.cats, true)}
+    <div class="eq-q">What happened? <i>*</i></div><textarea id="eq-what" placeholder="What were you doing, and what did the monitor do or fail to do? Any message on the screen?">${escapeHTML(s.what)}</textarea>
+    <div class="eq-q">Photo (optional)</div>
+    <label class="eq-alt eq-photo-btn"><input type="file" accept="image/*" id="eq-photo" hidden>📷 Add a photo</label>
+    <div class="eq-photos" id="eq-photos">${s.photos.map(p => p.url ? `<img src="${escapeAttr(p.url)}" alt="">` : `<span class="eq-up">${p.state === 'up' ? 'Uploading…' : 'Could not upload'}</span>`).join('')}</div>
+    <div class="eq-q">Same device each time, or more than one?</div>${eqChips('scope', e.scope)}
+    <div class="eq-q">How many times has this happened?</div>${eqChips('times', e.times)}
+    <div class="eq-q">Did it affect patient care?</div>${eqChips('impact', e.impact)}
+    <div class="eq-q">Was it reported at the time?</div>${eqChips('reported', e.reported)}
+    <div class="eq-q">Anything else?</div><textarea id="eq-more" placeholder="Serial number, CAD number, software version, workaround you used">${escapeHTML(s.more)}</textarea>
+    ${err ? `<div class="eq-err">${escapeHTML(err)}</div>` : ''}
+    <button type="button" class="eq-go" id="eq-send"${s.busy ? ' disabled' : ''} onclick="eqSend()">${s.busy ? 'Sending…' : 'Send report'}</button>
+    <button type="button" class="eq-alt" onclick="eqClose()">Cancel</button>`);
+  const sh = document.getElementById('eq-sheet');
+  sh.querySelectorAll('[data-eqf]').forEach(b => b.addEventListener('click', () => {
+    const f = b.dataset.eqf, v = b.dataset.eqv;
+    if (f === 'equip') return;
+    eqGrab();
+    if (b.dataset.multi) s[f] = s[f].includes(v) ? s[f].filter(x => x !== v) : s[f].concat(v);
+    else s[f] = s[f] === v ? '' : v;
+    const top = sh.scrollTop; eqRender(); document.getElementById('eq-sheet').scrollTop = top;
+  }));
+  document.getElementById('eq-photo').addEventListener('change', ev => eqPhoto(ev.target.files[0]));
+}
+function eqGrab() {
+  const s = EQ.st, g = id => document.getElementById(id);
+  if (g('eq-what')) s.what = g('eq-what').value;
+  if (g('eq-more')) s.more = g('eq-more').value;
+  if (g('eq-date')) s.date = g('eq-date').value || localDateStr();
+}
+async function eqPhoto(file) {
+  if (!file) return;
+  const s = EQ.st; eqGrab();
+  const p = { state: 'up', url: '' }; s.photos.push(p);
+  const top = document.getElementById('eq-sheet').scrollTop; eqRender(); document.getElementById('eq-sheet').scrollTop = top;
+  try {
+    const type = /^image\//.test(file.type || '') ? file.type : 'image/jpeg';
+    const r = await cfFetch(`/photos?unit=${encodeURIComponent('LP35 ' + (s.unit || ''))}&label=${encodeURIComponent('LP35 issue')}`, { method: 'POST', auth: true, headers: { 'Content-Type': type }, body: file, timeout: 60000 });
+    if (r && r.url) { p.url = r.url; p.state = 'ok'; } else p.state = 'fail';
+  } catch (e) { p.state = 'fail'; }
+  if (document.getElementById('eq-sheet') && !EQ.st.sent && EQ.st === s) { eqGrab(); const t2 = document.getElementById('eq-sheet').scrollTop; eqRender(); document.getElementById('eq-sheet').scrollTop = t2; }
+}
+function eqMoreText(s) {
+  const extra = [];
+  if (s.more) extra.push(s.more.trim());
+  if (s.fromRig) extra.push('Found during the ' + s.fromRig + ' check.');
+  s.photos.filter(p => p.url).forEach((p, i) => extra.push('Photo ' + (i + 1) + ': ' + p.url));
+  extra.push('Sent from the Apparatus Checker ' + APP.version + '.');
+  return extra.join('\n');
+}
+function eqFormUrl(s) {
+  const e = eqDef(), q = e.q, v = [];
+  const add = (k, val) => { if (val !== '' && val != null && !(Array.isArray(val) && !val.length)) v.push(q[k] + '=' + encodeURIComponent(Array.isArray(val) ? JSON.stringify(val) : val)); };
+  add('name', AUTH.name || ''); add('date', mdy(s.date)); add('unit', s.unit); add('cats', s.cats); add('what', s.what.trim());
+  add('scope', s.scope); add('times', s.times); add('impact', s.impact); add('reported', s.reported); add('more', eqMoreText(s));
+  return e.form + (v.length ? '&' + v.join('&') : '');
+}
+async function eqSend() {
+  const s = EQ.st, e = eqDef(); eqGrab();
+  if (!s.unit) return eqRender('Pick which ' + e.name + ' (or Not sure).');
+  if (!s.cats.length) return eqRender('Pick at least one kind of problem.');
+  if (!s.what.trim()) return eqRender('Say what happened.');
+  if (s.photos.some(p => p.state === 'up')) return eqRender('Wait for the photo to finish uploading.');
+  s.busy = true; eqRender();
+  if (s.fromRig) { try { localStorage.setItem('lp35_on_' + s.fromRig, s.unit); } catch (x) {} }
+  const lines = [
+    `${e.name.toUpperCase()} ISSUE (from the Apparatus Checker)`,
+    `Unit: ${s.unit}`,
+    `Date of issue: ${mdy(s.date)}`,
+    `Reported by: ${AUTH.name || ''}${AUTH.email ? ' (' + AUTH.email + ')' : ''} at ${hhmm()}`,
+    s.fromRig ? `Found on: the ${s.fromRig} check` : '',
+    `Kind of problem: ${s.cats.join('; ')}`,
+    `What happened: ${s.what.trim()}`,
+    s.scope ? `Same device or more than one: ${s.scope}` : '',
+    s.times ? `How many times: ${s.times}` : '',
+    s.impact ? `Patient care: ${s.impact}` : '',
+    s.reported ? `Reported at the time: ${s.reported}` : '',
+    s.more ? `Anything else: ${s.more.trim()}` : '',
+    ...s.photos.filter(p => p.url).map((p, i) => `Photo ${i + 1}: ${p.url}`),
+    '',
+    `The crew was sent to the ${e.name} issue report form to tap Submit, so it lands in the fleet log too.`
+  ].filter(x => x !== '');
+  let mailed = true;
+  try {
+    await emailjs.send(APP.data.emailjs.serviceId, APP.data.emailjs.templateId, {
+      unit_id: `${e.name} ${s.unit}`, check_date: s.date, check_type: 'equipment problem', initials: AUTH.name || 'Crew',
+      message: lines.join('\n'), flags_count: 1, to_email: APP.data.submissionEmail || 'd.boyce@northcountryems.org'
+    });
+  } catch (x) { mailed = false; console.warn('Equipment problem email did not send:', x); }
+  s.busy = false; s.sent = true; s.mailed = mailed;
+  haptic(mailed ? 'success' : 'error');
+  eqSheet(`<div class="eq-head"><div><h2>${mailed ? 'Sent' : 'Not sent yet'}</h2><div class="eq-sub">${escapeHTML(e.name)} ${escapeHTML(s.unit)}</div></div><button type="button" class="eq-x" onclick="eqClose()" aria-label="Close">✕</button></div>
+    <div class="eq-note">${mailed ? 'The report went to the chiefs.' : 'The email could not go out (no signal?). The form below still works when you have signal.'}<br><br><b>Last step:</b> open the ${escapeHTML(e.name)} issue report. Your answers are filled in. Tap <b>Submit</b> at the bottom so it lands in the fleet log.</div>
+    <a class="eq-go" href="${escapeAttr(eqFormUrl(s))}" target="_blank" rel="noopener" onclick="setTimeout(eqClose, 400)">Open the ${escapeHTML(e.name)} issue report</a>
+    <button type="button" class="eq-alt" onclick="eqClose()">Close</button>`);
+}
+/* a ✗ on anything in the LifePak 35 kit, or its self test answered No, offers the report */
+function lp35Offer(comp, bag, item) {
+  const c = APP.check;
+  if (!c || c.look || c.type !== 'ambulance') return;
+  if (!/life ?pak|lp ?35/i.test(`${comp} ${bag} ${item}`)) return;
+  c.lp35Offered = c.lp35Offered || {};
+  const k = `${comp}|${bag}|${item}`;
+  if (c.lp35Offered[k]) return;
+  c.lp35Offered[k] = 1;
+  const what = `${c.unitName} check: ${[comp, bag, item].filter(Boolean).join(' → ')} marked as a problem.`;
+  eqSheet(`<div class="eq-head"><div><h2>LifePak 35 problem?</h2><div class="eq-sub">${escapeHTML([comp, bag, item].filter(Boolean).join(' → '))}</div></div><button type="button" class="eq-x" onclick="eqClose()" aria-label="Close">✕</button></div>
+    <div class="eq-note">Send it to the LifePak 35 issue report too, so the chiefs can track the monitors. Your check stays right where it is.</div>
+    <button type="button" class="eq-go" id="lp35-go">Report it now</button>
+    <button type="button" class="eq-alt" onclick="eqClose()">Not now</button>`);
+  document.getElementById('lp35-go').addEventListener('click', () => eqOpen({ fromRig: c.unitName, what }));
+}
+
 const UPD = { busy: false, last: 0 };
 function updSafeNow() {
   if (APP.check || !['home', 'ambulance-picker', 'rescue-picker', 'success'].includes(APP.screen)) return false;
-  const open = ['fl-overlay', 'mv-sheet', 'mv-review', 'whatsnew'].some(id => { const el = document.getElementById(id); return el && !el.hidden; });
+  const open = ['fl-overlay', 'mv-sheet', 'mv-review', 'whatsnew', 'eq-overlay'].some(id => { const el = document.getElementById(id); return el && !el.hidden; });
   const modal = document.getElementById('submit-modal');
   return !open && !(modal && !modal.classList.contains('hidden'));
 }
@@ -2733,6 +3132,13 @@ const FLEET_HEALTH_URL = 'https://cgstaff.northcountryems.org/#fleet';   // 2.35
 const FLEET_HEALTH_STAFF = ['d.boyce@northcountryems.org', 'd.langdon@northcountryems.org', 'd.madler@northcountryems.org', 'b.shirley@northcountryems.org', 'c.andrus@northcountryems.org', 'k.reid@northcountryems.org'];
 function showAppInfo() { showWhatsNew(true); }
 const WHATS_NEW = [
+  ['Equipment Problem', 'New red button on the home screen, and it pops up when you mark something in the LifePak 35 with an ✗. Pick the monitor (35-1, 35-2, 35-3), what kind of problem, what happened, add a photo, and send. Then tap Submit on the LifePak 35 issue report it opens.'],
+  ['Search this rig', 'Type in the box next to the date at the top of a check to find any item. Tap a result to jump right to it.'],
+  ['Back saves your check', 'Back no longer asks to discard. Your check is saved on the phone and is there when you come back today. Other Units now save too.'],
+  ['Checking with a partner', 'A small line at the top shows when your partner\'s marks are coming in, and the submit popup tells you their marks are included.'],
+  ['Switching rigs', 'When your crew is in a different rig than yesterday, the app asks if you moved over and what you brought (IV pump, LifePak 35, cables, batteries). It goes on the new rig\'s check.'],
+  ['C-collar bags', 'Every rig has 2 blue C-collar bags (same items in each, two red tag numbers) and 1 orange.'],
+  ['M18 LiquidSpring', 'M18 has a LiquidSpring suspension section with the panel picture and quick Yes/No checks.'],
   ['Med kit and Airway Bag - M18 corrected', 'Joseph organized the med kit and airway bag on M25A last week. M18 is now an exact copy of that layout, so both orange ambulances have identical organization.'],
   ['Only real problems are flagged', 'Fuel, DEF, main O2, narcotic counts, gurney checks and tire pressure are still recorded on the check, but they no longer count as problems. Lights, horn, oil, unsafe tires, the fridge and crew or patient equipment still do.'],
   ['Narcotics: OK to stay at this level', 'When a controlled count is under par, tick "OK to stay at this level" and the item counts as checked. You do not need Restocked or Unable to restock. At or under half par the red box still shows and now reads UNDER HALF PAR. Over par is still an error. Changing the count clears the tick, and the email says the crew was OK to stay at this level.'],
@@ -3112,17 +3518,14 @@ function showScreen(id) {
 function goHome() {
   liveStop();
   document.title = APP_TITLE;
-  if (APP.screen === 'check' && hasUnsavedWork()) {
-    if (!confirm('You have unsaved work. Discard and go back to home?')) return;
-  }
+  if (APP.screen === 'check') leaveCheckSaved();   // 2.46: Back saves, no Discard question
   APP.check = null;
   showScreen('home');
 }
 
 function confirmExitCheck() {
-  if (hasUnsavedWork()) {
-    if (!confirm('You have unsaved work. Discard and go back?')) return;
-  }
+  leaveCheckSaved();   // 2.46: Back saves the check on this phone
+  liveStop();
   APP.check = null;
   showScreen('home');
 }
@@ -3288,6 +3691,7 @@ function restoreAutosave() {
   if (!c) return;
   let raw;
   try { raw = localStorage.getItem(autosaveKey(c)); } catch (e) { return; }
+  if (!raw) raw = asPrevDay(c);   // 2.46: started before midnight, still there until 07:30
   if (!raw) return;
   let parsed;
   try { parsed = JSON.parse(raw); } catch (e) { return; }
@@ -3299,6 +3703,7 @@ function restoreAutosave() {
     APP.check[k] = saved[k];
   });
   // Re-render so restored values show, then repaint field states
+  if (c.type === 'rescue') { renderRescueCheck(); repaintRescue(); updateProgress(); return; }   // 2.46: Other Units save too
   renderAmbulanceCheck();
   repaintRestoredState();
   updateProgress();
@@ -3460,6 +3865,7 @@ function renderAmbulanceCheck() {
   const c = APP.check;
   document.getElementById('check-title').innerHTML =
     `${escapeHTML(c.unitName)} Check <span class="header-sub">· ${formatDate(c.date)}</span>`;
+  ckSearchSetup(true);   // 2.46
   document.title = `${c.unitName} Check · NCEMS`;
 
   const body = document.getElementById('check-body');
@@ -3529,12 +3935,14 @@ function startRescueCheck(unitName) {
   renderRescueCheck();
   showScreen('check');
   updateProgress();
+  if (!APP.check.look) restoreAutosave();   // 2.46
 }
 
 function renderRescueCheck() {
   const c = APP.check;
   document.getElementById('check-title').innerHTML =
     `${c.unitName} <span class="header-sub">· ${formatDate(c.date)}</span>`;
+  ckSearchSetup(false);
   const checks = APP.data.rescueRigChecks;
   const body = document.getElementById('check-body');
 
@@ -3582,8 +3990,8 @@ function attachRescueHandlers() {
   const rIniEl = document.getElementById('rescue-initials');
   if (rIniEl && APP.check.initials) rIniEl.value = APP.check.initials;
   document.getElementById('rescue-initials').oninput = e => { APP.check.initials = e.target.value; updateProgress(); saveAutosave(); };
-  document.getElementById('rescue-mileage').oninput = e => { APP.check.mileage = e.target.value; updateProgress(); };
-  document.getElementById('rescue-comments').oninput = e => { APP.check.comments = e.target.value; };
+  document.getElementById('rescue-mileage').oninput = e => { APP.check.mileage = e.target.value; updateProgress(); saveAutosave(); };
+  document.getElementById('rescue-comments').oninput = e => { APP.check.comments = e.target.value; saveAutosave(); };
 
   // Wire up the WNL rows for the rescue check
   document.querySelectorAll('.check-row[data-bucket="rescueChecks"]').forEach(row => {
@@ -3603,24 +4011,26 @@ function attachRescueHandlers() {
           APP.check.rescueChecks[key].status = status;
           document.getElementById('detail-' + safeKey).style.display = status === 'bad' ? 'block' : 'none';
         }
-        updateProgress();
+        updateProgress(); saveAutosave();
       };
     });
     const detail = document.getElementById('detail-' + safeKey);
     detail.querySelector('textarea').oninput = e => {
       APP.check.rescueChecks[key] = APP.check.rescueChecks[key] || {};
-      APP.check.rescueChecks[key].notes = e.target.value;
+      APP.check.rescueChecks[key].notes = e.target.value; saveAutosave();
     };
     detail.querySelector('[data-fixed]').onchange = e => {
       APP.check.rescueChecks[key] = APP.check.rescueChecks[key] || {};
       APP.check.rescueChecks[key].fixed = e.target.checked;
       if (e.target.checked) { APP.check.rescueChecks[key].unfixed = false; const u = detail.querySelector('[data-unfixed]'); if (u) u.checked = false; }
+      saveAutosave();
     };
     const ru = detail.querySelector('[data-unfixed]');
     if (ru) ru.onchange = e => {
       APP.check.rescueChecks[key] = APP.check.rescueChecks[key] || {};
       APP.check.rescueChecks[key].unfixed = e.target.checked;
       if (e.target.checked) { APP.check.rescueChecks[key].fixed = false; const f = detail.querySelector('[data-fixed]'); if (f) f.checked = false; }
+      saveAutosave();
     };
   });
 }
@@ -3944,7 +4354,7 @@ function renderCompartmentSection(title, type, compartments) {
 
 // True if anything in this compartment needs special attention (red tag / battery / fridge temp)
 function compNeedsStar(comp) {
-  if (comp.redTag || comp.operationalCheck) return true;
+  if (comp.redTag || comp.operationalCheck || (comp.ynChecks || []).length) return true;
   if (comp.name === 'Fridge') return true; // nested temp check
   if ((comp.items || []).some(it => it.operationalCheck)) return true;
   if ((comp.bags || []).some(bag => bag.redTag || (bag.items || []).some(it => it.operationalCheck))) return true;
@@ -3993,6 +4403,10 @@ function renderCompartmentBody(safeId, comp) {
   if (comp.operationalCheck) {
     html += opCheckHTML(comp.name, '', '__comp_op__', comp.operationalCheck);
   }
+  // 2.46: a picture, Yes/No checks and notes (M18 LiquidSpring). A No is a problem like any operational check
+  if (comp.image) html += `<div class="comp-info"><img src="${escapeAttr(comp.image)}" alt="${escapeAttr(comp.name)}" loading="lazy"></div>`;
+  (comp.ynChecks || []).forEach(q => { html += opCheckHTML(comp.name, '', q, q); });
+  if (comp.info) html += `<div class="comp-info">${[].concat(comp.info).map(p => `<p>${escapeHTML(p)}</p>`).join('')}</div>`;
 
   // ── Gurney special checks (Yes/No rows, no items) ──
   if (comp.specialChecks && comp.specialChecks.length) {
@@ -4012,7 +4426,7 @@ function renderCompartmentBody(safeId, comp) {
 
   // ── Red tag input (for compartments flagged redTag) ──
   if (comp.redTag) {
-    html += redTagHTML(comp.name);
+    html += redTagKeys(comp).map(k => redTagHTML(k.key, k.label)).join('');   // 2.46
   }
 
   // Direct items in the compartment
@@ -4056,13 +4470,13 @@ function renderCompartmentBody(safeId, comp) {
   if (comp.bags && comp.bags.length > 0) {
     comp.bags.forEach((bag, bIdx) => {
       const bagSafeId = `${safeId}-bag-${bIdx}`;
-      const bagRedTag = bag.redTag ? redTagHTML(bag.name) : '';
+      const bagRedTag = redTagKeys(bag).map(k => redTagHTML(k.key, k.label)).join('');   // 2.46: one box per bag
       html += `
         <div class="bag-card" id="bag-${bagSafeId}" data-bag-name="${escapeAttr(bag.name)}">
           <div class="bag-head" data-bag-toggle="${bagSafeId}">
             <div>
               <div class="bag-name">${escapeHTML(bag.name)}${bag.redTag ? '<span class="req-star">*</span>' : ''}</div>
-              <div class="bag-counts">${bag.items.length} items</div>
+              <div class="bag-counts">${Number(bag.redTag) > 1 ? bag.redTag + ' bags, same items in each · ' : ''}${bag.items.length} items</div>
             </div>
             <button class="comp-header-mark-btn" type="button" data-bag-mark="${escapeAttr(bag.name)}" data-bag-mark-comp="${escapeAttr(comp.name)}" data-bag-mark-safeid="${safeId}" title="Mark the rest of this bag complete">✓ All</button>
             <div class="bag-expand">▼</div>
@@ -4174,7 +4588,8 @@ function repaintCompartmentRestored(safeId, comp) {
   updateCompartmentCounts(safeId, comp);
 }
 
-function redTagHTML(name) {
+function redTagHTML(name, label) {
+  const lab = `🔴 ${label ? escapeHTML(label) + ' ' : ''}Red Tag # (last 4):`;
   const unitId = APP.check?.unitId || '';
   const remembered = getRememberedRedTag(unitId, name);
   const current = APP.check?.redTags?.[name] || '';
@@ -4184,7 +4599,7 @@ function redTagHTML(name) {
   if (remembered) {
     return `
       <div class="red-tag-row${confirmed ? ' confirmed' : ''}" data-redtag-name="${escapeAttr(name)}">
-        <div class="red-tag-label">🔴 Red Tag # (last 4):</div>
+        <div class="red-tag-label">${lab}</div>
         <input type="text" class="red-tag-input" inputmode="numeric" maxlength="4" placeholder="0000" value="${escapeAttr(shown)}" data-redtag-for="${escapeAttr(name)}" />
         <button type="button" class="red-tag-confirm${confirmed ? ' done' : ''}" data-redtag-confirm="${escapeAttr(name)}">${confirmed ? '✓ Confirmed' : 'Confirm'}</button>
       </div>`;
@@ -4192,7 +4607,7 @@ function redTagHTML(name) {
   // First time on this unit+bag: type it in (it gets remembered on submit).
   return `
     <div class="red-tag-row" data-redtag-name="${escapeAttr(name)}">
-      <div class="red-tag-label">🔴 Red Tag # (last 4):</div>
+      <div class="red-tag-label">${lab}</div>
       <input type="text" class="red-tag-input" inputmode="numeric" maxlength="4" placeholder="0000" value="${escapeAttr(shown)}" data-redtag-for="${escapeAttr(name)}" />
     </div>`;
 }
@@ -4407,6 +4822,7 @@ function wireCompartmentBody(safeId, comp) {
           c.opChecks[key] = val;
           row.style.background = (val === 'no') ? 'var(--warn-bg)' : '';
           if (det) det.style.display = (val === 'no') ? 'block' : 'none';
+          if (val === 'no') lp35Offer(compName, bagName, itemName === '__comp_op__' ? 'self test' : itemName);   // 2.46
         }
         updateProgress(); saveAutosave();
       });
@@ -4561,6 +4977,7 @@ function wireCompartmentBody(safeId, comp) {
         }
         updateCompartmentCounts(safeId, comp);
         updateProgress(); saveAutosave();
+        if (!wasActive && status === 'abnormal') lp35Offer(compName, bagName, itemName);   // 2.46
       });
     });
     textarea.addEventListener('input', e => {
@@ -4780,7 +5197,7 @@ function promptBagSpecials(safeId, compName, bagName) {
   if (!bag || !body) return;
   const needs = [];
   const redRow = [...body.querySelectorAll('.red-tag-row')].find(r => r.dataset.redtagName === bagName);
-  if (bag.redTag && !c.redTags?.[bagName] && redRow) needs.push(['Red tag # (last 4) for ' + bagName, redRow]);
+  redTagKeys(bag).forEach(k => { const rr = [...body.querySelectorAll('.red-tag-row')].find(r => r.dataset.redtagName === k.key); if (!c.redTags?.[k.key] && rr) needs.push(['Red tag # (last 4) for ' + k.key, rr]); });   // 2.46
   bag.items.forEach(it => {
     if (!it.operationalCheck) return;
     const key = `${compName}||${bagName}||${it.name}`;
@@ -4804,14 +5221,9 @@ function promptSpecialChecks(safeId, comp) {
   const redTagEl = name => [...body.querySelectorAll('.red-tag-row')].find(r => r.dataset.redtagName === name);
 
   // Red tags (compartment-level + bags) with no number entered
-  if (comp.redTag && !c.redTags?.[comp.name]) {
-    needs.push([`Red tag # for ${comp.name}`, redTagEl(comp.name)]);
-  }
-  (comp.bags || []).forEach(bag => {
-    if (bag.redTag && !c.redTags?.[bag.name]) {
-      needs.push([`Red tag # for ${bag.name}`, redTagEl(bag.name)]);
-    }
-  });
+  [comp].concat(comp.bags || []).forEach(o => redTagKeys(o).forEach(k => {   // 2.46: one number per bag
+    if (!c.redTags?.[k.key]) needs.push([`Red tag # for ${k.key}`, redTagEl(k.key)]);
+  }));
   // Battery/operational checks not answered
   const opEl = key => [...body.querySelectorAll('.op-check-row[data-op-comp]')].find(r =>
     `${r.dataset.opComp}||${r.dataset.opBag}||${r.dataset.opItem}` === key);
@@ -4826,6 +5238,7 @@ function promptSpecialChecks(safeId, comp) {
   if (comp.operationalCheck && !c.opChecks?.[`${comp.name}||${''}||__comp_op__`]) {
     needs.push([`${comp.name}: ${comp.operationalCheck}`, opEl(`${comp.name}||${''}||__comp_op__`)]);
   }
+  (comp.ynChecks || []).forEach(q => { const k = `${comp.name}||||${q}`; if (!c.opChecks?.[k]) needs.push([q, opEl(k)]); });   // 2.46
   // Fridge temp
   if (comp.name === 'Fridge' && !c.cooler?.answered) {
     needs.push(['Fridge reading between ' + fridgeRange() + '? (Yes/No)', body.querySelector('[data-cooler]')]);
@@ -5479,6 +5892,7 @@ function computeCompletionPct() {
       if (comp.specialChecks && comp.specialChecks.length) {
         comp.specialChecks.forEach(sc => { total++; if (c.gurney?.[sc.label]) done++; });
       }
+      (comp.ynChecks || []).forEach(q => { total++; if (c.opChecks?.[`${comp.name}||||${q}`]) done++; });   // 2.46
       const compItems = comp.items.length + (comp.bags || []).reduce((n, b) => n + b.items.length, 0);
       total += compItems;
       const cs = c.compartments[comp.name];
@@ -5537,6 +5951,8 @@ function showSubmitModal() {
     warnEl.textContent = `⚠ This check is only ${pct}% complete (below ${sendMinPct()}%). The report will be held and sent automatically at ${holdLabel()} so you or your partner can finish first.`;
   }
 
+  const pn = document.getElementById('modal-partner-note');
+  if (pn) pn.hidden = !(live.partner && c.type === 'ambulance' && live.docId);   // 2.46
   document.getElementById('submit-modal').classList.remove('hidden');
 }
 
@@ -5599,6 +6015,8 @@ async function submitCheck() {
 
   try {
     const summary = buildSummary();
+    const swNote = swNoteFor(c);   // 2.46: what was moved over from the old rig
+    if (swNote) summary.plain = swNote + '\n\n' + summary.plain;
     const crew = logInitials(c.unitId, c.date, c.initials);
     const crewLine = crew.join(' + ');
     const params = {
@@ -6156,10 +6574,18 @@ function liveOnSnap(snap) {
   if (n) liveRepaint(fresh);
   else if (repush) liveSchedule();
 }
-/* 2.17: no "Live with" banner. Doug: just show what's checked, not who. */
+/* 2.17: no "Live with" banner. Doug: just show what's checked, not who.
+   2.46 (Doug): a small sharing line, still no names, only when a partner is on the same rig. */
 function livePaintBanner() {
   const el = document.getElementById('live-banner');
-  if (el) el.classList.remove('on');
+  if (!el) return;
+  const me = liveDeviceId(), seen = Date.now() - 15 * 60 * 1000;
+  live.partner = Object.entries(live.people || {}).some(([d, p]) => d !== me && p && p.at > seen);
+  if (!live.partner) { el.classList.remove('on'); return; }
+  const stale = !live.lastOk || Date.now() - live.lastOk > 30000;
+  el.classList.add('on'); el.classList.toggle('off', stale);
+  el.innerHTML = stale ? '<strong>Not sharing right now</strong> (no signal). Your partner\'s marks will show up when it comes back.'
+    : `<span class="live-dot"></span><strong>Sharing with your partner</strong> · updated ${hhmm(live.lastOk)}`;
   return;
   const dev = liveDeviceId(), cutoff = Date.now() - 3 * 3600 * 1000;
   const others = Object.entries(live.people || {}).filter(([d, p]) => d !== dev && p && p.at > cutoff).map(([, p]) => p.name || 'Partner');
@@ -6209,12 +6635,13 @@ async function liveStart() {
   liveStop();
   live.docId = `${c.unitId}_${c.date}`;
   live.pushed = {}; live.localAt = {}; live.by = {}; live.people = {}; live.flagDev = {}; live.flagName = {};
+  live.lastOk = 0; live.partner = false;   // 2.46
   // 2.26: Cloudflare. Ask for the partner's marks every 5 seconds while the check is open
   const id = live.docId;
   const pull = async () => {
     if (live.docId !== id || document.hidden) return;
-    try { const r = await cfFetch('/live/' + encodeURIComponent(id), { auth: true, timeout: 8000 }); if (r && r.data && live.docId === id) liveOnSnap({ data: () => r.data }); }
-    catch (e) { /* no signal or not signed in: stay quiet */ }
+    try { const r = await cfFetch('/live/' + encodeURIComponent(id), { auth: true, timeout: 8000 }); if (live.docId === id) live.lastOk = Date.now(); if (r && r.data && live.docId === id) liveOnSnap({ data: () => r.data }); else livePaintBanner(); }
+    catch (e) { livePaintBanner(); /* no signal: the sharing line says so if a partner was there */ }
   };
   live.unsub = (() => { const t = setInterval(pull, 5000); return () => clearInterval(t); })();
   pull();

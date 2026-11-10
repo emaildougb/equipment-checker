@@ -1,5 +1,5 @@
 {
-  "version": "2.29",
+  "version": "2.31",
   "submissionEmail": "d.boyce@northcountryems.org",
   "emailjs": {
     "serviceId": "service_uqfd3sj",
@@ -20,7 +20,9 @@
     {
       "id": "M19",
       "name": "M19",
-      "type": "Medic"
+      "type": "Medic",
+      "fridgeC": true,
+      "defOk": true
     },
     {
       "id": "M18",
@@ -411,8 +413,8 @@
           ],
           "bags": [
             {
-              "name": "Blue C-collar Bag",
-              "redTag": true,
+              "name": "Blue C-collar Bags",
+              "redTag": 2,
               "items": [
                 {
                   "name": "2\" Tape",
@@ -447,43 +449,7 @@
               ]
             },
             {
-              "name": "Orange C-collar Bag 1",
-              "redTag": true,
-              "items": [
-                {
-                  "name": "2\" Tape",
-                  "qty": 1,
-                  "ctrl": false
-                },
-                {
-                  "name": "Back Raft with Pump",
-                  "qty": 1,
-                  "ctrl": false
-                },
-                {
-                  "name": "Cervical Collar adjustable",
-                  "qty": 1,
-                  "ctrl": false
-                },
-                {
-                  "name": "Cervical collar-pediatric",
-                  "qty": 1,
-                  "ctrl": false
-                },
-                {
-                  "name": "Headbed",
-                  "qty": 1,
-                  "ctrl": false
-                },
-                {
-                  "name": "Spider Strap",
-                  "qty": 1,
-                  "ctrl": false
-                }
-              ]
-            },
-            {
-              "name": "Orange C-collar Bag 2",
+              "name": "Orange C-collar Bag",
               "redTag": true,
               "items": [
                 {
@@ -3093,8 +3059,8 @@
           ],
           "bags": [
             {
-              "name": "Blue C-collar Bag",
-              "redTag": true,
+              "name": "Blue C-collar Bags",
+              "redTag": 2,
               "items": [
                 {
                   "name": "2\" Tape",
@@ -3129,43 +3095,7 @@
               ]
             },
             {
-              "name": "Orange C-collar Bag 1",
-              "redTag": true,
-              "items": [
-                {
-                  "name": "2\" Tape",
-                  "qty": 1,
-                  "ctrl": false
-                },
-                {
-                  "name": "Back Raft with Pump",
-                  "qty": 1,
-                  "ctrl": false
-                },
-                {
-                  "name": "Cervical Collar adjustable",
-                  "qty": 1,
-                  "ctrl": false
-                },
-                {
-                  "name": "Cervical collar-pediatric",
-                  "qty": 1,
-                  "ctrl": false
-                },
-                {
-                  "name": "Headbed",
-                  "qty": 1,
-                  "ctrl": false
-                },
-                {
-                  "name": "Spider Strap",
-                  "qty": 1,
-                  "ctrl": false
-                }
-              ]
-            },
-            {
-              "name": "Orange C-collar Bag 2",
+              "name": "Orange C-collar Bag",
               "redTag": true,
               "items": [
                 {
@@ -5829,8 +5759,8 @@
           ],
           "bags": [
             {
-              "name": "Blue C-collar Bag",
-              "redTag": true,
+              "name": "Blue C-collar Bags",
+              "redTag": 2,
               "items": [
                 {
                   "name": "2\" Tape",
@@ -5865,43 +5795,7 @@
               ]
             },
             {
-              "name": "Orange C-collar Bag 1",
-              "redTag": true,
-              "items": [
-                {
-                  "name": "2\" Tape",
-                  "qty": 1,
-                  "ctrl": false
-                },
-                {
-                  "name": "Back Raft with Pump",
-                  "qty": 1,
-                  "ctrl": false
-                },
-                {
-                  "name": "Cervical Collar adjustable",
-                  "qty": 1,
-                  "ctrl": false
-                },
-                {
-                  "name": "Cervical collar-pediatric",
-                  "qty": 1,
-                  "ctrl": false
-                },
-                {
-                  "name": "Headbed",
-                  "qty": 1,
-                  "ctrl": false
-                },
-                {
-                  "name": "Spider Strap",
-                  "qty": 1,
-                  "ctrl": false
-                }
-              ]
-            },
-            {
-              "name": "Orange C-collar Bag 2",
+              "name": "Orange C-collar Bag",
               "redTag": true,
               "items": [
                 {
@@ -6272,6 +6166,39 @@
           ]
         },
         {
+          "name": "Interior Shelf",
+          "after": "Fridge",
+          "items": [
+            {
+              "name": "Nitrous Kit",
+              "qty": 1,
+              "ctrl": false
+            }
+          ],
+          "bags": [
+            {
+              "name": "Nitrous Kit",
+              "items": [
+                {
+                  "name": "Mixer",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Nitrous tank",
+                  "qty": 1,
+                  "ctrl": false
+                },
+                {
+                  "name": "Masks",
+                  "qty": 2,
+                  "ctrl": false
+                }
+              ]
+            }
+          ]
+        },
+        {
           "name": "Gurney",
           "items": [
             {
@@ -6306,11 +6233,6 @@
           "items": [
             {
               "name": "Nitrous Spare Bottle (under bench seat)",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Nitrous Kit",
               "qty": 1,
               "ctrl": false
             },
@@ -6400,28 +6322,7 @@
               "ctrl": false
             }
           ],
-          "bags": [
-            {
-              "name": "Nitrous Kit",
-              "items": [
-                {
-                  "name": "Mixer",
-                  "qty": 1,
-                  "ctrl": false
-                },
-                {
-                  "name": "Nitrous tank",
-                  "qty": 1,
-                  "ctrl": false
-                },
-                {
-                  "name": "Masks",
-                  "qty": 2,
-                  "ctrl": false
-                }
-              ]
-            }
-          ]
+          "bags": []
         },
         {
           "name": "Compartment A",
@@ -6642,13 +6543,8 @@
               "ctrl": false
             },
             {
-              "name": "60 gtt set",
-              "qty": 4,
-              "ctrl": false
-            },
-            {
-              "name": "10 gtt set",
-              "qty": 4,
+              "name": "IV drip sets",
+              "qty": 6,
               "ctrl": false
             },
             {
@@ -6691,16 +6587,6 @@
         {
           "name": "Compartment C",
           "items": [
-            {
-              "name": "Petrolatum Gauze",
-              "qty": 1,
-              "ctrl": false
-            },
-            {
-              "name": "Triangle Bandage",
-              "qty": 1,
-              "ctrl": false
-            },
             {
               "name": "Cleaning Supplies",
               "qty": 1,
@@ -7899,13 +7785,8 @@
           "name": "Pass-Through",
           "items": [
             {
-              "name": "Flash Light",
-              "qty": 2,
-              "ctrl": false
-            },
-            {
               "name": "Rechargeable Flashlight",
-              "qty": 1,
+              "qty": 2,
               "ctrl": false
             },
             {
@@ -8226,8 +8107,8 @@
           ],
           "bags": [
             {
-              "name": "Blue C-collar Bag",
-              "redTag": true,
+              "name": "Blue C-collar Bags",
+              "redTag": 2,
               "items": [
                 {
                   "name": "2\" Tape",
@@ -8262,43 +8143,7 @@
               ]
             },
             {
-              "name": "Orange C-collar Bag 1",
-              "redTag": true,
-              "items": [
-                {
-                  "name": "2\" Tape",
-                  "qty": 1,
-                  "ctrl": false
-                },
-                {
-                  "name": "Back Raft with Pump",
-                  "qty": 1,
-                  "ctrl": false
-                },
-                {
-                  "name": "Cervical Collar adjustable",
-                  "qty": 1,
-                  "ctrl": false
-                },
-                {
-                  "name": "Cervical collar-pediatric",
-                  "qty": 1,
-                  "ctrl": false
-                },
-                {
-                  "name": "Headbed",
-                  "qty": 1,
-                  "ctrl": false
-                },
-                {
-                  "name": "Spider Strap",
-                  "qty": 1,
-                  "ctrl": false
-                }
-              ]
-            },
-            {
-              "name": "Orange C-collar Bag 2",
+              "name": "Orange C-collar Bag",
               "redTag": true,
               "items": [
                 {
@@ -8602,6 +8447,26 @@
               ],
               "redTag": true
             }
+          ]
+        },
+        {
+          "name": "LiquidSpring Suspension",
+          "after": "Compartment 6",
+          "items": [],
+          "image": "rigs/liquidspring.jpg",
+          "ynChecks": [
+            "Box power on (control screen lit). If it is off, turn on the ignition or flip System Activate & Check Out Lights first",
+            "No red WARNING light on the LiquidSpring panel by the steering wheel",
+            "Ride height green light is on NORMAL",
+            "All 4 yellow steering lights are on with the wheel straight",
+            "Turn the wheel about 10 degrees each way: the yellow lights go off",
+            "Rear doors: opening them lowers the rig to loading height, closing raises it back up",
+            "Suspension Disable switch by the rear doors is DOWN (toward the label) when you finish"
+          ],
+          "info": [
+            "Suspension Disable switch: DOWN (toward the label) is normal. Flip it UP (away from the label) only when the rear bumper is too close to the ground: open the first rear door, flip it up, then open the second door.",
+            "If the suspension does not respond, the box power probably timed out. Turn on the ignition or cycle System Activate & Check Out Lights.",
+            "Do not run the LiquidSpring calibration unless a Chief Officer tells you to. Report any ride height or steering light problem to a chief. The calibration steps are in the build binder."
           ]
         }
       ],
@@ -10644,7 +10509,7 @@
           "items": [
             {
               "name": "C-Collar Bags",
-              "qty": 2,
+              "qty": 3,
               "ctrl": false
             },
             {
@@ -10660,8 +10525,8 @@
           ],
           "bags": [
             {
-              "name": "Blue C-collar Bag",
-              "redTag": true,
+              "name": "Blue C-collar Bags",
+              "redTag": 2,
               "items": [
                 {
                   "name": "2\" Tape",
@@ -10696,37 +10561,37 @@
               ]
             },
             {
-              "name": "Orange C-collar bag",
+              "name": "Orange C-collar Bag",
               "redTag": true,
               "items": [
                 {
                   "name": "2\" Tape",
-                  "qty": 2,
+                  "qty": 1,
                   "ctrl": false
                 },
                 {
                   "name": "Back Raft with Pump",
-                  "qty": 2,
+                  "qty": 1,
                   "ctrl": false
                 },
                 {
                   "name": "Cervical Collar adjustable",
-                  "qty": 2,
+                  "qty": 1,
                   "ctrl": false
                 },
                 {
                   "name": "Cervical collar-pediatric",
-                  "qty": 2,
+                  "qty": 1,
                   "ctrl": false
                 },
                 {
                   "name": "Headbed",
-                  "qty": 2,
+                  "qty": 1,
                   "ctrl": false
                 },
                 {
                   "name": "Spider Strap",
-                  "qty": 2,
+                  "qty": 1,
                   "ctrl": false
                 }
               ]
@@ -12931,19 +12796,19 @@
   },
   "unitNotices": {
     "M25A": {
-      "text": "\u26a0 M25A: Must activate engine brake every time you drive",
+      "text": "⚠ M25A: Must activate engine brake every time you drive",
       "style": "warn"
     },
     "M25B": {
-      "text": "\u26a0 M25B: Must activate engine brake every time you drive",
+      "text": "⚠ M25B: Must activate engine brake every time you drive",
       "style": "warn"
     },
     "M19": {
-      "text": "\u26a0 M19: Must activate engine brake every time you drive",
+      "text": "⚠ M19: Must activate engine brake every time you drive",
       "style": "warn"
     },
     "M14": {
-      "text": "\u26a0 M14: Must activate engine brake every time you drive",
+      "text": "⚠ M14: Must activate engine brake every time you drive",
       "style": "warn"
     },
     "M18": {

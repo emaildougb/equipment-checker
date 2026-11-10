@@ -2,7 +2,7 @@
 
 Equipment and property check submission tool for North Country EMS crews.
 
-**Version 2.45**
+**Version 2.46**
 
 ## Links
 
@@ -163,7 +163,29 @@ Doug 11/1: a check item is a problem (flag, email flag block, known problem popu
 - Rule lives in `issueMinor()` in index.html and matches CG Staff 1.31.1 `vehMinor()` (keys s|fuel, s|def, s|o2, s|tire, g|*; labels starting Fuel , DEF at , Main O2 at ; labels containing gurney, tire pressure, tire psi; narc labels ending (count N)). Change both together
 - Gurney checks are the Yes/No rows (`specialChecks`) on the Gurney compartment. Tire pressure is the single Yes/No question (key s|tire, label "Tire pressure out of range"). Portable O2 cylinder PSI rows are still problems
 
+## 2.46 (Doug 11/10/2026)
+
+- **Equipment Problem:** red button under Other Units, and it pops up when anything in a Lifepak 35 compartment is marked ✗ or the LP35 self test is answered No (once per item per check). Sheet: equipment (LifePak 35 for now, list `EQUIP` in index.html), which one (35-1, 35-2, 35-3, Not sure), date, kind of problem (the same 12 choices as the form), what happened, optional photos (R2, `/photos`), same device or more, how many times, patient care, reported at the time, anything else. **Send report** emails it (EmailJS, check type `equipment problem`) and then shows **Open the LifePak 35 issue report**, which opens Doug's Microsoft Form with the answers filled in so the crew taps Submit and it lands in the fleet log. The pre-filled link needs pre-filled answers turned on for that form (Forms, ⋯, Get pre-filled URL). Question ids are in `EQUIP[0].q`. No Worker change
+- **Search this rig:** box to the right of the date in an ambulance check. Matches compartments, bags, items and Yes/No checks on the open rig only. Tapping a result opens it, scrolls to it and highlights it
+- **Back saves:** no more "Discard" question. Back (and Home) save the check on the phone and show "Saved". Other Units checks now save and come back too (they never did). A check started before midnight still comes back until 07:30
+- **Sharing line:** when a partner is on the same rig, a small line says "Sharing with your partner · updated 0812" (no names), or "Not sharing right now (no signal)". The submit popup says the partner's marks are included
+- **Switching rigs (needs ncems-checks Worker 1.4):** when a crew's rig today isn't the one that crew had the day before (Worker 1.4 adds yesterday's rig picks to /fleet/today as `prev`; if there are none, the crew's primary), it asks "Are you transferring into M19 from M25A?" Yes opens the bring-over checklist (from, to, IV pump, LifePak 35, LifePak 35 cables, LifePak 35 batteries; `switchRigItems` in the units list can change it). Also a link at the top of Your ambulances. Ticks are kept on that phone for the day and go at the top of the new rig's check email and record
+- **Red tags per bag:** a bag (or compartment) with `"redTag": 2` shows two red tag boxes, saved as `NAME #1` and `NAME #2`, both required
+- **Yes/No checks with a picture:** a compartment can have `ynChecks` (list of questions), `image` and `info` (notes). Answers are saved like operational checks (a No is a problem, with notes and fixed or unable to fix). Used for M18 LiquidSpring Suspension (`rigs/liquidspring.jpg`)
+
+### Unit list 2.31 (shared copy, with this build)
+
+- C-collar bags on every ambulance, Compartment 5: **Blue C-collar Bags** (`redTag: 2`, the same items in each) and **Orange C-collar Bag** (one red tag). C-Collar Bags count 3
+- M18 Medication Kit and Airway Bag copied from GitHub units.json (the 2.45 change was only in units.json, and the shared 2.30 copy was winning, so it never showed)
+- M18 new compartment **LiquidSpring Suspension** after Compartment 6, with the panel picture, 7 Yes/No checks and 3 notes from Doug's write up
+- GitHub units.json now matches the shared copy
+
 ## Changelog
+
+### v2.46 (11/10/2026)
+- Equipment Problem (LifePak 35 issue report), search this rig, Back saves (Other Units too), sharing line, switching rigs checklist, two red tags on one bag, Yes/No checks with a picture
+- Unit list 2.31: C-collar bags 2 blue + 1 orange, M18 med kit and airway bag, M18 LiquidSpring
+- Changed index.html, units.json, README.md, added rigs/liquidspring.jpg
 
 ### v2.45 (11/1/2026)
 - M18 med kit and airway bag corrected. Copied Joseph's correct layout from M25A (Medication Kit 76 items in order, Airway Bag 7 bags in order). Both orange ambulances now identical.
