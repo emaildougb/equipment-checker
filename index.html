@@ -1072,6 +1072,10 @@
     }
     .op-check-row .op-detail { flex-basis: 100%; }
     .req-star { color: var(--bad); font-weight: 900; margin-left: 3px; }
+    .comp-why { margin: 0 0 12px; padding: 10px 12px; border-radius: 10px; background: var(--g-pale); font-size: 14px; line-height: 1.45; }
+    .comp-why b { display: block; margin-bottom: 4px; }
+    .comp-why ul { margin: 0; padding-left: 18px; }
+    .comp-warn { margin: 0 0 12px; font-weight: 800; }
     .op-check-label {
       flex: 1;
       font-size: 14px;
@@ -1928,7 +1932,7 @@
    APP STATE
    ============================================================ */
 const APP = {
-  version: '2.47',
+  version: '2.48',
   data: null,        // loaded units.json
   screen: 'home',
   check: null,       // current in-progress check
@@ -3173,6 +3177,7 @@ const FLEET_HEALTH_URL = 'https://cgstaff.northcountryems.org/#fleet';   // 2.35
 const FLEET_HEALTH_STAFF = ['d.boyce@northcountryems.org', 'd.langdon@northcountryems.org', 'd.madler@northcountryems.org', 'b.shirley@northcountryems.org', 'c.andrus@northcountryems.org', 'k.reid@northcountryems.org'];
 function showAppInfo() { showWhatsNew(true); }
 const WHATS_NEW = [
+  ['M18 Suspension Recalibration', 'The M18 LiquidSpring section is now Suspension Recalibration. It is not part of the daily check and is rarely needed, so nothing in it is required. It lists when it is needed. Tell the battalion chief if there is a LiquidSpring suspension problem or a recalibration.'],
   ['Home screen tidy up', 'Equipment Problem no longer sits on top of the Other Units button. Other Units now says which units are due today. Just looking has its own button at the bottom and lasts until you go back to home. New refresh circle at the top right reloads the app (your check is saved first). Tapping Ambulances asks Where are you today? if you haven\'t picked a crew.'],
   ['Equipment Problem', 'New red button on the home screen, and it pops up when you mark something in the LifePak 35 with an ✗. Pick the monitor (35-1, 35-2, 35-3), what kind of problem, what happened, add a photo, and send. Then tap Submit on the LifePak 35 issue report it opens.'],
   ['Search this rig', 'Type in the box next to the date at the top of a check to find any item. Tap a result to jump right to it.'],
@@ -4400,6 +4405,7 @@ function renderCompartmentSection(title, type, compartments) {
 
 // True if anything in this compartment needs special attention (red tag / battery / fridge temp)
 function compNeedsStar(comp) {
+  if (comp.optional) return false;   // 2.48: not part of the daily check, no star
   if (comp.redTag || comp.operationalCheck || (comp.ynChecks || []).length) return true;
   if (comp.name === 'Fridge') return true; // nested temp check
   if ((comp.items || []).some(it => it.operationalCheck)) return true;
@@ -4423,7 +4429,7 @@ function renderCompartmentCard(safeId, comp, type, idx = 0) {
           <div class="compartment-head-left">
             <div>
               <div class="compartment-name">${escapeHTML(comp.name)}${compNeedsStar(comp) ? '<span class="req-star">*</span>' : ''}</div>
-              <div class="compartment-counts" id="comp-counts-${safeId}">${totalItems} item${totalItems!==1?'s':''}${bagSummary}</div>
+              <div class="compartment-counts" id="comp-counts-${safeId}">${comp.optional && !totalItems ? 'Only when needed. Not part of the daily check' : `${totalItems} item${totalItems!==1?'s':''}${bagSummary}`}</div>
             </div>
           </div>
           ${markBtn}
@@ -4450,8 +4456,10 @@ function renderCompartmentBody(safeId, comp) {
     html += opCheckHTML(comp.name, '', '__comp_op__', comp.operationalCheck);
   }
   // 2.46: a picture, Yes/No checks and notes (M18 LiquidSpring). A No is a problem like any operational check
+  if (comp.warn) html += `<div class="unit-notice warn comp-warn">${escapeHTML(comp.warn)}</div>`;   // 2.48
+  if (comp.why && comp.why.length) html += `<div class="comp-why"><b>When this is needed</b><ul>${comp.why.map(w => `<li>${escapeHTML(w)}</li>`).join('')}</ul></div>`;   // 2.48
   if (comp.image) html += `<div class="comp-info"><img src="${escapeAttr(comp.image)}" alt="${escapeAttr(comp.name)}" loading="lazy"></div>`;
-  (comp.ynChecks || []).forEach(q => { html += opCheckHTML(comp.name, '', q, q); });
+  (comp.ynChecks || []).forEach(q => { const row = opCheckHTML(comp.name, '', q, q); html += comp.optional ? row.replace('class="op-check-row"', 'class="op-check-row" data-op-opt="1"') : row; });
   if (comp.info) html += `<div class="comp-info">${[].concat(comp.info).map(p => `<p>${escapeHTML(p)}</p>`).join('')}</div>`;
 
   // ── Gurney special checks (Yes/No rows, no items) ──
@@ -5147,7 +5155,7 @@ function paintRequired() {
   const root = document.getElementById('check-body'); if (!root) return;
   const pend = (el, on) => el && el.classList.toggle('req-pending', !!on);
   root.querySelectorAll('.red-tag-row').forEach(r => { const i = r.querySelector('.red-tag-input'); pend(r, !r.classList.contains('confirmed') && (!i || !i.value || r.querySelector('.red-tag-confirm'))); });
-  root.querySelectorAll('.op-check-row[data-op-comp]').forEach(r => pend(r, !r.querySelector('.yn-btn.active')));
+  root.querySelectorAll('.op-check-row[data-op-comp]:not([data-op-opt])').forEach(r => pend(r, !r.querySelector('.yn-btn.active')));
   root.querySelectorAll('.op-check-row[data-oxygen]').forEach(r => { const i = r.querySelector('#oxygen-psi'); pend(r, i && !i.value); });
   root.querySelectorAll('.op-check-row[data-cooler]').forEach(r => pend(r, !r.querySelector('[data-cooler-yn].active')));
   root.querySelectorAll('.narc-row').forEach(r => { const i = r.querySelector('input.narc-count'); pend(r, i && !i.value); });
@@ -5159,7 +5167,7 @@ function paintSectionBadges() {
   document.querySelectorAll('#check-body .section.collapsible').forEach(sec => {
     const b = sec.querySelector(':scope > .section-head .sec-badge'); if (!b) return;
     if (SEC_START_OPEN.test(sec.dataset.secTitle || '')) { b.textContent = ''; return; }   // compartments show their own counts
-    const rows = [...sec.querySelectorAll('.check-row[data-key], .yn-row, .item-row, .op-check-row')].filter(r => !r.closest('.op-detail') && !r.closest('.item-detail'));
+    const rows = [...sec.querySelectorAll('.check-row[data-key], .yn-row, .item-row, .op-check-row:not([data-op-opt])')].filter(r => !r.closest('.op-detail') && !r.closest('.item-detail'));
     const groups = [...sec.querySelectorAll('.fuel-picker')];
     if (sec.querySelector('#walkaround-notes')) { b.textContent = 'optional'; b.classList.remove('done'); return; }
     const total = rows.length + groups.length;
@@ -5284,7 +5292,7 @@ function promptSpecialChecks(safeId, comp) {
   if (comp.operationalCheck && !c.opChecks?.[`${comp.name}||${''}||__comp_op__`]) {
     needs.push([`${comp.name}: ${comp.operationalCheck}`, opEl(`${comp.name}||${''}||__comp_op__`)]);
   }
-  (comp.ynChecks || []).forEach(q => { const k = `${comp.name}||||${q}`; if (!c.opChecks?.[k]) needs.push([q, opEl(k)]); });   // 2.46
+  if (!comp.optional) (comp.ynChecks || []).forEach(q => { const k = `${comp.name}||||${q}`; if (!c.opChecks?.[k]) needs.push([q, opEl(k)]); });   // 2.46 (2.48: optional ones aren't required)
   // Fridge temp
   if (comp.name === 'Fridge' && !c.cooler?.answered) {
     needs.push(['Fridge reading between ' + fridgeRange() + '? (Yes/No)', body.querySelector('[data-cooler]')]);
@@ -5938,7 +5946,7 @@ function computeCompletionPct() {
       if (comp.specialChecks && comp.specialChecks.length) {
         comp.specialChecks.forEach(sc => { total++; if (c.gurney?.[sc.label]) done++; });
       }
-      (comp.ynChecks || []).forEach(q => { total++; if (c.opChecks?.[`${comp.name}||||${q}`]) done++; });   // 2.46
+      if (!comp.optional) (comp.ynChecks || []).forEach(q => { total++; if (c.opChecks?.[`${comp.name}||||${q}`]) done++; });   // 2.46 (2.48: optional ones don't count)
       const compItems = comp.items.length + (comp.bags || []).reduce((n, b) => n + b.items.length, 0);
       total += compItems;
       const cs = c.compartments[comp.name];

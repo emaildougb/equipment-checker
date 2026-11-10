@@ -1,5 +1,5 @@
 {
-  "version": "2.31",
+  "version": "2.32",
   "submissionEmail": "d.boyce@northcountryems.org",
   "emailjs": {
     "serviceId": "service_uqfd3sj",
@@ -8450,8 +8450,17 @@
           ]
         },
         {
-          "name": "LiquidSpring Suspension",
+          "name": "Suspension Recalibration",
           "after": "Compartment 6",
+          "optional": true,
+          "warn": "Tell the battalion chief if there is a LiquidSpring suspension problem or recalibration. Do not complete this for no reason. It is rarely needed.",
+          "why": [
+            "Red WARNING light on the LiquidSpring panel by the steering wheel",
+            "Ride height looks wrong: the rig sits too high, too low or leans, or the green ride height light is not on NORMAL",
+            "Steering lights wrong: the 4 yellow lights are not all on with the wheel straight, or they don't go off when you turn the wheel about 10 degrees",
+            "The rig doesn't lower when the rear doors open or raise when they close, even with box power on",
+            "A Chief Officer asked for it (for example after suspension or steering work)"
+          ],
           "items": [],
           "image": "rigs/liquidspring.jpg",
           "ynChecks": [

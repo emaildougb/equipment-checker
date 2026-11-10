@@ -2,7 +2,7 @@
 
 Equipment and property check submission tool for North Country EMS crews.
 
-**Version 2.47**
+**Version 2.48**
 
 ## Links
 
@@ -163,6 +163,12 @@ Doug 11/1: a check item is a problem (flag, email flag block, known problem popu
 - Rule lives in `issueMinor()` in index.html and matches CG Staff 1.31.1 `vehMinor()` (keys s|fuel, s|def, s|o2, s|tire, g|*; labels starting Fuel , DEF at , Main O2 at ; labels containing gurney, tire pressure, tire psi; narc labels ending (count N)). Change both together
 - Gurney checks are the Yes/No rows (`specialChecks`) on the Gurney compartment. Tire pressure is the single Yes/No question (key s|tire, label "Tire pressure out of range"). Portable O2 cylinder PSI rows are still problems
 
+## 2.48 (Doug 11/10/2026)
+
+- M18 **LiquidSpring Suspension** renamed **Suspension Recalibration**, same spot (after Compartment 6). Not part of the daily check: no star, "Only when needed. Not part of the daily check" under the name, red box at the top "Tell the battalion chief if there is a LiquidSpring suspension problem or recalibration. Do not complete this for no reason. It is rarely needed.", then **When this is needed** (warning light, ride height wrong, steering lights wrong, doors don't lower or raise it, a Chief Officer asked). Reasons come from Mike Wagner's 11/4 email. Its Yes/No checks are optional: not required, not counted in the percent. A No is still a problem if someone answers it
+- New compartment fields: `"optional": true` (Yes/No checks optional, no star), `"warn"` (red box at the top of the section), `"why"` (list under it)
+- Unit list 2.32 (GitHub units.json; the shared D1 copy is still 2.30)
+
 ## 2.47 (Doug 11/10/2026)
 
 - Home screen order: Ambulances, Other Units, Equipment Problem, the date line, then **Just looking**. On small phones the Equipment Problem button was sitting on top of Other Units (the picture buttons shrank to fit); now nothing shrinks and the home screen scrolls if it doesn't fit
@@ -189,6 +195,10 @@ Doug 11/1: a check item is a problem (flag, email flag block, known problem popu
 - GitHub units.json now matches the shared copy
 
 ## Changelog
+
+### v2.48 (11/10/2026)
+- M18 Suspension Recalibration: renamed, optional, red box to tell the battalion chief, when it is needed. Unit list 2.32
+- Changed index.html, units.json, README.md
 
 ### v2.47 (11/10/2026)
 - Home screen: Equipment Problem no longer overlaps Other Units, Other Units shows today's due units, Just looking button at the bottom (one visit only), refresh circle in the top bar, Ambulances asks Where are you today? when no crew is picked
