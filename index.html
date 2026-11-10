@@ -356,6 +356,19 @@
     .modal-partner { margin: 10px 0 0; padding: 10px 12px; border-radius: 10px; background: #EAF2F8; border: 1.5px solid var(--info); font-size: 14px; line-height: 1.4; text-align: left; }
     .home-eq { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; width: 100%; max-width: 480px; margin: 12px auto 0; min-height: 60px; border-radius: 16px; border: 3px solid #fff; background: #A93434; color: #fff; font: inherit; font-size: 19px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; cursor: pointer; box-shadow: 0 6px 20px rgba(0,0,0,.3); }
     .home-eq span { font-size: 12px; font-weight: 700; text-transform: none; letter-spacing: 0; opacity: .92; }
+    /* 2.47: nothing on home shrinks into the next thing; if it doesn't fit, the page scrolls */
+    .home.active { justify-content: flex-start; }
+    .home.active > .logo-flip-wrap { margin-top: auto; }
+    .home.active > .home-look, .home.active > .home-footer:last-child { margin-bottom: auto; }
+    .home-buttons { flex: 0 0 auto; }
+    .home-btn { flex: 0 0 auto; height: 108px; }
+    .home-eq, .home-footer, .fl-date, .who-strip, .logo-flip-wrap, .logo-flip-hint { flex-shrink: 0; }
+    .home-btn-label { flex-direction: column; gap: 4px; }
+    .home-due { display: block; max-width: 92%; font-size: 13px; font-weight: 700; letter-spacing: 0; text-transform: none; line-height: 1.3; padding: 4px 10px; border-radius: 10px; background: rgba(0,0,0,0.45); text-shadow: none; }
+    .home-due[hidden] { display: none; }
+    .home-look { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 2px; width: 100%; max-width: 480px; margin: 10px auto 0; padding: 10px 14px; border-radius: 14px; border: 2px dashed rgba(255,255,255,0.7); background: transparent; color: var(--white); font: inherit; font-size: 16px; font-weight: 800; cursor: pointer; }
+    .home-look span { font-size: 12px; font-weight: 600; opacity: 0.85; }
+    .home-look[hidden] { display: none; }
     .eq-overlay { position: fixed; inset: 0; z-index: 80; background: rgba(0,0,0,.45); display: flex; align-items: flex-end; justify-content: center; }
     .eq-overlay[hidden] { display: none; }
     .eq-sheet { background: var(--bg); width: 100%; max-width: 560px; max-height: 94vh; overflow-y: auto; -webkit-overflow-scrolling: touch; border-radius: 18px 18px 0 0; padding: 18px 16px calc(18px + env(safe-area-inset-bottom)); box-shadow: 0 -6px 30px rgba(0,0,0,.25); }
@@ -1353,8 +1366,8 @@
     }
 
     @media (min-width: 600px) {
-      .home-buttons { flex-direction: row; max-width: 760px; flex: 0 1 auto; }
-      .home-btn { height: auto; aspect-ratio: 4 / 3; max-height: 46vh; flex: 1 1 0; }
+      .home-buttons { flex-direction: row; max-width: 760px; flex: 0 0 auto; }
+      .home-btn { height: clamp(150px, 21vh, 250px); aspect-ratio: auto; max-height: none; flex: 1 1 0; }
       .home-btn-label { font-size: clamp(22px, 3vw, 32px); }
       .tire-grid { grid-template-columns: repeat(3, 1fr); }
     }
@@ -1623,6 +1636,7 @@
   .nch-sub .nch-org { display:none; }
   .nch-btn { width:36px; height:36px; }
 }
+@media (max-width:430px) { .nch-text h1 .nch-ncems { display:none; } }   /* 2.47: room for the refresh circle */
 @media print { .nch { display:none !important; } }
 .nch-btn.nch-wide { width:auto; padding:0 12px; font-size:13.5px; font-weight:600; color:#4a4a4a; gap:6px; }
 .nch-btn[hidden] { display:none; }
@@ -1758,6 +1772,7 @@
   <a class="nch-btn" href="https://hub.northcountryems.org/" title="NCEMS Hub" aria-label="NCEMS Hub"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h5v-6h4v6h5V10"/></svg></a>
   <img class="nch-logo" src="./logo.png" alt="">
   <div class="nch-text"><h1><span class="nch-ncems">NCEMS </span><span class="nch-g">Apparatus Checker</span></h1><div class="nch-sub"><span class="nch-org">North Country EMS</span><p class="nch-line" id="nch-line"></p></div></div>
+  <button class="nch-btn" onclick="appRefresh()" title="Refresh" aria-label="Refresh"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 1 1-2.34-5.66"/><path d="M20 4v5h-5"/></svg></button>
   <button class="nch-btn" onclick="showAppInfo()" title="Details" aria-label="Details"><span class="nch-i">i</span></button>
 </header>
 
@@ -1788,11 +1803,12 @@
       <div class="home-btn-label">Ambulances</div>
     </button>
     <button class="home-btn others" id="home-btn-others" type="button">
-      <div class="home-btn-label">Other Units</div>
+      <div class="home-btn-label">Other Units<span class="home-due" id="home-due" hidden></span></div>
     </button>
   </div>
   <button type="button" class="home-eq" id="home-btn-equip" onclick="eqOpen({})">Equipment Problem<span>LifePak 35 issue report</span></button>
   <div class="home-footer">v<span id="version-tag">2.1.0</span> · <span id="today-date"></span></div>
+  <button type="button" class="home-look" id="home-btn-look" hidden onclick="fleetJustLook()">Just looking<span>Look around any rig. Nothing is saved or sent.</span></button>
 </div>
 
 <!-- ============ AMBULANCE PICKER ============ -->
@@ -1912,7 +1928,7 @@
    APP STATE
    ============================================================ */
 const APP = {
-  version: '2.46',
+  version: '2.47',
   data: null,        // loaded units.json
   screen: 'home',
   check: null,       // current in-progress check
@@ -2455,8 +2471,24 @@ async function fleetPost(path, body) {
 function fleetMyCrew() { return FLEET.data && FLEET.data.me ? FLEET.data.me.crew : ''; }
 function fleetCrewInfo(c) { return (FLEET.data && FLEET.data.crews && FLEET.data.crews[c]) || null; }
 
+/* 2.47 (Doug 11/10): Other Units shows today's rotation, "Tuesday's check: SAR51, B13". Done ones get a check mark */
+function homeDue() {
+  const el = document.getElementById('home-due');
+  if (!el) return;
+  const rot = (APP.data && APP.data.rescueRotation) || {};
+  const day = DAY_NAMES[new Date().getDay()];
+  const due = rot[day] || [];
+  if (!due.length) { el.hidden = true; return; }
+  el.textContent = day + "'s check: " + due.map(u => u + (flRescueCheck(u) ? ' ✓' : '')).join(', ');
+  el.hidden = false;
+}
+/* 2.47: Just looking is for one visit. Coming back to home (or opening the app) ends it */
+function fleetLookEnd() { try { localStorage.removeItem(FL_SKIP); } catch (e) {} }
 /* home: big date and the crew card */
 function fleetHome() {
+  homeDue();
+  const lookBtn = document.getElementById('home-btn-look');
+  if (lookBtn) lookBtn.hidden = !(AUTH.state === 'in' && FLEET.data && !fleetLooking());
   const dEl = document.getElementById('fl-date');
   if (dEl) dEl.textContent = flDayLabel(FLEET.data && FLEET.data.day);
   const card = document.getElementById('fl-crew');
@@ -2753,7 +2785,9 @@ function fleetLooking() {
   return !!day && s === AUTH.email + '|' + day;
 }
 async function fleetJustLook() {
+  const fromHome = APP.screen === 'home';   // 2.47: from home, go straight to the Ambulances list to look around
   try { localStorage.setItem(FL_SKIP, AUTH.email + '|' + (FLEET.data && FLEET.data.day)); } catch (e) {}
+  setTimeout(() => { if (fromHome && APP.screen === 'home') showAmbulancePicker(); }, 0);
   document.getElementById('fl-overlay').hidden = true; FLEET.then = null;
   haptic('success');
   fleetHome();
@@ -2786,6 +2820,13 @@ function toast(msg, ms) {
 }
 
 /* ---------- Back saves the check on this phone (no "Discard" question) ---------- */
+/* 2.47: refresh circle. Saves an open check on this phone first, then reloads the newest app and today's lists */
+function appRefresh() {
+  try { if (APP.screen === 'check' && APP.check && !APP.check.look && hasUnsavedWork()) saveAutosave(); } catch (e) {}
+  haptic('success');
+  const u = new URL(location.href); u.searchParams.set('nc', Date.now()); u.hash = '';
+  location.replace(u.toString());
+}
 function leaveCheckSaved() {
   const c = APP.check;
   if (!c || c.look || !hasUnsavedWork()) return;
@@ -3132,6 +3173,7 @@ const FLEET_HEALTH_URL = 'https://cgstaff.northcountryems.org/#fleet';   // 2.35
 const FLEET_HEALTH_STAFF = ['d.boyce@northcountryems.org', 'd.langdon@northcountryems.org', 'd.madler@northcountryems.org', 'b.shirley@northcountryems.org', 'c.andrus@northcountryems.org', 'k.reid@northcountryems.org'];
 function showAppInfo() { showWhatsNew(true); }
 const WHATS_NEW = [
+  ['Home screen tidy up', 'Equipment Problem no longer sits on top of the Other Units button. Other Units now says which units are due today. Just looking has its own button at the bottom and lasts until you go back to home. New refresh circle at the top right reloads the app (your check is saved first). Tapping Ambulances asks Where are you today? if you haven\'t picked a crew.'],
   ['Equipment Problem', 'New red button on the home screen, and it pops up when you mark something in the LifePak 35 with an ✗. Pick the monitor (35-1, 35-2, 35-3), what kind of problem, what happened, add a photo, and send. Then tap Submit on the LifePak 35 issue report it opens.'],
   ['Search this rig', 'Type in the box next to the date at the top of a check to find any item. Tap a result to jump right to it.'],
   ['Back saves your check', 'Back no longer asks to discard. Your check is saved on the phone and is there when you come back today. Other Units now save too.'],
@@ -3185,6 +3227,7 @@ const DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','
 window.addEventListener('DOMContentLoaded', boot);
 
 async function boot() {
+  fleetLookEnd();   // 2.47: a fresh open never starts in Just looking
   // Handle MSAL redirect return first — catches ?code=/?state= on page load
   authWire();
   authBoot();
@@ -3265,6 +3308,7 @@ async function boot() {
       if (pend && pend.data && verCmp(pend.data.version, APP.data.version) >= 0) { APP.data = pend.data; APP.listSource = { from: 'pending', at: pend.at }; }
     } catch (e) {}
     document.getElementById('version-tag').textContent = APP.version + (APP.data.version && APP.data.version !== APP.version ? ' · list ' + APP.data.version : '');
+    homeDue();   // 2.47
     showWhatsNew(false);
 
     // Old per-device admin edits (before 2.24) are no longer applied; the admin page offers to send them
@@ -3507,6 +3551,7 @@ async function tryUnlockAdmin() {
    NAVIGATION
    ============================================================ */
 function showScreen(id) {
+  if (id === 'home') fleetLookEnd();   // 2.47
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + id).classList.add('active');
   window.scrollTo(0, 0);
@@ -3521,6 +3566,7 @@ function goHome() {
   if (APP.screen === 'check') leaveCheckSaved();   // 2.46: Back saves, no Discard question
   APP.check = null;
   showScreen('home');
+  try { fleetHome(); } catch (e) {}   // 2.47: refresh the Other Units tickler
 }
 
 function confirmExitCheck() {

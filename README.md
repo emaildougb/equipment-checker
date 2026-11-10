@@ -2,7 +2,7 @@
 
 Equipment and property check submission tool for North Country EMS crews.
 
-**Version 2.46**
+**Version 2.47**
 
 ## Links
 
@@ -163,6 +163,14 @@ Doug 11/1: a check item is a problem (flag, email flag block, known problem popu
 - Rule lives in `issueMinor()` in index.html and matches CG Staff 1.31.1 `vehMinor()` (keys s|fuel, s|def, s|o2, s|tire, g|*; labels starting Fuel , DEF at , Main O2 at ; labels containing gurney, tire pressure, tire psi; narc labels ending (count N)). Change both together
 - Gurney checks are the Yes/No rows (`specialChecks`) on the Gurney compartment. Tire pressure is the single Yes/No question (key s|tire, label "Tire pressure out of range"). Portable O2 cylinder PSI rows are still problems
 
+## 2.47 (Doug 11/10/2026)
+
+- Home screen order: Ambulances, Other Units, Equipment Problem, the date line, then **Just looking**. On small phones the Equipment Problem button was sitting on top of Other Units (the picture buttons shrank to fit); now nothing shrinks and the home screen scrolls if it doesn't fit
+- **Just looking** button at the very bottom of home (signed in, crew list loaded, not already looking). Same as the Just looking choice on Where are you today?, and it opens the Ambulances list
+- **Refresh circle** in the top bar, left of the i. Saves an open check on the phone, then reloads the newest version and today's rig list (`appRefresh()`)
+- **Just looking lasts one visit** (Doug 11/10): it ends when the person comes back to home or opens the app again (it used to last the whole check day, so a phone could sit in Just looking). **Ambulances asks Where are you today?** (M51, M52, M54) when no crew is picked, then opens the list. The switching rigs question still comes when a crew takes a different rig than the day before
+- **Other Units tickler:** the Other Units button says which units are due today from `rescueRotation`, for example "Tuesday's check: SAR51, B13", with a check mark on any done today (75% or more)
+
 ## 2.46 (Doug 11/10/2026)
 
 - **Equipment Problem:** red button under Other Units, and it pops up when anything in a Lifepak 35 compartment is marked ✗ or the LP35 self test is answered No (once per item per check). Sheet: equipment (LifePak 35 for now, list `EQUIP` in index.html), which one (35-1, 35-2, 35-3, Not sure), date, kind of problem (the same 12 choices as the form), what happened, optional photos (R2, `/photos`), same device or more, how many times, patient care, reported at the time, anything else. **Send report** emails it (EmailJS, check type `equipment problem`) and then shows **Open the LifePak 35 issue report**, which opens Doug's Microsoft Form with the answers filled in so the crew taps Submit and it lands in the fleet log. The pre-filled link needs pre-filled answers turned on for that form (Forms, ⋯, Get pre-filled URL). Question ids are in `EQUIP[0].q`. No Worker change
@@ -181,6 +189,10 @@ Doug 11/1: a check item is a problem (flag, email flag block, known problem popu
 - GitHub units.json now matches the shared copy
 
 ## Changelog
+
+### v2.47 (11/10/2026)
+- Home screen: Equipment Problem no longer overlaps Other Units, Other Units shows today's due units, Just looking button at the bottom (one visit only), refresh circle in the top bar, Ambulances asks Where are you today? when no crew is picked
+- Changed index.html and README.md only
 
 ### v2.46 (11/10/2026)
 - Equipment Problem (LifePak 35 issue report), search this rig, Back saves (Other Units too), sharing line, switching rigs checklist, two red tags on one bag, Yes/No checks with a picture
