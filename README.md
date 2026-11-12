@@ -2,7 +2,7 @@
 
 Equipment and property check submission tool for North Country EMS crews.
 
-**Version 2.48**
+**Version 2.49**
 
 ## Links
 
@@ -163,6 +163,17 @@ Doug 11/1: a check item is a problem (flag, email flag block, known problem popu
 - Rule lives in `issueMinor()` in index.html and matches CG Staff 1.31.1 `vehMinor()` (keys s|fuel, s|def, s|o2, s|tire, g|*; labels starting Fuel , DEF at , Main O2 at ; labels containing gurney, tire pressure, tire psi; narc labels ending (count N)). Change both together
 - Gurney checks are the Yes/No rows (`specialChecks`) on the Gurney compartment. Tire pressure is the single Yes/No question (key s|tire, label "Tire pressure out of range"). Portable O2 cylinder PSI rows are still problems
 
+## 2.49 (Doug 11/12/2026)
+
+- **Out of service on the home screen:** each out of service ambulance shows as a red card under the crew card (M19, Out of service, the reason, Back in service)
+- **Back in service** (anyone signed in): why it is going back in service, **which station it goes to** (new), and the BC who approved it. Open "could not fix" problems still have to be cleared first. The station is saved on the vehicleStatus record and sent to the Worker as `/fleet/move` (**needs ncems-checks Worker 1.5**; without it the rig keeps its last station)
+- **Admin > Ambulances in service:** every ambulance with an **Out of service** button (or Back in service). Out of service asks why and shows the checklist of what comes off the rig: Gurney, LifePak 35, Med Kit, Airway Kit, IV Pump, Narcotics, Nitrous. Only the narcotics go to the battalion chief to lock in the main safe (`oosItems` in the units list can change it). Saved on the rig's vehicleStatus record as `offload`. If a crew had the rig today, it is given back
+- **Secondary or switching:** when a crew takes a rig it did not have yesterday, the question is now "Is M19 a secondary (backup) at Station 51 today, or are you transferring into it from M25A?" Secondary: no bring over list, a Secondary tag on Your ambulances, and a SECONDARY line on the check email. Transferring: the bring over list. "Not sure" asks again next time the app opens
+- Bring over list adds **Garage door opener**
+- **Known problems:** Still broken, **Missing** (new) or Now fixed, then a free text box "What do you see now?". The note goes on the item's notes (CG Staff and Fleet Health read those), on `knownChecked` (`result`, `note`) and in the email
+- **Throw away my marks and start over** at the bottom of every check: clears what this phone marked on that rig today and sends a clear (`v: null`) for those marks to the shared live copy, so the next person starts clean. A partner's marks stay. Doug picked this over a full start from scratch, which would wipe the partner's work too
+- **Admin station picker:** each in service ambulance in Admin has a station list; changing it moves the rig (`/fleet/move`, Worker 1.5)
+
 ## 2.48 (Doug 11/10/2026)
 
 - M18 **LiquidSpring Suspension** renamed **Suspension Recalibration**, same spot (after Compartment 6). Not part of the daily check: no star, "Only when needed. Not part of the daily check" under the name, red box at the top "Tell the battalion chief if there is a LiquidSpring suspension problem or recalibration. Do not complete this for no reason. It is rarely needed.", then **When this is needed** (warning light, ride height wrong, steering lights wrong, doors don't lower or raise it, a Chief Officer asked). Reasons come from Mike Wagner's 11/4 email. Its Yes/No checks are optional: not required, not counted in the percent. A No is still a problem if someone answers it
@@ -195,6 +206,10 @@ Doug 11/1: a check item is a problem (flag, email flag block, known problem popu
 - GitHub units.json now matches the shared copy
 
 ## Changelog
+
+### v2.49 (11/12/2026)
+- Out of service rigs on home, back in service asks the station, admin out of service button and station picker, known problems Missing plus notes, throw away my marks with the take off checklist (narcotics to the BC for the main safe), secondary or switching question, garage door opener
+- Changed index.html and README.md. Needs Worker 1.5 (/fleet/move)
 
 ### v2.48 (11/10/2026)
 - M18 Suspension Recalibration: renamed, optional, red box to tell the battalion chief, when it is needed. Unit list 2.32

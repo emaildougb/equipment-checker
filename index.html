@@ -295,6 +295,9 @@
     .kb-btns button { flex: 1; min-height: 42px; border-radius: 9px; font: inherit; font-size: 14px; font-weight: 800; cursor: pointer; border: 1.5px solid var(--border); background: #fff; }
     .kb-btns .kb-broken { border-color: var(--bad); color: var(--bad); }
     .kb-btns .kb-fixed { border-color: var(--g-accent); color: var(--g-mid); }
+    .kb-btns .kb-missing { border-color: var(--bad); color: var(--bad); }
+    .kb-note { width: 100%; box-sizing: border-box; margin-top: 6px; min-height: 52px; padding: 8px; border: 1.5px solid var(--border); border-radius: 8px; font: inherit; font-size: 14px; background: #fff; }
+    .ck-throw { display: block; width: 100%; margin-top: 12px; min-height: 44px; border-radius: 10px; border: 1.5px dashed var(--bad); background: #fff; color: var(--bad); font: inherit; font-size: 14px; font-weight: 700; cursor: pointer; }
     .kb-btns .kb-go { flex: 0 0 auto; color: var(--info); }
     .kb-result { font-size: 13px; font-weight: 800; margin-top: 6px; }
     .known-btn { display: inline-block; margin-left: 6px; padding: 2px 9px; border-radius: 10px; border: 1.5px solid var(--warn); background: #FFF0D6; color: var(--warn); font: inherit; font-size: 11px; font-weight: 800; vertical-align: middle; cursor: pointer; text-transform: none; letter-spacing: 0; }
@@ -369,6 +372,23 @@
     .home-look { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 2px; width: 100%; max-width: 480px; margin: 10px auto 0; padding: 10px 14px; border-radius: 14px; border: 2px dashed rgba(255,255,255,0.7); background: transparent; color: var(--white); font: inherit; font-size: 16px; font-weight: 800; cursor: pointer; }
     .home-look span { font-size: 12px; font-weight: 600; opacity: 0.85; }
     .home-look[hidden] { display: none; }
+    /* 2.49: out of service rigs on the home screen */
+    .home-oos { flex-shrink: 0; width: 100%; max-width: 480px; margin: 0 auto 12px; position: relative; z-index: 2; display: grid; gap: 8px; }
+    .home-oos[hidden] { display: none; }
+    .adm-oos { margin: 4px 0 18px; }
+    .adm-oos-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1.5px solid var(--border); border-radius: 12px; background: #fff; margin-bottom: 8px; }
+    .adm-oos-row > div { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+    .adm-oos-row b { font-size: 17px; }
+    .adm-oos-row span { font-size: 13px; color: var(--muted); }
+    .adm-oos-row.bad { border-color: var(--bad); background: #FBEAEA; }
+    .adm-oos-row.bad span { color: var(--bad); font-weight: 700; }
+    .adm-oos-row .admin-btn { width: auto; margin: 0; flex-shrink: 0; }
+    .adm-st { font: inherit; font-size: 13px; padding: 2px 4px; border-radius: 6px; border: 1px solid var(--border); background: #fff; }
+    .home-oos button { display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px 14px; border-radius: 14px; border: 2px solid #fff; background: #A93434; color: #fff; font: inherit; text-align: left; cursor: pointer; box-shadow: 0 6px 20px rgba(0,0,0,.25); }
+    .home-oos b { font-size: 22px; font-weight: 800; flex-shrink: 0; }
+    .home-oos span { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; font-size: 13px; }
+    .home-oos span strong { font-size: 15px; }
+    .home-oos em { font-style: normal; font-size: 13px; font-weight: 800; text-decoration: underline; flex-shrink: 0; }
     .eq-overlay { position: fixed; inset: 0; z-index: 80; background: rgba(0,0,0,.45); display: flex; align-items: flex-end; justify-content: center; }
     .eq-overlay[hidden] { display: none; }
     .eq-sheet { background: var(--bg); width: 100%; max-width: 560px; max-height: 94vh; overflow-y: auto; -webkit-overflow-scrolling: touch; border-radius: 18px 18px 0 0; padding: 18px 16px calc(18px + env(safe-area-inset-bottom)); box-shadow: 0 -6px 30px rgba(0,0,0,.25); }
@@ -1802,6 +1822,7 @@
   <div class="fl-date" id="fl-date"></div>
   <button type="button" class="fl-crew" id="fl-crew" hidden></button>
   <button type="button" class="moves-banner" id="moves-banner" hidden></button>
+  <div class="home-oos" id="home-oos" hidden></div>
   <div class="home-buttons">
     <button class="home-btn ambulances" id="home-btn-ambulances" type="button">
       <div class="home-btn-label">Ambulances</div>
@@ -1932,7 +1953,7 @@
    APP STATE
    ============================================================ */
 const APP = {
-  version: '2.48',
+  version: '2.49',
   data: null,        // loaded units.json
   screen: 'home',
   check: null,       // current in-progress check
@@ -2488,9 +2509,21 @@ function homeDue() {
 }
 /* 2.47: Just looking is for one visit. Coming back to home (or opening the app) ends it */
 function fleetLookEnd() { try { localStorage.removeItem(FL_SKIP); } catch (e) {} }
+/* 2.49 (Doug 11/12): out of service ambulances show on the home screen. Tap one to put it back in service */
+function homeOOS() {
+  const el = document.getElementById('home-oos'); if (!el) return;
+  const d = FLEET.data;
+  const known = new Set(((APP.data && APP.data.ambulances) || []).map(a => a.id));
+  const list = AUTH.state === 'in' && d ? (d.rigs || []).filter(r => r.oos && known.has(r.rig)) : [];
+  if (!list.length) { el.hidden = true; el.innerHTML = ''; return; }
+  el.innerHTML = list.map(r => `<button type="button" data-oos-rig="${escapeAttr(r.rig)}"><b>${escapeHTML(r.rig)}</b><span><strong>Out of service</strong>${escapeHTML(r.oos.reason || 'No reason given')}</span><em>Back in service</em></button>`).join('');
+  el.querySelectorAll('[data-oos-rig]').forEach(b => b.addEventListener('click', () => rtsOpen(b.dataset.oosRig)));
+  el.hidden = false;
+}
 /* home: big date and the crew card */
 function fleetHome() {
   homeDue();
+  homeOOS();
   const lookBtn = document.getElementById('home-btn-look');
   if (lookBtn) lookBtn.hidden = !(AUTH.state === 'in' && FLEET.data && !fleetLooking());
   const dEl = document.getElementById('fl-date');
@@ -2616,7 +2649,7 @@ function renderFleetPicker() {
   const row = (r, kind) => {
     const prim = flPrimaryOf(r.rig);
     let meta = '', right = '<div class="unit-btn-arrow">→</div>', extra = '';
-    if (kind === 'mine') meta = (prim === mine ? `<span class="fl-tag">${escapeHTML(mine)} primary</span>` : '') + flStatus(r);
+    if (kind === 'mine') meta = (prim === mine ? `<span class="fl-tag">${escapeHTML(mine)} primary</span>` : swRole(r.rig) === 'secondary' ? '<span class="fl-tag">Secondary</span>' : '') + flStatus(r);
     if (kind === 'open') { meta = `<span class="fl-tag soft">${prim ? escapeHTML(prim) + ' primary' : 'Spare'} · nobody has it yet</span>`; right = '<span class="fl-take">Take it</span>'; }
     if (kind === 'taken') meta = `<span class="fl-tag soft">${escapeHTML(r.claim.crew)} has it (${escapeHTML(r.claim.byName || r.claim.by || '')})</span>` + flStatus(r);
     if (kind === 'away') {
@@ -2710,7 +2743,7 @@ function rtsEl() {
 function rtsClose() { rtsEl().hidden = true; RTS.busy = false; }
 async function rtsOpen(rig) {
   const r = ((FLEET.data && FLEET.data.rigs) || []).find(x => x.rig === rig) || {};
-  RTS = { rig, reason: (r.oos && r.oos.reason) || '', unfixed: null, busy: false, loading: true };
+  RTS = { rig, reason: (r.oos && r.oos.reason) || '', station: r.station || '', unfixed: null, busy: false, loading: true };
   rtsEl().hidden = false;
   rtsRender();
   try { RTS.unfixed = await rtsOpenUnfixed(rig); } catch (e) { RTS.unfixed = null; }
@@ -2731,8 +2764,11 @@ function rtsRender() {
     h += RTS.unfixed.map(k => `<div class="fl-tag bad" style="display:block;margin:4px 0">${esc(k.label)}${k.notes ? ' · ' + esc(k.notes) : ''} · ${esc(k.crew || 'crew')} ${k.at ? esc(new Date(k.at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })) : ''}</div>`).join('');
     h += `<p class="picker-intro">A BC has to clear these before ${esc(rig)} can go back in service.</p>`;
   } else {
-    h += `<label class="picker-intro" for="rts-fix"><b>What fixed it?</b></label>`;
-    h += `<textarea id="rts-fix" rows="3" maxlength="300" placeholder="Like: replaced the bender lift" style="width:100%;box-sizing:border-box;font:inherit;padding:8px;border-radius:8px;border:1px solid #ccc"></textarea>`;
+    h += `<label class="picker-intro" for="rts-fix"><b>Why is it going back in service?</b></label>`;
+    h += `<textarea id="rts-fix" rows="3" maxlength="300" placeholder="Like: new tires on, shop says good to go" style="width:100%;box-sizing:border-box;font:inherit;padding:8px;border-radius:8px;border:1px solid #ccc"></textarea>`;
+    const sts = rtsStations();
+    h += `<label class="picker-intro" for="rts-st" style="display:block;margin-top:10px"><b>Which station is it going to?</b></label>`;
+    h += `<select id="rts-st" style="width:100%;font:inherit;padding:8px;border-radius:8px;border:1px solid #ccc"><option value="">Pick a station</option>${sts.map(s => `<option value="${esc(s)}">Station ${esc(s)}</option>`).join('')}</select>`;
     h += `<label class="picker-intro" for="rts-bc" style="display:block;margin-top:10px"><b>Which BC approved it?</b></label>`;
     h += `<select id="rts-bc" style="width:100%;font:inherit;padding:8px;border-radius:8px;border:1px solid #ccc"><option value="">Pick a BC</option>${RTS_APPROVERS.map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join('')}</select>`;
     h += `<button type="button" class="fl-all" id="rts-go" style="margin-top:12px">${RTS.busy ? 'Saving...' : 'Put ' + esc(rig) + ' back in service'}</button>`;
@@ -2744,24 +2780,31 @@ function rtsRender() {
   document.getElementById('rts-close').onclick = rtsClose;
   document.getElementById('rts-check').onclick = async () => { const rr = RTS.rig; rtsClose(); await startAmbulanceCheck(rr); };
 }
+function rtsStations() {
+  const d = FLEET.data || {};
+  return [...new Set(Object.values(d.crews || {}).map(c => c.station).filter(Boolean))].sort();
+}
 async function rtsSubmit() {
   if (RTS.busy) return;
   const fix = (document.getElementById('rts-fix') || {}).value || '';
   const bc = (document.getElementById('rts-bc') || {}).value || '';
-  if (!fix.trim()) { alert('Write what fixed it first.'); return; }
+  const st = (document.getElementById('rts-st') || {}).value || '';
+  if (!fix.trim()) { alert('Write why it is going back in service first.'); return; }
+  if (!st) { alert('Pick the station it is going to.'); return; }
   if (!bc) { alert('Pick the BC who approved it.'); return; }
   RTS.busy = true; rtsRender();
   const at = new Date().toISOString();
   const rec = { oos: false, reason: '', by: AUTH.name || AUTH.email || '', at,
-    returnedFrom: RTS.reason || '', fixNote: fix.trim(), approvedBy: bc, returnedBy: fleetMyCrew() || '' };
+    returnedFrom: RTS.reason || '', fixNote: fix.trim(), approvedBy: bc, returnedBy: fleetMyCrew() || '', station: st };
   try {
     await cfFetch('/state/vehicleStatus/' + encodeURIComponent(RTS.rig), { method: 'PUT', auth: true, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ data: rec }) });
+    try { await fleetPost('/fleet/move', { rig: RTS.rig, station: st }); } catch (e) { console.warn('move', e); }   // 2.49 (Worker 1.5): where it goes
     haptic('success');
     const rr = RTS.rig;
     rtsClose();
     await fleetLoad(true);
-    renderFleetPicker();
-    alert(rr + ' is back in service. Approved by ' + bc + '.');
+    if (APP.screen === 'admin-home') showAdminHome(); else renderFleetPicker();
+    alert(rr + ' is back in service at Station ' + st + '. Approved by ' + bc + '.');
   } catch (e) {
     RTS.busy = false; rtsRender();
     alert('Did not save. ' + (e.message || e) + '. Try again, or ask Doug.');
@@ -2933,7 +2976,11 @@ function ckSearchGo(r) {
 }
 
 /* ---------- switching rigs: what to bring over ---------- */
-const SW_DEFAULT = ['IV pump', 'LifePak 35', 'LifePak 35 cables', 'LifePak 35 batteries'];
+const SW_DEFAULT = ['IV pump', 'LifePak 35', 'LifePak 35 cables', 'LifePak 35 batteries', 'Garage door opener'];
+const SW_LATER = new Set();
+function swRoleKey(rig) { return `sw_role_v1::${rig}::${(FLEET.data && FLEET.data.day) || localDateStr()}`; }
+function swRole(rig) { try { return localStorage.getItem(swRoleKey(rig)) || ''; } catch (e) { return ''; } }
+function swSetRole(rig, v) { try { localStorage.setItem(swRoleKey(rig), v); } catch (e) {} }
 function swItems() { return (APP.data && APP.data.switchRigItems) || SW_DEFAULT; }
 function swKey(rig, day) { return `sw_v1::${rig}::${day || localDateStr()}`; }
 /* Doug 11/10: compare with the rig this crew had the day before, from the server (Worker 1.4 /fleet/today "prev").
@@ -2956,13 +3003,16 @@ function swCheck() {
     let asked = ''; try { asked = localStorage.getItem(swAskedKey(r.rig)) || ''; } catch (e) {}
     if (asked) continue;
     const from = swFromFor(r.rig);
-    if (!from) continue;
-    try { localStorage.setItem(swAskedKey(r.rig), '1'); } catch (e) {}
-    eqSheet(`<div class="eq-head"><div><h2>Moving into ${escapeHTML(r.rig)}?</h2><div class="eq-sub">${escapeHTML(mine)} had ${escapeHTML(from)} ${d.prev && (d.prev.claims || []).some(x => x.crew === mine) ? 'yesterday' : 'as its primary'}</div></div><button type="button" class="eq-x" onclick="eqClose()" aria-label="Close">✕</button></div>
-      <div class="eq-note">Are you transferring into <b>${escapeHTML(r.rig)}</b> from <b>${escapeHTML(from)}</b>?</div>
-      <button type="button" class="eq-go" id="sw-yes">Yes, from ${escapeHTML(from)}</button>
-      <button type="button" class="eq-alt" onclick="eqClose()">No</button>`);
-    document.getElementById('sw-yes').addEventListener('click', () => swOpen(r.rig, from));
+    if (!from || swRole(r.rig) || SW_LATER.has(r.rig)) continue;   // 2.49: asked until answered (later = next time the app opens)
+    const st = (fleetCrewInfo(mine) || {}).station || '';
+    eqSheet(`<div class="eq-head"><div><h2>${escapeHTML(r.rig)} at Station ${escapeHTML(st)} today</h2><div class="eq-sub">${escapeHTML(mine)} had ${escapeHTML(from)} ${d.prev && (d.prev.claims || []).some(x => x.crew === mine) ? 'yesterday' : 'as its primary'}</div></div><button type="button" class="eq-x" onclick="eqClose()" aria-label="Close">✕</button></div>
+      <div class="eq-note">Is <b>${escapeHTML(r.rig)}</b> a secondary (backup) at Station ${escapeHTML(st)} today, or are you transferring into it from <b>${escapeHTML(from)}</b>?</div>
+      <button type="button" class="eq-go" id="sw-sec">It's a secondary</button>
+      <button type="button" class="eq-alt" id="sw-yes" style="font-weight:800">Transferring in from ${escapeHTML(from)}</button>
+      <button type="button" class="eq-alt" id="sw-later">Not sure, ask me later</button>`);
+    document.getElementById('sw-sec').addEventListener('click', () => { swSetRole(r.rig, 'secondary'); haptic('success'); eqClose(); toast(r.rig + ' is a secondary at Station ' + st + ' today.'); try { if (APP.screen === 'ambulance-picker') renderFleetPicker(); } catch (e) {} swMaybe(); });
+    document.getElementById('sw-yes').addEventListener('click', () => { swSetRole(r.rig, 'moved'); swOpen(r.rig, from); });
+    document.getElementById('sw-later').addEventListener('click', () => { SW_LATER.add(r.rig); eqClose(); });
     return;
   }
 }
@@ -2991,6 +3041,7 @@ function swSave() {
 }
 function swNoteFor(c) {
   let s = null; try { s = JSON.parse(localStorage.getItem(swKey(c.unitId, c.date)) || 'null'); } catch (e) {}
+  if ((!s || !s.items) && swRole(c.unitId) === 'secondary') return `SECONDARY at Station ${(fleetCrewInfo(fleetMyCrew()) || {}).station || '?'} today (${fleetMyCrew() || ''})`;   // 2.49
   if (!s || !s.items) return '';
   return `SWITCHED RIGS: moved over from ${s.from} to ${s.to}${s.by ? ' by ' + s.by : ''} at ${hhmm(s.at)}\n` + s.items.map(x => `  ${x.moved ? '✓' : '✗ NOT moved:'} ${x.name}`).join('\n');
 }
@@ -3177,6 +3228,10 @@ const FLEET_HEALTH_URL = 'https://cgstaff.northcountryems.org/#fleet';   // 2.35
 const FLEET_HEALTH_STAFF = ['d.boyce@northcountryems.org', 'd.langdon@northcountryems.org', 'd.madler@northcountryems.org', 'b.shirley@northcountryems.org', 'c.andrus@northcountryems.org', 'k.reid@northcountryems.org'];
 function showAppInfo() { showWhatsNew(true); }
 const WHATS_NEW = [
+  ['Out of service rigs', 'An ambulance that is out of service shows in red on the home screen. Tap it to put it back in service: say why, which station it goes to, and the BC who approved it.'],
+  ['Known problems', 'On a problem from an earlier check you can now pick Still broken, Missing or Now fixed, and write what you see. The chiefs read it.'],
+  ['Throw away my marks', 'Opened the wrong rig or tapped around by mistake? At the bottom of a check, Throw away my marks clears what you marked today. Your partner\'s marks stay.'],
+  ['Secondary or switching?', 'When your crew takes a rig it did not have yesterday, the app asks if it is a secondary (backup) at your station, or if you are transferring into it. The bring over list now has the garage door opener too.'],
   ['M18 Suspension Recalibration', 'The M18 LiquidSpring section is now Suspension Recalibration. It is not part of the daily check and is rarely needed, so nothing in it is required. It lists when it is needed. Tell the battalion chief if there is a LiquidSpring suspension problem or a recalibration.'],
   ['Home screen tidy up', 'Equipment Problem no longer sits on top of the Other Units button. Other Units now says which units are due today. Just looking has its own button at the bottom and lasts until you go back to home. New refresh circle at the top right reloads the app (your check is saved first). Tapping Ambulances asks Where are you today? if you haven\'t picked a crew.'],
   ['Equipment Problem', 'New red button on the home screen, and it pops up when you mark something in the LifePak 35 with an ✗. Pick the monitor (35-1, 35-2, 35-3), what kind of problem, what happened, add a photo, and send. Then tap Submit on the LifePak 35 issue report it opens.'],
@@ -3935,6 +3990,7 @@ function renderAmbulanceCheck() {
     <div class="submit-wrap">
       <button type="button" id="submit-flags" style="display:none;width:100%;margin-bottom:10px;padding:12px;font-family:inherit;font-size:15px;font-weight:800;color:var(--warn);background:var(--warn-bg);border:1.5px solid var(--warn);border-radius:10px;cursor:pointer;" onclick="cycleToNextFlag()"></button>
       <button class="submit-btn" id="submit-btn" onclick="showSubmitModal()">Submit Check</button>
+      ${c.look ? '' : '<button type="button" class="ck-throw" onclick="ckThrowAway()">Throw away my marks and start over</button>'}
     </div>
   `;
   attachAmbulanceHandlers();
@@ -4021,6 +4077,7 @@ function renderRescueCheck() {
     </div>
     <div class="submit-wrap">
       <button class="submit-btn" onclick="showSubmitModal()">Submit Check</button>
+      <button type="button" class="ck-throw" onclick="ckThrowAway()">Throw away my marks and start over</button>
     </div>
   `;
   attachRescueHandlers();
@@ -6491,7 +6548,7 @@ function liveFlatten(c) {
   if (c.oxygenPsi !== '' && c.oxygenPsi != null) out['s|o2'] = { psi: String(c.oxygenPsi), notes: c.oxygenNotes || '', fixed: !!c.oxygenFixed, unfixed: !!c.oxygenUnfixed };
   if (c.tireYN) out['s|tire'] = { yn: c.tireYN, notes: c.tireNotes || '', fixed: !!c.tireFixed, unfixed: !!c.tireUnfixed };
   if (c.cooler && c.cooler.answered) out['s|cooler'] = { ok: !!c.cooler.ok, reading: c.cooler.reading || '' };
-  (c.knownChecked || []).forEach(k => { out[`k|${k.checkId}|${k.label}`] = { result: k.result, key: k.key || '' }; });
+  (c.knownChecked || []).forEach(k => { out[`k|${k.checkId}|${k.label}`] = { result: k.result, key: k.key || '', note: k.note || '' }; });
   return out;
 }
 /* 1 = an issue (✗, Abnormal, Overfilled, No, out of range), 0 = normal or just a value */
@@ -6547,6 +6604,7 @@ function liveGuard(k, nowNormal) {
 }
 function liveApply(c, key, v) {
   const p = key.indexOf('|'), kind = key.slice(0, p), rest = key.slice(p + 1);
+  if (v == null) return liveClear(c, key, kind, rest);   // 2.49: a partner threw their marks away
   if (kind === 'i') {
     const parts = rest.split('|'), cn = parts[0], bn = parts[1], nm = parts.slice(2).join('|');
     if (!findCompartmentByName(cn)) return false;
@@ -6561,7 +6619,7 @@ function liveApply(c, key, v) {
   else if (kind === 'k') {
     const q = rest.indexOf('|'), checkId = rest.slice(0, q), label = rest.slice(q + 1);
     c.knownChecked = (c.knownChecked || []).filter(x => !(x.checkId === checkId && x.label === label));
-    c.knownChecked.push({ checkId, label, key: v.key || '', result: v.result });
+    if (v) c.knownChecked.push({ checkId, label, key: v.key || '', result: v.result, note: v.note || '' });
     if (typeof knownRenderBanner === 'function') setTimeout(knownRenderBanner, 0);
   }
   else if (kind === 'g') { c.gurney = c.gurney || {}; c.gurney[rest] = v; }
@@ -6572,6 +6630,42 @@ function liveApply(c, key, v) {
   else if (key === 's|cooler') { c.cooler = Object.assign(c.cooler || {}, { answered: true, ok: !!v.ok, reading: v.reading || '' }); }
   else return false;
   return true;
+}
+function liveClear(c, key, kind, rest) {
+  if (kind === 'i') {
+    const parts = rest.split('|'), cn = parts[0], bn = parts[1], nm = parts.slice(2).join('|');
+    if (!findCompartmentByName(cn)) return false;
+    const st = ensureItemState(cn, bn, nm); st.status = null; st.notes = ''; st.fixed = false; st.unfixed = false; delete st.count;
+  } else if (kind === 'r') { const q = rest.indexOf('|'), b = rest.slice(0, q), k = rest.slice(q + 1); if (c[b]) delete c[b][k]; }
+  else if (kind === 'o') { ['opChecks', 'opNotes', 'opFixed', 'opUnfixed'].forEach(f => { if (c[f]) delete c[f][rest]; }); }
+  else if (kind === 't') { if (c.redTags) delete c.redTags[rest]; }
+  else if (kind === 'g') { if (c.gurney) delete c.gurney[rest]; }
+  else if (kind === 'k') { const q = rest.indexOf('|'); c.knownChecked = (c.knownChecked || []).filter(x => !(x.checkId === rest.slice(0, q) && x.label === rest.slice(q + 1))); }
+  else if (key === 's|fuel') c.fuel = null;
+  else if (key === 's|def') c.def = null;
+  else if (key === 's|o2') { c.oxygenPsi = ''; c.oxygenNotes = ''; }
+  else if (key === 's|tire') { c.tireYN = null; c.tireNotes = ''; }
+  else if (key === 's|cooler') { c.cooler = Object.assign(c.cooler || {}, { answered: false, ok: false, reading: '' }); }
+  else return false;
+  return true;
+}
+async function ckThrowAway() {
+  const c = APP.check; if (!c || c.look) return;
+  if (!confirm(`Throw away what you marked on ${c.unitName} today? Your partner's marks stay. You start clean.`)) return;
+  if (c.type === 'ambulance' && live.docId === `${c.unitId}_${c.date}`) {
+    const flat = liveFlatten(c), now = Date.now(), dev = liveDeviceId(), who = (c.initials || 'Partner').trim(), s = {};
+    Object.keys(flat).forEach(k => { if (!live.by[k]) s[liveEnc(k)] = { v: null, by: who, dev, at: now }; });   // only the marks this phone made
+    if (Object.keys(s).length) {
+      try { await cfFetch('/live/' + encodeURIComponent(live.docId), { method: 'PUT', auth: true, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ unit: c.unitId, date: c.date, updatedAt: now, s }) }); }
+      catch (e) { alert('No signal, so your marks could not be cleared for your partner yet. Try again when you have signal.'); return; }
+    }
+  }
+  try { localStorage.removeItem(autosaveKey(c)); const y = new Date(Date.now() - 86400000); localStorage.removeItem(AUTOSAVE_PREFIX + (c.unitId || c.unitName || 'unit') + '::' + localDateStr(y)); } catch (e) {}
+  const id = c.unitId || c.unitName, type = c.type;
+  liveStop(); APP.check = null;
+  haptic('success');
+  if (type === 'rescue') await startRescueCheck(id); else await startAmbulanceCheck(id);
+  toast('Your marks are gone. Start fresh.');
 }
 function liveSchedule() {
   if (!live.docId || !APP.check) return;
@@ -6613,6 +6707,7 @@ function liveOnSnap(snap) {
   Object.entries(d.s || {}).forEach(([ek, e]) => {
     if (!e || e.dev === dev) return;
     const k = liveDec(ek), j = JSON.stringify(e.v);
+    if (e.v == null && flat[k] === undefined) { live.pushed[k] = j; return; }   // 2.49: cleared, and we never had it
     if (live.pushed[k] === j) { live.by[k] = e.by; return; }
     const dec = liveDecide(k, flat[k], e);
     if (dec.act === 'same') { live.pushed[k] = j; live.by[k] = e.by; if (e.fdev) { live.flagDev[k] = e.fdev; live.flagName[k] = e.fby || e.by; } return; }
@@ -6773,7 +6868,7 @@ function knownBannerHTML() {
   if (!c || known.unit !== c.unitId || !known.list.length) return '';
   const open = known.list.filter(k => !knownResult(k)).length;
   let h = `<h3>⚠ Known problems on ${escapeHTML(c.unitName)} (${known.list.length})</h3>
-    <div class="kb-sub">${open ? 'Reported on earlier checks and not marked fixed yet. Look at each one and tap Still broken or Now fixed.' : 'All checked. Thanks.'}</div>`;
+    <div class="kb-sub">${open ? 'Reported on earlier checks and not marked fixed yet. Look at each one and tap Still broken, Missing or Now fixed, and say what you see.' : 'All checked. Thanks.'}</div>`;
   known.list.forEach((k, n) => {
     const r = knownResult(k), age = Math.floor((Date.now() - new Date(k.at).getTime()) / 86400000);
     const when = new Date(k.at), whenTxt = `${when.getMonth() + 1}/${when.getDate()} ${String(when.getHours()).padStart(2, '0')}${String(when.getMinutes()).padStart(2, '0')}`;
@@ -6782,8 +6877,8 @@ function knownBannerHTML() {
       <div class="kb-line">${k.state === 'unfixed' ? 'Could not fix' : 'Left open'} · reported by ${escapeHTML(k.crew || 'a crew')} ${whenTxt}${age >= 1 ? ` · open ${age} day${age === 1 ? '' : 's'}` : ''}</div>
       ${k.notes ? `<div class="kb-line">Crew notes: ${escapeHTML(k.notes)}</div>` : ''}
       ${k.link && k.link.lastNote ? `<div class="kb-line chief">Latest from the chiefs: ${escapeHTML(k.link.lastNote)}${k.link.lastNoteBy ? ` (${escapeHTML(String(k.link.lastNoteBy).split(' ')[0])})` : ''}</div>` : (k.link ? `<div class="kb-line chief">On the Shift Ops board${k.link.status ? ' · ' + escapeHTML(String(k.link.status).toLowerCase()) : ''}</div>` : '')}
-      ${r ? `<div class="kb-result">${r.result === 'fixed' ? '✓ Marked fixed' : '✗ Still broken, noted'} <a href="#" onclick="knownUndo(${n});return false;" style="font-weight:600;margin-left:6px;">change</a></div>`
-          : `<div class="kb-btns"><button type="button" class="kb-broken" onclick="knownMark(${n}, 'broken')">Still broken</button><button type="button" class="kb-fixed" onclick="knownMark(${n}, 'fixed')">Now fixed</button>${k.key && k.key[0] === 'i' ? `<button type="button" class="kb-go" onclick="knownGo(${n})">Go to it</button>` : ''}</div>`}
+      ${r ? `<div class="kb-result">${knownWord(r.result)} <a href="#" onclick="knownUndo(${n});return false;" style="font-weight:600;margin-left:6px;">change</a></div>${r.result !== 'fixed' ? `<textarea class="kb-note" placeholder="What do you see now? (the chiefs read this)" onchange="knownNote(${n}, this.value)">${escapeHTML(r.note || '')}</textarea>` : ''}`
+          : `<div class="kb-btns"><button type="button" class="kb-broken" onclick="knownMark(${n}, 'broken')">Still broken</button><button type="button" class="kb-missing" onclick="knownMark(${n}, 'missing')">Missing</button><button type="button" class="kb-fixed" onclick="knownMark(${n}, 'fixed')">Now fixed</button>${k.key && k.key[0] === 'i' ? `<button type="button" class="kb-go" onclick="knownGo(${n})">Go to it</button>` : ''}</div>`}
     </div>`;
   });
   return h;
@@ -6797,21 +6892,29 @@ function knownRenderBanner() {
   el.innerHTML = h;
   el.style.display = h ? 'block' : 'none';
 }
-function knownApplyToItem(k, result) {
+function knownWord(res) { return res === 'fixed' ? '✓ Marked fixed' : res === 'missing' ? '✗ Missing, noted' : '✗ Still broken, noted'; }
+function knownNoteText(k, r) { return 'Known problem from ' + (k.crew || 'an earlier check') + ', ' + (r && r.result === 'missing' ? 'missing' : 'still broken') + (r && r.note ? ': ' + r.note : ''); }
+function knownNote(n, text) {   // 2.49: free text on a known problem, goes on the item notes, the record and the email
+  const k = known.list[n], r = k && knownResult(k); if (!r) return;
+  r.note = String(text || '').trim().slice(0, 300);
+  knownApplyToItem(k, r.result, true);
+  saveAutosave(); knownRenderBanner();
+}
+function knownApplyToItem(k, result, renote) {
   const c = APP.check, key = k.key || '';
-  const note = 'Known problem from ' + (k.crew || 'an earlier check') + ', still broken';
+  const note = knownNoteText(k, knownResult(k));
   if (key.startsWith('i|')) {
     const parts = key.slice(2).split('|'), cn = parts[0], bn = parts[1], nm = parts.slice(2).join('|');
     if (!findCompartmentByName(cn)) return;
     const st = ensureItemState(cn, bn, nm);
-    if (result === 'broken') Object.assign(st, { status: 'abnormal', unfixed: true, fixed: false, known: true, notes: st.notes || note });
+    if (result === 'broken' || result === 'missing') Object.assign(st, { status: 'abnormal', unfixed: true, fixed: false, known: true, notes: renote || !st.notes || /^Known problem from /.test(st.notes) ? note : st.notes });
     else if (result === 'fixed') { st.status = 'complete'; st.known = false; st.unfixed = false; }
     else { st.status = null; st.known = false; }
   } else if (key.startsWith('r|')) {
     const q = key.indexOf('|', 2), b = key.slice(2, q), nm = key.slice(q + 1);
     c[b] = c[b] || {};
     const st = c[b][nm] = c[b][nm] || {};
-    if (result === 'broken') Object.assign(st, { status: 'bad', unfixed: true, fixed: false, known: true, notes: st.notes || note });
+    if (result === 'broken' || result === 'missing') Object.assign(st, { status: 'bad', unfixed: true, fixed: false, known: true, notes: renote || !st.notes || /^Known problem from /.test(st.notes) ? note : st.notes });
     else if (result === 'fixed') { st.status = 'wnl'; st.known = false; st.unfixed = false; }
     else { st.status = null; st.known = false; }
   }
@@ -6820,7 +6923,7 @@ async function knownMark(n, result) {
   const c = APP.check, k = known.list[n];
   if (!c || !k) return;
   c.knownChecked = (c.knownChecked || []).filter(x => !(x.checkId === k.checkId && x.label === k.label));
-  c.knownChecked.push({ checkId: k.checkId, label: k.label, key: k.key || '', result });
+  c.knownChecked.push({ checkId: k.checkId, label: k.label, key: k.key || '', result, note: '' });
   knownApplyToItem(k, result);
   knownRenderBanner();
   liveRepaint([]);
@@ -6860,7 +6963,7 @@ function knownPaintRows() {
     const holder = row.querySelector('.item-name, .check-label'); if (!holder) return;
     const b = document.createElement('button');
     b.type = 'button'; b.className = 'known-btn' + (r ? (r.result === 'fixed' ? ' ok' : ' still') : '');
-    b.textContent = r ? (r.result === 'fixed' ? '✓ Marked fixed' : '⚠ Still broken') : '⚠ Outstanding';
+    b.textContent = r ? (r.result === 'fixed' ? '✓ Marked fixed' : r.result === 'missing' ? '⚠ Missing' : '⚠ Still broken') : '⚠ Outstanding';
     b.onclick = e => { e.stopPropagation(); knownRowPop(n); };
     holder.appendChild(b);
   });
@@ -6875,7 +6978,7 @@ function knownRowPop(n) {
   ].filter(Boolean);
   document.getElementById('kpop-title').textContent = k.label;
   document.getElementById('kpop-body').innerHTML = lines.map(t => `<li>${escapeHTML(t)}</li>`).join('');
-  document.getElementById('kpop-btns').innerHTML = `<button type="button" class="kb-broken" onclick="knownMark(${n}, 'broken');knownPopClose()">Still broken</button><button type="button" class="kb-fixed" onclick="knownMark(${n}, 'fixed');knownPopClose()">Now fixed</button>`;
+  document.getElementById('kpop-btns').innerHTML = `<button type="button" class="kb-broken" onclick="knownMark(${n}, 'broken');knownPopClose()">Still broken</button><button type="button" class="kb-missing" onclick="knownMark(${n}, 'missing');knownPopClose()">Missing</button><button type="button" class="kb-fixed" onclick="knownMark(${n}, 'fixed');knownPopClose()">Now fixed</button>`;
   document.getElementById('kpop').hidden = false;
 }
 function knownPopClose() { document.getElementById('kpop').hidden = true; knownPaintRows(); }
@@ -7121,7 +7224,7 @@ function buildSummary() {
     // Known problems carried over from earlier checks
     if ((c.knownChecked || []).length) {
       lines.push('Known problems from earlier checks:');
-      c.knownChecked.forEach(k => lines.push(`  ${k.label}: ${k.result === 'fixed' ? 'Crew found it fixed ✓' : 'Still broken ⚠'}`));
+      c.knownChecked.forEach(k => lines.push(`  ${k.label}: ${k.result === 'fixed' ? 'Crew found it fixed ✓' : k.result === 'missing' ? 'Missing ⚠' : 'Still broken ⚠'}${k.note ? ' · ' + k.note : ''}`));
       lines.push('');
     }
 
@@ -7254,6 +7357,64 @@ const ADMIN = {
   draft: null,         // mutable working copy of {exterior, interior}
 };
 
+/* 2.49 (Doug 11/12): admin puts an ambulance out of service. The crew takes these off the rig.
+   Only the narcotics go to the battalion chief for the main safe. Saved on the rig's vehicleStatus record (CG Staff reads it too) */
+const OOS_DEFAULT = ['Gurney', 'LifePak 35', 'Med Kit', 'Airway Kit', 'IV Pump', 'Narcotics', 'Nitrous'];
+function oosItems() { return (APP.data && APP.data.oosItems) || OOS_DEFAULT; }
+function adminOOSSection(body) {
+  const box = document.createElement('div');
+  box.className = 'adm-oos';
+  const rigs = (FLEET.data && FLEET.data.rigs) || [];
+  const row = a => {
+    const r = rigs.find(x => x.rig === a.id) || {};
+    return r.oos
+      ? `<div class="adm-oos-row bad"><div><b>${escapeHTML(a.id)}</b><span>Out of service: ${escapeHTML(r.oos.reason || 'no reason given')}</span></div><button type="button" class="admin-btn" data-adm-rts="${escapeAttr(a.id)}">Back in service</button></div>`
+      : `<div class="adm-oos-row"><div><b>${escapeHTML(a.id)}</b><span>In service at <select class="adm-st" data-adm-st="${escapeAttr(a.id)}">${rtsStations().map(s => `<option value="${escapeAttr(s)}"${s === r.station ? ' selected' : ''}>Station ${escapeHTML(s)}</option>`).join('')}</select></span></div><button type="button" class="admin-btn" data-adm-oos="${escapeAttr(a.id)}">Out of service</button></div>`;
+  };
+  box.innerHTML = `<div class="section-label">Ambulances in service</div>` + (FLEET.data ? (APP.data.ambulances || []).map(row).join('') : '<p class="picker-intro">Loading...</p>');
+  body.appendChild(box);
+  box.querySelectorAll('[data-adm-oos]').forEach(b => b.addEventListener('click', () => oosOpen(b.dataset.admOos)));
+  box.querySelectorAll('[data-adm-rts]').forEach(b => b.addEventListener('click', () => rtsOpen(b.dataset.admRts)));
+  box.querySelectorAll('[data-adm-st]').forEach(sel => sel.addEventListener('change', async () => {
+    const rig = sel.dataset.admSt, st = sel.value;
+    try { await fleetPost('/fleet/move', { rig, station: st }); haptic('success'); toast(rig + ' is now at Station ' + st + '.'); }
+    catch (e) { alert('Could not move ' + rig + ': ' + (e.message || e)); }
+    if (APP.screen === 'admin-home') showAdminHome();
+  }));
+  if (!FLEET.data) fleetLoad(true).then(d => { if (d && APP.screen === 'admin-home') showAdminHome(); });
+}
+function oosOpen(rig) {
+  eqSheet(`<div class="eq-head"><div><h2>${escapeHTML(rig)} out of service</h2><div class="eq-sub">It shows as out of service on every phone until someone puts it back</div></div><button type="button" class="eq-x" onclick="eqClose()" aria-label="Close">✕</button></div>
+    <div class="eq-q">Why is it going out of service? <i>*</i></div><textarea id="oos-why" maxlength="300" placeholder="Like: transmission, at the shop"></textarea>
+    <div class="eq-q">Take these off ${escapeHTML(rig)}</div>
+    <div class="eq-list">${oosItems().map((n, i) => `<label><input type="checkbox" data-oosi="${i}"> ${escapeHTML(n)}${/narc/i.test(n) ? ' <small style="font-weight:600;color:var(--bad)">to the BC to lock in the main safe</small>' : ''}</label>`).join('')}</div>
+    <div class="eq-err" id="oos-err"></div>
+    <button type="button" class="eq-go" id="oos-go">Put ${escapeHTML(rig)} out of service</button>
+    <button type="button" class="eq-alt" onclick="eqClose()">Cancel</button>`);
+  document.getElementById('oos-go').addEventListener('click', () => oosSave(rig));
+}
+async function oosSave(rig) {
+  const why = (document.getElementById('oos-why').value || '').trim();
+  const err = document.getElementById('oos-err'), go = document.getElementById('oos-go');
+  if (!why) { err.textContent = 'Write why it is going out of service.'; return; }
+  const items = oosItems().map((n, i) => ({ name: n, done: !!document.querySelector(`[data-oosi="${i}"]`).checked }));
+  const left = items.filter(x => !x.done).map(x => x.name);
+  if (left.length && !confirm('Not ticked yet: ' + left.join(', ') + '. Put ' + rig + ' out of service anyway?')) return;
+  go.disabled = true; go.textContent = 'Saving...';
+  const rec = { oos: true, reason: why, by: AUTH.name || AUTH.email || '', at: new Date().toISOString(), offload: items, narcsTo: 'BC, main safe' };
+  try {
+    await cfFetch('/state/vehicleStatus/' + encodeURIComponent(rig), { method: 'PUT', auth: true, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ data: rec }) });
+    const r = ((FLEET.data && FLEET.data.rigs) || []).find(x => x.rig === rig);
+    if (r && r.claim) { try { await fleetPost('/fleet/unclaim', { rig }); } catch (e) {} }
+    haptic('success'); eqClose();
+    await fleetLoad(true);
+    if (APP.screen === 'admin-home') showAdminHome();
+    toast(rig + ' is out of service.' + (left.length ? ' Not taken off yet: ' + left.join(', ') + '.' : ''));
+  } catch (e) {
+    go.disabled = false; go.textContent = 'Put ' + rig + ' out of service';
+    err.textContent = 'Did not save. ' + (e.message || e);
+  }
+}
 function showAdminHome() {
   const body = document.getElementById('admin-home-body');
   body.innerHTML = '';
@@ -7293,6 +7454,8 @@ function showAdminHome() {
     });
     old.querySelector('#legacy-clear').addEventListener('click', clearAllOverrides);
   }
+
+  adminOOSSection(body);   // 2.49
 
   const intro = document.createElement('p');
   intro.className = 'picker-intro';
