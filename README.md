@@ -2,7 +2,7 @@
 
 Equipment and property check submission tool for North Country EMS crews.
 
-**Version 2.49**
+**Version 2.50**
 
 ## Links
 
@@ -163,6 +163,12 @@ Doug 11/1: a check item is a problem (flag, email flag block, known problem popu
 - Rule lives in `issueMinor()` in index.html and matches CG Staff 1.31.1 `vehMinor()` (keys s|fuel, s|def, s|o2, s|tire, g|*; labels starting Fuel , DEF at , Main O2 at ; labels containing gurney, tire pressure, tire psi; narc labels ending (count N)). Change both together
 - Gurney checks are the Yes/No rows (`specialChecks`) on the Gurney compartment. Tire pressure is the single Yes/No question (key s|tire, label "Tire pressure out of range"). Portable O2 cylinder PSI rows are still problems
 
+## 2.50 (Doug 11/14/2026)
+
+- Every check email starts with a line like `Medic 51 · Station 51 · M25A · checked by Doug Boyce`
+- Every check record now has `crewId` ("M51", "M52", "M54", or '' if no crew picked), `station` ("51" or "52", the crew's station, else the rig's station), `rigRole` ("secondary", "moved" for transferring in, or ''), and `switchedFrom` (the old rig when transferring in). CG Staff can read these straight off the check instead of matching fleet_claims and fleet_signins
+- Crew comes from today's claim on that rig, else the person's crew pick. The secondary or transferring answer still also lives on the phone (`sw_role_v1`, `sw_v1`)
+
 ## 2.49 (Doug 11/12/2026)
 
 - **Out of service on the home screen:** each out of service ambulance shows as a red card under the crew card (M19, Out of service, the reason, Back in service)
@@ -206,6 +212,10 @@ Doug 11/1: a check item is a problem (flag, email flag block, known problem popu
 - GitHub units.json now matches the shared copy
 
 ## Changelog
+
+### v2.50 (11/14/2026)
+- Crew, station and rig line at the top of every check email; crewId, station, rigRole, switchedFrom on every check record
+- Changed index.html and README.md only
 
 ### v2.49 (11/12/2026)
 - Out of service rigs on home, back in service asks the station, admin out of service button and station picker, known problems Missing plus notes, throw away my marks with the take off checklist (narcotics to the BC for the main safe), secondary or switching question, garage door opener

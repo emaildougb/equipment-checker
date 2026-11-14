@@ -1953,7 +1953,7 @@
    APP STATE
    ============================================================ */
 const APP = {
-  version: '2.49',
+  version: '2.50',
   data: null,        // loaded units.json
   screen: 'home',
   check: null,       // current in-progress check
@@ -3228,6 +3228,7 @@ const FLEET_HEALTH_URL = 'https://cgstaff.northcountryems.org/#fleet';   // 2.35
 const FLEET_HEALTH_STAFF = ['d.boyce@northcountryems.org', 'd.langdon@northcountryems.org', 'd.madler@northcountryems.org', 'b.shirley@northcountryems.org', 'c.andrus@northcountryems.org', 'k.reid@northcountryems.org'];
 function showAppInfo() { showWhatsNew(true); }
 const WHATS_NEW = [
+  ['Crew and station on every check', 'Each check email now starts with your crew, station and rig, like Medic 51 · Station 51 · M25A · checked by your name.'],
   ['Out of service rigs', 'An ambulance that is out of service shows in red on the home screen. Tap it to put it back in service: say why, which station it goes to, and the BC who approved it.'],
   ['Known problems', 'On a problem from an earlier check you can now pick Still broken, Missing or Now fixed, and write what you see. The chiefs read it.'],
   ['Throw away my marks', 'Opened the wrong rig or tapped around by mistake? At the bottom of a check, Throw away my marks clears what you marked today. Your partner\'s marks stay.'],
@@ -6128,6 +6129,7 @@ async function submitCheck() {
     const summary = buildSummary();
     const swNote = swNoteFor(c);   // 2.46: what was moved over from the old rig
     if (swNote) summary.plain = swNote + '\n\n' + summary.plain;
+    summary.plain = ckWhereLine(c) + '\n\n' + summary.plain;   // 2.50: Medic 51 · Station 51 · M25A · checked by
     const crew = logInitials(c.unitId, c.date, c.initials);
     const crewLine = crew.join(' + ');
     const params = {
@@ -6325,8 +6327,28 @@ function collectNarcCounts(c) {
   return out;
 }
 
+/* 2.50 (Doug 11/14): crew call sign and station saved on every check, so CG Staff doesn't have to match tables */
+function ckWhere(c) {
+  const d = FLEET.data, rig = c.unitId || c.unitName;
+  const r = d && (d.rigs || []).find(x => x.rig === rig);
+  const crewId = (r && r.claim && r.claim.crew) || fleetMyCrew() || '';
+  const station = (crewId && (fleetCrewInfo(crewId) || {}).station) || (r && r.station) || '';
+  let sw = null; try { sw = JSON.parse(localStorage.getItem(swKey(rig, c.date)) || 'null'); } catch (e) {}
+  const role = c.type === 'ambulance' ? (swRole(rig) || '') : '';
+  return { crewId, station, rigRole: role, switchedFrom: role === 'moved' && sw ? sw.from || '' : '' };
+}
+function ckWhereLine(c) {
+  const w = ckWhere(c);
+  const who = AUTH.state === 'in' ? (AUTH.name || AUTH.email) : (c.initials || '');
+  return [w.crewId ? 'Medic ' + w.crewId.replace(/^M/, '') : '', w.station ? 'Station ' + w.station : '', c.unitName, who ? 'checked by ' + who : ''].filter(Boolean).join(' · ');
+}
 function buildCheckLogRecord(c, crewLine, pct, held, detail) {
+  const w = c.type === 'ambulance' ? ckWhere(c) : { crewId: fleetMyCrew() || '', station: (fleetCrewInfo(fleetMyCrew()) || {}).station || '', rigRole: '', switchedFrom: '' };
   return {
+    crewId: w.crewId,          // 2.50: "M51", "M52", "M54" ('' if no crew picked)
+    station: w.station,        // 2.50: "51" or "52"
+    rigRole: w.rigRole,        // 2.50: "secondary", "moved" (transferring in) or ''
+    switchedFrom: w.switchedFrom,   // 2.50: old rig when transferring in
     detail: detail || '',
     knownChecked: (c.knownChecked || []).slice(),
     id: `${c.unitId || c.unitName}-${c.date}-${Date.now().toString(36)}`,
