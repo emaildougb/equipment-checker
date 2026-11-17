@@ -2,7 +2,7 @@
 
 Equipment and property check submission tool for North Country EMS crews.
 
-**Version 2.51**
+**Version 2.52**
 
 ## Links
 
@@ -162,6 +162,11 @@ Doug 11/1: a check item is a problem (flag, email flag block, known problem popu
 - **Recorded, not problems:** fuel, DEF, main O2 PSI, narcotic counts under par, gurney checks, tire pressure. They show in the email under "NOTED (recorded, not a problem)" and in Full check, carry `minor: true` in the record's issues, need no description, and don't pop up as known problems
 - Rule lives in `issueMinor()` in index.html and matches CG Staff 1.31.1 `vehMinor()` (keys s|fuel, s|def, s|o2, s|tire, g|*; labels starting Fuel , DEF at , Main O2 at ; labels containing gurney, tire pressure, tire psi; narc labels ending (count N)). Change both together
 - Gurney checks are the Yes/No rows (`specialChecks`) on the Gurney compartment. Tire pressure is the single Yes/No question (key s|tire, label "Tire pressure out of range"). Portable O2 cylinder PSI rows are still problems
+
+## 2.52 (11/17)
+
+- Crew notes at the top of the check email: every typed note (Other notes, walk-around, comments, fluid descriptions) sits in a CREW NOTES block right under the header, before the UNABLE TO FIX and flag blocks, so Doug sees them first.
+- Notes are still typed, not flagged. Nothing about the flag rules changed.
 
 ## 2.51 (11/17)
 

@@ -1953,7 +1953,7 @@
    APP STATE
    ============================================================ */
 const APP = {
-  version: '2.51',
+  version: '2.52',
   data: null,        // loaded units.json
   screen: 'home',
   check: null,       // current in-progress check
@@ -7117,6 +7117,17 @@ function buildSummary() {
   lines.push(AUTH.state === 'in' ? `Signed in: ${AUTH.name} (${AUTH.email})` : 'Signed in: NOT SIGNED IN (no signal at check time)');
   if (c.mileage) lines.push(`Mileage: ${c.mileage}`);
   lines.push('');
+
+  // ── 2.52 (Doug 11/17): every typed crew note sits right under the header, before anything else ──
+  const topNotes = collectSectionNotes(c).filter(n => n.section !== 'Walk-around' && !(APP.data.textFluids || []).includes(n.section));
+  if (topNotes.length) {
+    lines.push(divider);
+    lines.push(`CREW NOTES (${topNotes.length}), typed on this check`);
+    lines.push(divider);
+    topNotes.forEach(n => lines.push('  \u2022 ' + n.section + ': ' + n.text));
+    lines.push(divider);
+    lines.push('');
+  }
 
   // ── UNABLE TO FIX (very top — for immediate admin review) ──────────────
   const unfixList = collectUnableToFix();
