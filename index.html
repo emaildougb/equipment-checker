@@ -1953,7 +1953,7 @@
    APP STATE
    ============================================================ */
 const APP = {
-  version: '2.50',
+  version: '2.51',
   data: null,        // loaded units.json
   screen: 'home',
   check: null,       // current in-progress check
@@ -2012,7 +2012,9 @@ let msalApp = null, msalAccount = null;
 
 function localDateStr(d) { const x = d || new Date(); return x.getFullYear() + '-' + String(x.getMonth() + 1).padStart(2, '0') + '-' + String(x.getDate()).padStart(2, '0'); }
 function getSavedInitials() {
-  try { return localStorage.getItem('ncems_ep_initials') || ''; } catch(e) { return ''; }
+  // 2.51 (Doug 11/17): the name of whoever is signed in right now, never an old saved name
+  if (msalAccount && msalAccount.name) return msalAccount.name.trim();
+  return '';
 }
 function saveInitialsFromAccount(account) {
   if (!account || !account.name) return;
@@ -2048,7 +2050,7 @@ async function initMsal(goToAdmin) {
       }
     }
   } else {
-    msalAccount = msalApp.getActiveAccount() || msalApp.getAllAccounts()[0] || null;
+    msalAccount = msalApp.getActiveAccount() || (msalApp.getAllAccounts().length === 1 ? msalApp.getAllAccounts()[0] : null);   // 2.51: never guess between several cached accounts
     if (msalAccount) {
       saveInitialsFromAccount(msalAccount);
       if (goToAdmin) {

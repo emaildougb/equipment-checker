@@ -2,7 +2,7 @@
 
 Equipment and property check submission tool for North Country EMS crews.
 
-**Version 2.50**
+**Version 2.51**
 
 ## Links
 
@@ -162,6 +162,12 @@ Doug 11/1: a check item is a problem (flag, email flag block, known problem popu
 - **Recorded, not problems:** fuel, DEF, main O2 PSI, narcotic counts under par, gurney checks, tire pressure. They show in the email under "NOTED (recorded, not a problem)" and in Full check, carry `minor: true` in the record's issues, need no description, and don't pop up as known problems
 - Rule lives in `issueMinor()` in index.html and matches CG Staff 1.31.1 `vehMinor()` (keys s|fuel, s|def, s|o2, s|tire, g|*; labels starting Fuel , DEF at , Main O2 at ; labels containing gurney, tire pressure, tire psi; narc labels ending (count N)). Change both together
 - Gurney checks are the Yes/No rows (`specialChecks`) on the Gurney compartment. Tire pressure is the single Yes/No question (key s|tire, label "Tire pressure out of range"). Portable O2 cylinder PSI rows are still problems
+
+## 2.51 (11/17)
+
+- Name on checks: the "checked by" name is always the account signed in right now. The old saved name is no longer used.
+- On a shared phone with several cached Microsoft accounts, the app no longer guesses which one is signed in. It uses the active account only.
+- Not in this build yet: combining a second submit with the first, the Critical items list for the BCs, and the "cannibalized" note on the donor rig.
 
 ## 2.50 (Doug 11/14/2026)
 
