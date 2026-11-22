@@ -16,6 +16,7 @@
   <link rel="manifest" href="./manifest.json" />
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@3.30.0/lib/msal-browser.min.js"></script>
+  <script src="signin/ncems-signin.js"></script>
   <style>
     :root {
       --g-deep: #1C3A1C;
@@ -334,7 +335,7 @@
     .abc-row { display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin: 2px 0 8px; font-size: 12px; color: var(--muted); font-weight: 700; }
     .abc-btn { width: 46px; height: 46px; border-radius: 50%; border: 2px solid var(--g-mid); background: var(--white); color: var(--g-mid); font: 800 13px/1 inherit; letter-spacing: 0.02em; cursor: pointer; }
     .abc-btn.on { background: var(--g-mid); color: #fff; }
-    .comp-header-mark-btn.all-done, .comp-header-mark-btn.all-done:active { background: var(--g-pale) !important; color: var(--g-deep) !important; border: 1.5px solid var(--g-accent) !important; pointer-events: none; box-shadow: none; }
+    .comp-header-mark-btn.all-done, .comp-header-mark-btn.all-done:active { background: var(--g-deep) !important; color: #fff !important; border: 1.5px solid var(--g-deep) !important; pointer-events: none; box-shadow: none; }
     .live-banner { display: none; margin: 10px 14px 0; padding: 10px 12px; border-radius: 10px; background: #EAF2F8; border: 1.5px solid var(--info); color: var(--text); font-size: 13px; line-height: 1.4; }
     .live-banner.on { display: block; }
     .live-banner.off { background: var(--warn-bg); border-color: var(--warn); }
@@ -1162,9 +1163,9 @@
     /* Compartment mark-all in header (no expand needed) */
     .comp-header-mark-btn {
       padding: 6px 12px;
-      background: var(--g-mid);
-      color: var(--white);
-      border: none;
+      background: var(--g-pale);
+      color: var(--g-deep);
+      border: 1.5px solid var(--g-accent);
       border-radius: 8px;
       font-size: 11px;
       font-weight: 700;
@@ -1177,7 +1178,9 @@
     }
     .comp-header-mark-btn:active { background: var(--g-accent); }
     .comp-header-mark-btn.done {
-      background: var(--g-accent);
+      background: var(--g-deep);
+      color: #fff;
+      border: 1.5px solid var(--g-deep);
     }
 
     /* Confirmation modal */
@@ -1285,8 +1288,8 @@
 
     /* Bottom status bar */
     .status-bar {
-      position: fixed;
-      bottom: -1px; left: 0; right: 0;
+      position: sticky;
+      bottom: 0; left: 0; right: 0;
       background: var(--g-deep);
       color: var(--white);
       padding: 12px 16px;
@@ -1300,6 +1303,8 @@
       content: ''; position: absolute; top: 100%; left: 0; right: 0; height: 80px; background: var(--g-deep);
     }
     #status-flags { text-decoration: underline; font-weight: 800; }
+    .jump-unfinished { display: block; width: 100%; margin-top: 8px; min-height: 40px; padding: 8px 12px; border: none; border-radius: 8px; background: #fff; color: var(--g-deep); font: inherit; font-size: 14px; font-weight: 800; cursor: pointer; }
+    .jump-unfinished[hidden] { display: none; }
     html, body { overscroll-behavior-y: none; }
     .status-text {
       font-size: 13px;
@@ -1942,6 +1947,7 @@
   <div class="status-text">
     <span id="status-label">Check is 0% complete</span>
     <span id="status-flags"></span>
+    <button type="button" id="jump-unfinished" class="jump-unfinished" hidden>Jump to what's unfinished ↓</button>
   </div>
   <div class="status-track"><div class="status-fill" id="status-fill"></div></div>
 </div>
@@ -1953,7 +1959,7 @@
    APP STATE
    ============================================================ */
 const APP = {
-  version: '2.52',
+  version: '2.56',
   data: null,        // loaded units.json
   screen: 'home',
   check: null,       // current in-progress check
@@ -2013,6 +2019,7 @@ let msalApp = null, msalAccount = null;
 function localDateStr(d) { const x = d || new Date(); return x.getFullYear() + '-' + String(x.getMonth() + 1).padStart(2, '0') + '-' + String(x.getDate()).padStart(2, '0'); }
 function getSavedInitials() {
   // 2.51 (Doug 11/17): the name of whoever is signed in right now, never an old saved name
+  if (AUTH.state === 'in' && AUTH.name) return AUTH.name;   // 2.53
   if (msalAccount && msalAccount.name) return msalAccount.name.trim();
   return '';
 }
@@ -2123,8 +2130,10 @@ function setAuth(state, detail) {
   err.textContent = '';
   btn.hidden = true; off.hidden = true;
   if (state === 'in') {
-    AUTH.email = (msalAccount.username || '').toLowerCase();
-    AUTH.name = (msalAccount.name || AUTH.email).trim();
+    if (!NCEMS_ID.on) {   // 2.53: PIN sign-in sets AUTH itself (ncemsOnSignedIn)
+      AUTH.email = (msalAccount.username || '').toLowerCase();
+      AUTH.name = (msalAccount.name || AUTH.email).trim();
+    }
     try { localStorage.setItem('ncems_login_hint', AUTH.email); } catch (e) {}
     document.getElementById('who-name').textContent = AUTH.name;
     strip.hidden = false;
@@ -2138,6 +2147,7 @@ function setAuth(state, detail) {
   strip.hidden = true;
   try { fleetReset(); } catch (e) {}
   if (typeof movesBanner === 'function') movesBanner();
+  if (NCEMS_ID.on) { gate.hidden = true; return; }   // 2.53: the PIN screen is the gate
   gate.hidden = false;
   if (state === 'out') {
     msg.textContent = autoOutReason() + 'Sign in with your North Country EMS Microsoft account (the same one you use for NCEMS email) to start your check.';
@@ -2154,7 +2164,48 @@ function setAuth(state, detail) {
     msg.textContent = 'Checking your sign in...';
   }
 }
+/* ============================================================
+   2.53 SHARED NCEMS SIGN-IN (ncems-signin.js v1.1.0, app key "checks")
+   Crews sign in with their NCEMS PIN. Shared iPads show the name list.
+   Admin screens still use Microsoft (the logo flip); the Worker refuses
+   shared-device tokens on admin routes.
+   Offline at start, or if the sign-in script is missing, the Microsoft
+   gate below is used as before, so offline checks still work.
+   ============================================================ */
+const NCEMS_ID = { on: false };
+function ncemsShared() { return !!(NCEMS_ID.on && window.NCEMSSignIn && NCEMSSignIn.isShared()); }
+function ncemsDoneAfterSubmit() { goHome(); if (ncemsShared()) { try { NCEMSSignIn.lock(); } catch (e) {} } }
+function ncemsOnSignedIn(s) {
+  AUTH.email = String(s.email || '').toLowerCase();
+  AUTH.name = String(s.name || AUTH.email || '').trim();
+  AUTH.shared = !!s.shared;
+  setAuth('in');
+}
+function ncemsOnSignedOut() {
+  AUTH.email = ''; AUTH.name = '';
+  try { fleetReset(); } catch (e) {}
+  setAuth('out');
+}
 async function authBoot() {
+  let canUsePin = false;
+  try { canUsePin = typeof NCEMSSignIn !== 'undefined' && navigator.onLine !== false && !!(window.crypto && crypto.subtle); } catch (e) {}
+  if (canUsePin) {
+    try {
+      await initMsal(false).catch(() => {});   // admin Microsoft sign-in still comes back here
+      NCEMSSignIn.init({
+        app: 'checks', clientId: MSAL_CONFIG.clientId, appName: 'NCEMS Apparatus Checker',
+        shared: true, sharedSetupBy: 'A battalion chief',
+        auto: true,
+        onSignedIn: ncemsOnSignedIn,
+        onSignedOut: ncemsOnSignedOut
+      });
+      NCEMS_ID.on = true;
+      return;
+    } catch (e) { console.warn('NCEMS sign-in not started, using Microsoft:', e); NCEMS_ID.on = false; }
+  }
+  return authBootMicrosoft();
+}
+async function authBootMicrosoft() {
   if (!MSAL_CONFIG.clientId) { setAuth('offline', 'Sign in is not set up yet.'); return; }
   if (typeof msal === 'undefined') { setAuth('offline'); return; }
   try {
@@ -2182,6 +2233,7 @@ function authWire() {
   });
   document.getElementById('who-switch').addEventListener('click', () => {
     if (APP.check && hasUnsavedWork() && !confirm('A check is in progress on this device. Switch user anyway? It stays saved here.')) return;
+    if (NCEMS_ID.on) { try { NCEMSSignIn.lock(); } catch (e) {} return; }   // 2.53
     gateSignIn(true);
   });
   document.getElementById('who-logout').addEventListener('click', () => {
@@ -2362,6 +2414,7 @@ function signOutNow(why) {
   try { if (typeof liveStop === 'function') liveStop(); } catch (e) {}
   if (APP.screen !== 'home') { APP.check = null; try { showScreen('home'); } catch (e) {} }
   const finishLocal = () => { AUTO_OUT.busy = false; setAuth('out'); };
+  if (NCEMS_ID.on) { try { NCEMSSignIn.lock(); } catch (e) {} return finishLocal(); }   // 2.53
   if (!msalApp) return finishLocal();
   const req = { postLogoutRedirectUri: location.origin + location.pathname.replace(/index\.html$/, '') };
   if (acct) req.account = acct;
@@ -2391,8 +2444,11 @@ function checksApi() { return ((APP.data && APP.data.checksApi) || CHECKS_API_DE
 function jwtExp(t) {
   try { return JSON.parse(atob(t.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))).exp || 0; } catch (e) { return 0; }
 }
-async function getIdToken() {
-  if (!msalApp || !msalAccount || AUTH.state !== 'in') return null;
+async function getIdToken(admin) {
+  if (NCEMS_ID.on && !admin) {   // 2.53: crew routes take the PIN sign-in token
+    try { const s = NCEMSSignIn.session(); return s ? s.token : null; } catch (e) { return null; }
+  }
+  if (!msalApp || !msalAccount || (!NCEMS_ID.on && AUTH.state !== 'in')) return null;
   try {
     let r = await msalApp.acquireTokenSilent({ scopes: ['User.Read'], account: msalAccount });
     if (!r.idToken || jwtExp(r.idToken) * 1000 < Date.now() + 5 * 60 * 1000) {
@@ -2408,7 +2464,7 @@ async function cfFetch(path, opts) {
   opts = opts || {};
   const headers = Object.assign({}, opts.headers || {});
   if (opts.auth) {
-    const tok = await getIdToken();
+    const tok = await getIdToken(!!opts.admin);
     if (!tok) throw new Error('Not signed in');
     headers.Authorization = 'Bearer ' + tok;
   }
@@ -2441,7 +2497,7 @@ async function pushSharedList(note) {
   data.editedBy = AUTH.email || '';
   try { localStorage.setItem(PENDING_LIST, JSON.stringify({ data, note, at: data.editedAt })); } catch (e) {}
   try {
-    const r = await cfFetch('/units', { method: 'PUT', auth: true, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ data, note }) });
+    const r = await cfFetch('/units', { method: 'PUT', auth: true, admin: true, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ data, note }) });
     try { localStorage.removeItem(PENDING_LIST); } catch (e) {}
     APP.data = data;
     APP.listSource = { from: 'shared', at: r.at, by: r.by };
@@ -3230,38 +3286,14 @@ const FLEET_HEALTH_URL = 'https://cgstaff.northcountryems.org/#fleet';   // 2.35
 const FLEET_HEALTH_STAFF = ['d.boyce@northcountryems.org', 'd.langdon@northcountryems.org', 'd.madler@northcountryems.org', 'b.shirley@northcountryems.org', 'c.andrus@northcountryems.org', 'k.reid@northcountryems.org'];
 function showAppInfo() { showWhatsNew(true); }
 const WHATS_NEW = [
-  ['Crew and station on every check', 'Each check email now starts with your crew, station and rig, like Medic 51 · Station 51 · M25A · checked by your name.'],
-  ['Out of service rigs', 'An ambulance that is out of service shows in red on the home screen. Tap it to put it back in service: say why, which station it goes to, and the BC who approved it.'],
-  ['Known problems', 'On a problem from an earlier check you can now pick Still broken, Missing or Now fixed, and write what you see. The chiefs read it.'],
-  ['Throw away my marks', 'Opened the wrong rig or tapped around by mistake? At the bottom of a check, Throw away my marks clears what you marked today. Your partner\'s marks stay.'],
-  ['Secondary or switching?', 'When your crew takes a rig it did not have yesterday, the app asks if it is a secondary (backup) at your station, or if you are transferring into it. The bring over list now has the garage door opener too.'],
-  ['M18 Suspension Recalibration', 'The M18 LiquidSpring section is now Suspension Recalibration. It is not part of the daily check and is rarely needed, so nothing in it is required. It lists when it is needed. Tell the battalion chief if there is a LiquidSpring suspension problem or a recalibration.'],
-  ['Home screen tidy up', 'Equipment Problem no longer sits on top of the Other Units button. Other Units now says which units are due today. Just looking has its own button at the bottom and lasts until you go back to home. New refresh circle at the top right reloads the app (your check is saved first). Tapping Ambulances asks Where are you today? if you haven\'t picked a crew.'],
-  ['Equipment Problem', 'New red button on the home screen, and it pops up when you mark something in the LifePak 35 with an ✗. Pick the monitor (35-1, 35-2, 35-3), what kind of problem, what happened, add a photo, and send. Then tap Submit on the LifePak 35 issue report it opens.'],
-  ['Search this rig', 'Type in the box next to the date at the top of a check to find any item. Tap a result to jump right to it.'],
-  ['Back saves your check', 'Back no longer asks to discard. Your check is saved on the phone and is there when you come back today. Other Units now save too.'],
-  ['Checking with a partner', 'A small line at the top shows when your partner\'s marks are coming in, and the submit popup tells you their marks are included.'],
-  ['Switching rigs', 'When your crew is in a different rig than yesterday, the app asks if you moved over and what you brought (IV pump, LifePak 35, cables, batteries). It goes on the new rig\'s check.'],
-  ['C-collar bags', 'Every rig has 2 blue C-collar bags (same items in each, two red tag numbers) and 1 orange.'],
-  ['M18 LiquidSpring', 'M18 has a LiquidSpring suspension section with the panel picture and quick Yes/No checks.'],
-  ['Med kit and Airway Bag - M18 corrected', 'Joseph organized the med kit and airway bag on M25A last week. M18 is now an exact copy of that layout, so both orange ambulances have identical organization.'],
-  ['Only real problems are flagged', 'Fuel, DEF, main O2, narcotic counts, gurney checks and tire pressure are still recorded on the check, but they no longer count as problems. Lights, horn, oil, unsafe tires, the fridge and crew or patient equipment still do.'],
-  ['Narcotics: OK to stay at this level', 'When a controlled count is under par, tick "OK to stay at this level" and the item counts as checked. You do not need Restocked or Unable to restock. At or under half par the red box still shows and now reads UNDER HALF PAR. Over par is still an error. Changing the count clears the tick, and the email says the crew was OK to stay at this level.'],
-  ['Rig pictures everywhere', 'Other Units and the plain ambulance list now show the rig photo too, the same as the Ambulances list.'],
-  ['Rig pictures', 'Each ambulance now shows a photo of the actual rig on the Ambulances and Other Units lists.'],
-  ['Back in service', 'A rig that is out of service has a Back in service button on the Ambulances list. Write what fixed it, pick the BC who approved it, and it goes back in service. A rig with a Could not fix problem can\'t be cleared by a crew.'],
-  ['Just looking', 'Tap "Just looking" on the Where are you today? screen to look around any rig without doing a check. Nothing is saved or sent. Tap the card on the home screen any time to go back to your crew and do real checks.'],
-  ['Updates itself', 'When a new version comes out, the app picks it up on its own the next time you open it. No more closing and reopening. It never updates in the middle of a check.'],
-  ['Asks where you are', 'Right after you sign in, the app asks "Where are you today?" on its own. Chiefs and anyone not on a crew can tap "Not on a crew today".'],
-  ['Where are you today?', 'After you sign in, pick your crew (M51, M52 or M54). The schedule suggests the right one. Your crew\'s main ambulance comes with it.'],
-  ['Your ambulances', 'The Ambulances list shows the rigs your crew has today and whether each one is checked. Tap any other rig at your station to take it. If a spare shows up from the other station, tap it and answer "Is it here today?". If another crew already took a rig, you\'ll see who.'],
-  ['Out of service', 'Rigs a chief marked out of service show at the bottom of the list.'],
-  ['Other Units', 'Each unit shows which day it gets checked, and a due unit turns green once it\'s done today.'],
-  ['New top bar', 'Same top bar as the other NCEMS apps. The house takes you to the NCEMS Hub and the i shows app details, on every screen.'],
-  ['More buzz', 'Your phone now buzzes on almost anything you tap, when you finish typing a number, and with a tick for each spot while you drag an item in Reorder. A sent check and a missing required item each have their own buzz.'],
-  ['Kit reorder', 'All three BCs, Steve Schutts and Lyndsey Maylone can now reorder kits too, along with Josh and Joseph.'],
-  ['Photos', 'If a photo can\'t upload, the app tells you and keeps it on the phone instead of failing.'],
-  ['Log out', 'Log out button on the home screen, and the app signs you out after an hour with no use and at shift change (7:30 AM).'],
+  ['Shared PIN sign-in', 'Shared iPads sign in with your crew PIN, so you no longer sign in with Microsoft every time.'],
+  ['Station moves for everyone', 'Any crew member can move a rig between stations, not just admins.'],
+  ['Clearer section buttons', 'Not finished is cream. All done is dark green with a check. Under the Hood has an All Done button too.'],
+  ['Start over needs a second tap', 'Throw away my marks asks "Are you sure?" before it clears anything.'],
+  ['Jump to what is unfinished', 'The bar at the bottom jumps to the first item still unmarked. Click to Review goes to the first open flag.'],
+  ['Bar stays at the bottom', 'The completion bar stays put while you scroll.'],
+  ['One report for two crews', 'When two crews check the same rig the same day, one combined email goes out, with the crews who worked on it listed.'],
+  ['Questions or requests', 'Email Doug at d.boyce@northcountryems.org. Tell him what you saw and which rig.'],
 ];
 function showWhatsNew(force) {
   let seen = '';
@@ -3314,6 +3346,7 @@ async function boot() {
   });
   document.getElementById('status-bar').addEventListener('click', () => {
     let target = (APP.lastTouched && document.body.contains(APP.lastTouched)) ? APP.lastTouched : null;
+    const flagged = collectFlaggedEls(); if (flagged.length) { target = flagged[0]; revealForPrompt(target); }
     if (!target) {
       // Fall back to the first unanswered row on the page
       target = [...document.querySelectorAll('#check-body .check-row[data-key], #check-body .item-row, #check-body .yn-row')]
@@ -3321,6 +3354,8 @@ async function boot() {
     }
     if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
+
+  document.getElementById('jump-unfinished').addEventListener('click', e => { e.stopPropagation(); jumpToUnfinished(); });
 
   // "Other notes" boxes anywhere on the check (works for lazy compartments too)
   document.getElementById('check-body').addEventListener('input', e => {
@@ -3559,6 +3594,7 @@ function setupLogoAdminTrigger() {
 
   // Flip on logo tap (front face click; ignore clicks on the back button)
   wrap.addEventListener('click', e => {
+    if (ncemsShared()) return;   // 2.53: admin side is hidden on shared devices
     const isFlipped = wrap.classList.contains('flipped');
     // If showing front, flip to back
     if (!isFlipped) {
@@ -4206,6 +4242,20 @@ function rowBuckets(c) {
 }
 /* 2.25: one tap marks every unanswered Mechanical & Lights row Normal. Rows stay visible as a review list;
    anything already marked Abnormal is left alone. Tire pressure is not included (it must be answered). */
+function hoodAllNormal() {
+  document.querySelectorAll('#check-body .check-row[data-bucket="underHood"]').forEach(row => {
+    if (row.querySelector('.check-btn.active')) return;
+    const b = row.querySelector('.check-btn[data-status="wnl"]'); if (b) b.click();
+  });
+  hoodAllPaint();
+}
+function hoodAllPaint() {
+  const btn = document.getElementById('hood-all-btn'); if (!btn) return;
+  const rows = [...document.querySelectorAll('#check-body .check-row[data-bucket="underHood"]')];
+  const done = rows.length > 0 && rows.every(r => r.querySelector('.check-btn.active'));
+  btn.classList.toggle('all-done', done); btn.classList.toggle('done', done);
+  btn.textContent = done ? '✓ All done' : '✓ All Done';
+}
 function mechAllNormal() {
   document.querySelectorAll('#check-body .check-row[data-bucket="mechanical"]').forEach(row => {
     if (row.querySelector('.check-btn.active')) return;
@@ -4240,7 +4290,8 @@ function isSealedTransmission(item) {
 
 function renderFluidsSection() {
   let html = `<div class="section"><div class="section-head">Under the Hood</div><div class="section-body">
-    <div class="hood-note">🔥 Warm the engine up first so the readings are accurate.${(APP.data.sealedTransmission || []).includes(APP.check?.unitId) ? ' This rig has a closed (sealed) transmission that can\'t be checked with a dipstick, so leave it alone.' : ''}</div>`;
+    <div class="hood-note">🔥 Warm the engine up first so the readings are accurate.${(APP.data.sealedTransmission || []).includes(APP.check?.unitId) ? ' This rig has a closed (sealed) transmission that can\'t be checked with a dipstick, so leave it alone.' : ''}</div>
+    <button type="button" class="comp-header-mark-btn" id="hood-all-btn" style="width:100%;margin-bottom:6px;" onclick="hoodAllNormal()">✓ All Done</button>`;
   APP.data.fluidChecks.forEach(item => {
     if (isSealedTransmission(item)) {
       html += `<div class="check-row" style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
@@ -5918,6 +5969,7 @@ function updateProgress() {
     ? `⚠ ${flags} flagged item${flags===1?'':'s'} — click to review`
     : '';
   document.getElementById('status-fill').style.width = pct + '%';
+  const ju = document.getElementById('jump-unfinished'); if (ju) ju.hidden = pct >= 100;
   // Flags recap next to the Submit button
   const sf = document.getElementById('submit-flags');
   if (sf) {
@@ -5931,6 +5983,25 @@ function updateProgress() {
 }
 
 /* Collect every currently-flagged element on the page (abnormal/no without "fixed"). */
+/* 2.55: the topmost item on the check that still has no answer, in page order. Opens its section first. */
+function firstUnfinishedEl() {
+  const root = document.getElementById('check-body'); if (!root) return null;
+  const els = root.querySelectorAll('.check-row[data-key], .yn-row[data-tire], .red-tag-row, .op-check-row[data-op-comp]');
+  for (const el of els) {
+    if (el.closest('.op-detail')) continue;
+    if (el.classList.contains('red-tag-row')) { const i = el.querySelector('input'); if (i && !i.value.trim()) return el; continue; }
+    if (!el.querySelector('.active')) return el;
+  }
+  return null;
+}
+function jumpToUnfinished() {
+  const el = firstUnfinishedEl();
+  if (!el) { alert("I can't find an unmarked item on the open part of the check. Open any compartments that are still folded and try again."); return; }
+  revealForPrompt(el);
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  el.style.outline = '3px solid var(--warn)';
+  setTimeout(() => { el.style.outline = ''; }, 2000);
+}
 function collectFlaggedEls() {
   const els = [];
   const root = document.getElementById('check-body');
@@ -6046,7 +6117,7 @@ function showSubmitModal() {
   // 2.18: Fixed on the spot needs nothing. 2.22: any problem still open or Unable to fix needs a short description. Photos are always optional.
   const noReason = collectIssueLog().filter(x => x.state !== 'fixed' && !x.known && !String(x.notes || '').trim() && needsDescription(x));
   if (noReason.length) {
-    const first = issueNoteEl(noReason[0].key) || unfixedNoReasonEls()[0] || null;
+    const first = issueNoteEl(noReason[0].key) || unfixedNoReasonEls()[0] || collectFlaggedEls()[0] || null;
     needsPopup('Add a short description', noReason.map((x, n) => [x.label, n === 0 ? first : null]));
     return;
   }
@@ -6099,10 +6170,38 @@ async function sendReport(params) {
   await emailjs.send(APP.data.emailjs.serviceId, APP.data.emailjs.templateId, params);
 }
 
+// 2.56: one email for every submission of the same unit and date. Each crew's own report is kept in full.
+function combineHeld(list) {
+  const first = list[0].params;
+  const names = [...new Set(list.flatMap(x => [...String(x.crew || '').split(' + '), ...(x.params.creditNames || [])]).map(x => String(x).trim()).filter(Boolean))];
+  const crews = names.join(' + ');
+  const body = list.map(x => `Submitted by: ${x.crew}\n\n` + String(x.params.message || '').replace(/^Submitted by:[^\n]*\n\n/, '')).join('\n\n==================================================\n\n');
+  return {
+    unit_id: first.unit_id, check_date: first.check_date, check_type: first.check_type,
+    initials: crews,
+    message: `COMBINED REPORT: ${list.length} submissions for this check (${crews}).\n\n` + body,
+    flags_count: Math.max(...list.map(x => x.params.flags_count || 0)),
+    to_email: first.to_email,
+  };
+}
+
 // Send any held reports once it's 11:00 AM or later on their queue date (or any day after)
 async function flushPendingSubmissions() {
   if (!APP.data) return;
   flushCheckLogQueue(); // units.json not loaded yet — interval/boot will retry
+  // 2.56: reports held on the server. From 11 AM today, send one combined email per unit and clear it.
+  try {
+    const today = localDateStr(new Date());
+    if (new Date() >= holdDue(today)) {
+      const res = await cfFetch('/held?date=' + encodeURIComponent(today), { method: 'GET', auth: true });
+      const byUnit = {};
+      ((res && res.held) || []).forEach(h => { (byUnit[h.unit] = byUnit[h.unit] || []).push({ crew: h.crew, params: h.params }); });
+      for (const unit of Object.keys(byUnit)) {
+        await sendReport(combineHeld(byUnit[unit]));
+        await cfFetch('/held/clear', { method: 'POST', auth: true, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ unit, date: today }) });
+      }
+    }
+  } catch (e) { console.error('Server hold sweep:', e); }
   const pending = loadJSON(PENDING_STORE, []);
   if (!pending.length) return;
   const now = new Date();
@@ -6123,6 +6222,8 @@ async function submitCheck() {
   const c = APP.check;
   if (!c || c.look) return;
 
+  const T0 = performance.now();
+  const tm = l => { const ms = Math.round(performance.now() - T0); (window.__submitTimes = window.__submitTimes || []).push(l + ' ' + ms + 'ms'); console.log('[submit] ' + l + ' ' + ms + 'ms'); };
   const btn = document.querySelector('.submit-btn');
   btn.disabled = true;
   btn.textContent = 'Sending...';
@@ -6134,6 +6235,8 @@ async function submitCheck() {
     summary.plain = ckWhereLine(c) + '\n\n' + summary.plain;   // 2.50: Medic 51 · Station 51 · M25A · checked by
     const crew = logInitials(c.unitId, c.date, c.initials);
     const crewLine = crew.join(' + ');
+    // 2.56b: everyone who worked on this check gets credit: the crew on this phone plus anyone who made a mark on the shared check
+    const creditNames = [...new Set([...crew, ...Object.values(live.by || {}).filter(Boolean).map(String)].map(x => x.trim()).filter(Boolean))];
     const params = {
       unit_id: c.unitName,
       check_date: c.date,
@@ -6143,25 +6246,34 @@ async function submitCheck() {
       flags_count: summary.flagCount,
       to_email: APP.data.submissionEmail || 'd.boyce@northcountryems.org',
     };
+    params.creditNames = creditNames;
 
-    const pct = computeCompletionPct();
+    const pct = computeCompletionPct(); tm('summary+pct');
     const sendNow = pct >= sendMinPct() || pastHoldTime(c.date);
     logCheckToBoard(buildCheckLogRecord(c, crewLine, pct, !sendNow, (crew.length > 1 ? `Submitted by: ${crewLine}\n\n` : '') + summary.plain));  // fire and forget
+    tm('board queued');
     liveStop();
-    if (sendNow) {
-      await sendReport(params);
-      persistRedTags(c);
-      clearAutosave();
-      showSuccess(summary, false);
-    } else {
-      // Hold until 11 AM, replace any earlier held report for this unit+date
+    // 2.56: every submit is held on the server. If the partner already submitted, one combined email goes out now.
+    let sentNow = false;
+    try {
+      const res = await cfFetch('/held', { method: 'POST', auth: true, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ unit: c.unitName, date: c.date, crew: crewLine, params }) });
+      const list = (res && res.held) || [];
+      tm('held on server');
+      if (list.length > 1) {
+        await sendReport(combineHeld(list));
+        await cfFetch('/held/clear', { method: 'POST', auth: true, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ unit: c.unitName, date: c.date }) });
+        sentNow = true; tm('combined email sent');
+      }
+    } catch (e) {
+      // No signal: keep it on this phone until the 11 AM hold, the way it worked before 2.56
+      console.error('Held on server failed, keeping on this phone:', e);
       const pending = loadJSON(PENDING_STORE, []).filter(p => !(p.unitId === c.unitId && p.date === c.date));
       pending.push({ unitId: c.unitId, date: c.date, params });
       localStorage.setItem(PENDING_STORE, JSON.stringify(pending));
-      persistRedTags(c);
-      clearAutosave();
-      showSuccess(summary, true);
     }
+    persistRedTags(c);
+    clearAutosave();
+    showSuccess(summary, !sentNow);
   } catch (err) {
     console.error('Submit failed:', err);
     alert('Submit failed: ' + (err.text || err.message || 'unknown error') + '\n\nThe check data is still in the app — try submitting again, or take a screenshot.');
@@ -6673,9 +6785,19 @@ function liveClear(c, key, kind, rest) {
   else return false;
   return true;
 }
+function ckThrowArm() {
+  APP.throwArmed = true;
+  document.querySelectorAll('.ck-throw').forEach(b => { if (!b.dataset.label) b.dataset.label = b.textContent; b.textContent = 'Are you sure? Tap again to start over'; });
+  clearTimeout(APP.throwTimer); APP.throwTimer = setTimeout(ckThrowDisarm, 6000);
+}
+function ckThrowDisarm() {
+  APP.throwArmed = false; clearTimeout(APP.throwTimer);
+  document.querySelectorAll('.ck-throw').forEach(b => { if (b.dataset.label) b.textContent = b.dataset.label; });
+}
 async function ckThrowAway() {
   const c = APP.check; if (!c || c.look) return;
-  if (!confirm(`Throw away what you marked on ${c.unitName} today? Your partner's marks stay. You start clean.`)) return;
+  if (!APP.throwArmed) { ckThrowArm(); return; }
+  ckThrowDisarm();
   if (c.type === 'ambulance' && live.docId === `${c.unitId}_${c.date}`) {
     const flat = liveFlatten(c), now = Date.now(), dev = liveDeviceId(), who = (c.initials || 'Partner').trim(), s = {};
     Object.keys(flat).forEach(k => { if (!live.by[k]) s[liveEnc(k)] = { v: null, by: who, dev, at: now }; });   // only the marks this phone made
@@ -7375,7 +7497,7 @@ function showSuccess(summary, queued = false) {
       <div class="row"><span>Flags</span><strong style="color:${summary.flagCount?'var(--bad)':'var(--g-mid)'}">${summary.flagCount}</strong></div>
     </div>
     <p style="font-size:13px;color:var(--muted);">If your partner completes more of the check today, both submissions will arrive separately tagged with the same unit and date.</p>
-    <a class="home-link" onclick="goHome()">Back to Home</a>
+    <a class="home-link" onclick="ncemsDoneAfterSubmit()">Back to Home</a>
   `;
   APP.check = null;
   showScreen('success');
@@ -8162,7 +8284,7 @@ async function moveDecide(m, status, card) {
       if (!saved.ok) throw new Error(saved.why || 'shared list did not save');
       Object.assign(decision, { unitsId: saved.id || null, applied: res.applied, skipped: res.skipped });
     }
-    await cfFetch(`/moves/${encodeURIComponent(m.id)}/decide`, { method: 'POST', auth: true, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(decision) });
+    await cfFetch(`/moves/${encodeURIComponent(m.id)}/decide`, { method: 'POST', auth: true, admin: true, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(decision) });
     m.status = status; m.decision = decision; m.decidedAt = new Date().toISOString();
     const back = status === 'approved'
       ? `Doug approved your kit move: ${moveWhere(m)} on ${decision.applied.join(', ')}.` + (decision.skipped.length ? ` Not changed on ${decision.skipped.join(', ')}.` : '') + ` Every device gets the new order the next time the Checker opens.`
