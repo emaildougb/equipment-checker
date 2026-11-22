@@ -2,7 +2,7 @@
 
 Equipment and property check submission tool for North Country EMS crews.
 
-**Version 2.54**
+**Version 2.52**
 
 ## Links
 
@@ -19,19 +19,7 @@ Equipment and property check submission tool for North Country EMS crews.
 - `logo.png` : NCEMS round logo (header + home-screen icon)
 - `apple-touch-icon.png` : iOS home-screen + tab icon
 - `manifest.json` : standalone app-mode config
-- `signin/` : shared NCEMS sign-in (ncems-signin.js 1.1.0, fonts, logo). Keep the folder together
 - `README.md` : this file
-
-## Shared NCEMS sign-in (2.53)
-
-Crews sign in with their NCEMS PIN instead of Microsoft every time. Microsoft is needed once per device (every 90 days). Shared iPads show a list of names; the person taps their name and enters their PIN.
-
-- Uses the `signin/` folder (ncems-signin.js v1.1.0), app key `checks`, same Entra client ID as before
-- Crew routes use the PIN token. The Worker (1.14) accepts shared-device tokens on crew routes only
-- Admin screens still sign in with Microsoft (the logo flip). Admin calls (unit list save, kit move approval) keep the Microsoft token. Shared devices don't show the admin logo flip
-- Name on each check comes from the PIN sign-in. Switch user and Log out (and the idle and shift change sign-outs) lock to the PIN screen. Submitting a check on a shared device locks it on Back to Home
-- Offline at start (or if the sign-in files are missing), the old Microsoft gate is used, so offline checks still work as before (name typed, marked not signed in)
-- Known limit: if signal drops while the PIN screen is open, the PIN screen can't check the PIN (no offline option there)
 
 ## Just looking (2.37)
 
@@ -471,11 +459,3 @@ Doug 11/1: a check item is a problem (flag, email flag block, known problem popu
 
 - Custom domain: checks.northcountryems.org (CNAME > emaildougb.github.io)
 - iOS home-screen caches hard : delete and re-add icon after every deploy
-
-## 2.54 (test site)
-- Header buttons: not-done is cream, done is dark green with a check.
-- Under the Hood gets an All Done button that marks every row Normal.
-- Start over asks for a second tap ("Are you sure? Tap again to start over") instead of a popup.
-- Click to Review jumps to the first open flagged item and opens its section.
-- Submit warnings fall back to the first flagged item so Go to it always lands somewhere.
-- Submit timing is recorded in window.__submitTimes and the console (diagnosing slow submit).

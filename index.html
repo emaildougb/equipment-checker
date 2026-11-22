@@ -9,14 +9,13 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="theme-color" content="#1C3A1C" />
-  <title>NCEMS EP Checker (TEST)</title>
+  <title>NCEMS EP Checker</title>
   <meta name="apple-mobile-web-app-title" content="Apparatus" />
   <link rel="icon" type="image/png" href="./apple-touch-icon.png" />
   <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
   <link rel="manifest" href="./manifest.json" />
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@azure/msal-browser@3.30.0/lib/msal-browser.min.js"></script>
-  <script src="signin/ncems-signin.js"></script>
   <style>
     :root {
       --g-deep: #1C3A1C;
@@ -335,7 +334,7 @@
     .abc-row { display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin: 2px 0 8px; font-size: 12px; color: var(--muted); font-weight: 700; }
     .abc-btn { width: 46px; height: 46px; border-radius: 50%; border: 2px solid var(--g-mid); background: var(--white); color: var(--g-mid); font: 800 13px/1 inherit; letter-spacing: 0.02em; cursor: pointer; }
     .abc-btn.on { background: var(--g-mid); color: #fff; }
-    .comp-header-mark-btn.all-done, .comp-header-mark-btn.all-done:active { background: var(--g-deep) !important; color: #fff !important; border: 1.5px solid var(--g-deep) !important; pointer-events: none; box-shadow: none; }
+    .comp-header-mark-btn.all-done, .comp-header-mark-btn.all-done:active { background: var(--g-pale) !important; color: var(--g-deep) !important; border: 1.5px solid var(--g-accent) !important; pointer-events: none; box-shadow: none; }
     .live-banner { display: none; margin: 10px 14px 0; padding: 10px 12px; border-radius: 10px; background: #EAF2F8; border: 1.5px solid var(--info); color: var(--text); font-size: 13px; line-height: 1.4; }
     .live-banner.on { display: block; }
     .live-banner.off { background: var(--warn-bg); border-color: var(--warn); }
@@ -1163,9 +1162,9 @@
     /* Compartment mark-all in header (no expand needed) */
     .comp-header-mark-btn {
       padding: 6px 12px;
-      background: var(--g-pale);
-      color: var(--g-deep);
-      border: 1.5px solid var(--g-accent);
+      background: var(--g-mid);
+      color: var(--white);
+      border: none;
       border-radius: 8px;
       font-size: 11px;
       font-weight: 700;
@@ -1178,9 +1177,7 @@
     }
     .comp-header-mark-btn:active { background: var(--g-accent); }
     .comp-header-mark-btn.done {
-      background: var(--g-deep);
-      color: #fff;
-      border: 1.5px solid var(--g-deep);
+      background: var(--g-accent);
     }
 
     /* Confirmation modal */
@@ -1956,7 +1953,7 @@
    APP STATE
    ============================================================ */
 const APP = {
-  version: '2.54',
+  version: '2.52',
   data: null,        // loaded units.json
   screen: 'home',
   check: null,       // current in-progress check
@@ -2016,7 +2013,6 @@ let msalApp = null, msalAccount = null;
 function localDateStr(d) { const x = d || new Date(); return x.getFullYear() + '-' + String(x.getMonth() + 1).padStart(2, '0') + '-' + String(x.getDate()).padStart(2, '0'); }
 function getSavedInitials() {
   // 2.51 (Doug 11/17): the name of whoever is signed in right now, never an old saved name
-  if (AUTH.state === 'in' && AUTH.name) return AUTH.name;   // 2.53
   if (msalAccount && msalAccount.name) return msalAccount.name.trim();
   return '';
 }
@@ -2127,10 +2123,8 @@ function setAuth(state, detail) {
   err.textContent = '';
   btn.hidden = true; off.hidden = true;
   if (state === 'in') {
-    if (!NCEMS_ID.on) {   // 2.53: PIN sign-in sets AUTH itself (ncemsOnSignedIn)
-      AUTH.email = (msalAccount.username || '').toLowerCase();
-      AUTH.name = (msalAccount.name || AUTH.email).trim();
-    }
+    AUTH.email = (msalAccount.username || '').toLowerCase();
+    AUTH.name = (msalAccount.name || AUTH.email).trim();
     try { localStorage.setItem('ncems_login_hint', AUTH.email); } catch (e) {}
     document.getElementById('who-name').textContent = AUTH.name;
     strip.hidden = false;
@@ -2144,7 +2138,6 @@ function setAuth(state, detail) {
   strip.hidden = true;
   try { fleetReset(); } catch (e) {}
   if (typeof movesBanner === 'function') movesBanner();
-  if (NCEMS_ID.on) { gate.hidden = true; return; }   // 2.53: the PIN screen is the gate
   gate.hidden = false;
   if (state === 'out') {
     msg.textContent = autoOutReason() + 'Sign in with your North Country EMS Microsoft account (the same one you use for NCEMS email) to start your check.';
@@ -2161,48 +2154,7 @@ function setAuth(state, detail) {
     msg.textContent = 'Checking your sign in...';
   }
 }
-/* ============================================================
-   2.53 SHARED NCEMS SIGN-IN (ncems-signin.js v1.1.0, app key "checks")
-   Crews sign in with their NCEMS PIN. Shared iPads show the name list.
-   Admin screens still use Microsoft (the logo flip); the Worker refuses
-   shared-device tokens on admin routes.
-   Offline at start, or if the sign-in script is missing, the Microsoft
-   gate below is used as before, so offline checks still work.
-   ============================================================ */
-const NCEMS_ID = { on: false };
-function ncemsShared() { return !!(NCEMS_ID.on && window.NCEMSSignIn && NCEMSSignIn.isShared()); }
-function ncemsDoneAfterSubmit() { goHome(); if (ncemsShared()) { try { NCEMSSignIn.lock(); } catch (e) {} } }
-function ncemsOnSignedIn(s) {
-  AUTH.email = String(s.email || '').toLowerCase();
-  AUTH.name = String(s.name || AUTH.email || '').trim();
-  AUTH.shared = !!s.shared;
-  setAuth('in');
-}
-function ncemsOnSignedOut() {
-  AUTH.email = ''; AUTH.name = '';
-  try { fleetReset(); } catch (e) {}
-  setAuth('out');
-}
 async function authBoot() {
-  let canUsePin = false;
-  try { canUsePin = typeof NCEMSSignIn !== 'undefined' && navigator.onLine !== false && !!(window.crypto && crypto.subtle); } catch (e) {}
-  if (canUsePin) {
-    try {
-      await initMsal(false).catch(() => {});   // admin Microsoft sign-in still comes back here
-      NCEMSSignIn.init({
-        app: 'checks-test', clientId: MSAL_CONFIG.clientId, appName: 'NCEMS Apparatus Checker',
-        shared: true, sharedSetupBy: 'A battalion chief',
-        auto: true,
-        onSignedIn: ncemsOnSignedIn,
-        onSignedOut: ncemsOnSignedOut
-      });
-      NCEMS_ID.on = true;
-      return;
-    } catch (e) { console.warn('NCEMS sign-in not started, using Microsoft:', e); NCEMS_ID.on = false; }
-  }
-  return authBootMicrosoft();
-}
-async function authBootMicrosoft() {
   if (!MSAL_CONFIG.clientId) { setAuth('offline', 'Sign in is not set up yet.'); return; }
   if (typeof msal === 'undefined') { setAuth('offline'); return; }
   try {
@@ -2230,7 +2182,6 @@ function authWire() {
   });
   document.getElementById('who-switch').addEventListener('click', () => {
     if (APP.check && hasUnsavedWork() && !confirm('A check is in progress on this device. Switch user anyway? It stays saved here.')) return;
-    if (NCEMS_ID.on) { try { NCEMSSignIn.lock(); } catch (e) {} return; }   // 2.53
     gateSignIn(true);
   });
   document.getElementById('who-logout').addEventListener('click', () => {
@@ -2411,7 +2362,6 @@ function signOutNow(why) {
   try { if (typeof liveStop === 'function') liveStop(); } catch (e) {}
   if (APP.screen !== 'home') { APP.check = null; try { showScreen('home'); } catch (e) {} }
   const finishLocal = () => { AUTO_OUT.busy = false; setAuth('out'); };
-  if (NCEMS_ID.on) { try { NCEMSSignIn.lock(); } catch (e) {} return finishLocal(); }   // 2.53
   if (!msalApp) return finishLocal();
   const req = { postLogoutRedirectUri: location.origin + location.pathname.replace(/index\.html$/, '') };
   if (acct) req.account = acct;
@@ -2436,16 +2386,13 @@ function autoOutWire() {
    Check records (D1), photos (R2) and the shared unit list.
    Firebase still gets every check until CG Staff reads from Cloudflare too.
    ============================================================ */
-const CHECKS_API_DEFAULT = 'https://ncems-checks-test.d-boyce.workers.dev';
+const CHECKS_API_DEFAULT = 'https://ncems-checks.d-boyce.workers.dev';
 function checksApi() { return ((APP.data && APP.data.checksApi) || CHECKS_API_DEFAULT).replace(/\/+$/, ''); }
 function jwtExp(t) {
   try { return JSON.parse(atob(t.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))).exp || 0; } catch (e) { return 0; }
 }
-async function getIdToken(admin) {
-  if (NCEMS_ID.on && !admin) {   // 2.53: crew routes take the PIN sign-in token
-    try { const s = NCEMSSignIn.session(); return s ? s.token : null; } catch (e) { return null; }
-  }
-  if (!msalApp || !msalAccount || (!NCEMS_ID.on && AUTH.state !== 'in')) return null;
+async function getIdToken() {
+  if (!msalApp || !msalAccount || AUTH.state !== 'in') return null;
   try {
     let r = await msalApp.acquireTokenSilent({ scopes: ['User.Read'], account: msalAccount });
     if (!r.idToken || jwtExp(r.idToken) * 1000 < Date.now() + 5 * 60 * 1000) {
@@ -2461,7 +2408,7 @@ async function cfFetch(path, opts) {
   opts = opts || {};
   const headers = Object.assign({}, opts.headers || {});
   if (opts.auth) {
-    const tok = await getIdToken(!!opts.admin);
+    const tok = await getIdToken();
     if (!tok) throw new Error('Not signed in');
     headers.Authorization = 'Bearer ' + tok;
   }
@@ -2494,7 +2441,7 @@ async function pushSharedList(note) {
   data.editedBy = AUTH.email || '';
   try { localStorage.setItem(PENDING_LIST, JSON.stringify({ data, note, at: data.editedAt })); } catch (e) {}
   try {
-    const r = await cfFetch('/units', { method: 'PUT', auth: true, admin: true, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ data, note }) });
+    const r = await cfFetch('/units', { method: 'PUT', auth: true, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ data, note }) });
     try { localStorage.removeItem(PENDING_LIST); } catch (e) {}
     APP.data = data;
     APP.listSource = { from: 'shared', at: r.at, by: r.by };
@@ -3367,7 +3314,6 @@ async function boot() {
   });
   document.getElementById('status-bar').addEventListener('click', () => {
     let target = (APP.lastTouched && document.body.contains(APP.lastTouched)) ? APP.lastTouched : null;
-    const flagged = collectFlaggedEls(); if (flagged.length) { target = flagged[0]; revealForPrompt(target); }
     if (!target) {
       // Fall back to the first unanswered row on the page
       target = [...document.querySelectorAll('#check-body .check-row[data-key], #check-body .item-row, #check-body .yn-row')]
@@ -3613,7 +3559,6 @@ function setupLogoAdminTrigger() {
 
   // Flip on logo tap (front face click; ignore clicks on the back button)
   wrap.addEventListener('click', e => {
-    if (ncemsShared()) return;   // 2.53: admin side is hidden on shared devices
     const isFlipped = wrap.classList.contains('flipped');
     // If showing front, flip to back
     if (!isFlipped) {
@@ -4261,20 +4206,6 @@ function rowBuckets(c) {
 }
 /* 2.25: one tap marks every unanswered Mechanical & Lights row Normal. Rows stay visible as a review list;
    anything already marked Abnormal is left alone. Tire pressure is not included (it must be answered). */
-function hoodAllNormal() {
-  document.querySelectorAll('#check-body .check-row[data-bucket="underHood"]').forEach(row => {
-    if (row.querySelector('.check-btn.active')) return;
-    const b = row.querySelector('.check-btn[data-status="wnl"]'); if (b) b.click();
-  });
-  hoodAllPaint();
-}
-function hoodAllPaint() {
-  const btn = document.getElementById('hood-all-btn'); if (!btn) return;
-  const rows = [...document.querySelectorAll('#check-body .check-row[data-bucket="underHood"]')];
-  const done = rows.length > 0 && rows.every(r => r.querySelector('.check-btn.active'));
-  btn.classList.toggle('all-done', done); btn.classList.toggle('done', done);
-  btn.textContent = done ? '✓ All done' : '✓ All Done';
-}
 function mechAllNormal() {
   document.querySelectorAll('#check-body .check-row[data-bucket="mechanical"]').forEach(row => {
     if (row.querySelector('.check-btn.active')) return;
@@ -4309,8 +4240,7 @@ function isSealedTransmission(item) {
 
 function renderFluidsSection() {
   let html = `<div class="section"><div class="section-head">Under the Hood</div><div class="section-body">
-    <div class="hood-note">🔥 Warm the engine up first so the readings are accurate.${(APP.data.sealedTransmission || []).includes(APP.check?.unitId) ? ' This rig has a closed (sealed) transmission that can\'t be checked with a dipstick, so leave it alone.' : ''}</div>
-    <button type="button" class="comp-header-mark-btn" id="hood-all-btn" style="width:100%;margin-bottom:6px;" onclick="hoodAllNormal()">✓ All Done</button>`;
+    <div class="hood-note">🔥 Warm the engine up first so the readings are accurate.${(APP.data.sealedTransmission || []).includes(APP.check?.unitId) ? ' This rig has a closed (sealed) transmission that can\'t be checked with a dipstick, so leave it alone.' : ''}</div>`;
   APP.data.fluidChecks.forEach(item => {
     if (isSealedTransmission(item)) {
       html += `<div class="check-row" style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
@@ -6116,7 +6046,7 @@ function showSubmitModal() {
   // 2.18: Fixed on the spot needs nothing. 2.22: any problem still open or Unable to fix needs a short description. Photos are always optional.
   const noReason = collectIssueLog().filter(x => x.state !== 'fixed' && !x.known && !String(x.notes || '').trim() && needsDescription(x));
   if (noReason.length) {
-    const first = issueNoteEl(noReason[0].key) || unfixedNoReasonEls()[0] || collectFlaggedEls()[0] || null;
+    const first = issueNoteEl(noReason[0].key) || unfixedNoReasonEls()[0] || null;
     needsPopup('Add a short description', noReason.map((x, n) => [x.label, n === 0 ? first : null]));
     return;
   }
@@ -6193,8 +6123,6 @@ async function submitCheck() {
   const c = APP.check;
   if (!c || c.look) return;
 
-  const T0 = performance.now();
-  const tm = l => { const ms = Math.round(performance.now() - T0); (window.__submitTimes = window.__submitTimes || []).push(l + ' ' + ms + 'ms'); console.log('[submit] ' + l + ' ' + ms + 'ms'); };
   const btn = document.querySelector('.submit-btn');
   btn.disabled = true;
   btn.textContent = 'Sending...';
@@ -6216,13 +6144,12 @@ async function submitCheck() {
       to_email: APP.data.submissionEmail || 'd.boyce@northcountryems.org',
     };
 
-    const pct = computeCompletionPct(); tm('summary+pct');
+    const pct = computeCompletionPct();
     const sendNow = pct >= sendMinPct() || pastHoldTime(c.date);
     logCheckToBoard(buildCheckLogRecord(c, crewLine, pct, !sendNow, (crew.length > 1 ? `Submitted by: ${crewLine}\n\n` : '') + summary.plain));  // fire and forget
-    tm('board queued');
     liveStop();
     if (sendNow) {
-      await sendReport(params); tm('email sent');
+      await sendReport(params);
       persistRedTags(c);
       clearAutosave();
       showSuccess(summary, false);
@@ -6746,19 +6673,9 @@ function liveClear(c, key, kind, rest) {
   else return false;
   return true;
 }
-function ckThrowArm() {
-  APP.throwArmed = true;
-  document.querySelectorAll('.ck-throw').forEach(b => { if (!b.dataset.label) b.dataset.label = b.textContent; b.textContent = 'Are you sure? Tap again to start over'; });
-  clearTimeout(APP.throwTimer); APP.throwTimer = setTimeout(ckThrowDisarm, 6000);
-}
-function ckThrowDisarm() {
-  APP.throwArmed = false; clearTimeout(APP.throwTimer);
-  document.querySelectorAll('.ck-throw').forEach(b => { if (b.dataset.label) b.textContent = b.dataset.label; });
-}
 async function ckThrowAway() {
   const c = APP.check; if (!c || c.look) return;
-  if (!APP.throwArmed) { ckThrowArm(); return; }
-  ckThrowDisarm();
+  if (!confirm(`Throw away what you marked on ${c.unitName} today? Your partner's marks stay. You start clean.`)) return;
   if (c.type === 'ambulance' && live.docId === `${c.unitId}_${c.date}`) {
     const flat = liveFlatten(c), now = Date.now(), dev = liveDeviceId(), who = (c.initials || 'Partner').trim(), s = {};
     Object.keys(flat).forEach(k => { if (!live.by[k]) s[liveEnc(k)] = { v: null, by: who, dev, at: now }; });   // only the marks this phone made
@@ -7458,7 +7375,7 @@ function showSuccess(summary, queued = false) {
       <div class="row"><span>Flags</span><strong style="color:${summary.flagCount?'var(--bad)':'var(--g-mid)'}">${summary.flagCount}</strong></div>
     </div>
     <p style="font-size:13px;color:var(--muted);">If your partner completes more of the check today, both submissions will arrive separately tagged with the same unit and date.</p>
-    <a class="home-link" onclick="ncemsDoneAfterSubmit()">Back to Home</a>
+    <a class="home-link" onclick="goHome()">Back to Home</a>
   `;
   APP.check = null;
   showScreen('success');
@@ -8245,7 +8162,7 @@ async function moveDecide(m, status, card) {
       if (!saved.ok) throw new Error(saved.why || 'shared list did not save');
       Object.assign(decision, { unitsId: saved.id || null, applied: res.applied, skipped: res.skipped });
     }
-    await cfFetch(`/moves/${encodeURIComponent(m.id)}/decide`, { method: 'POST', auth: true, admin: true, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(decision) });
+    await cfFetch(`/moves/${encodeURIComponent(m.id)}/decide`, { method: 'POST', auth: true, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(decision) });
     m.status = status; m.decision = decision; m.decidedAt = new Date().toISOString();
     const back = status === 'approved'
       ? `Doug approved your kit move: ${moveWhere(m)} on ${decision.applied.join(', ')}.` + (decision.skipped.length ? ` Not changed on ${decision.skipped.join(', ')}.` : '') + ` Every device gets the new order the next time the Checker opens.`
