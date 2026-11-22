@@ -1,4 +1,5 @@
 /*! NCEMS sign-in (drop-in) v1.1.0
+// v1.1.1: a wrong PIN always shows how many tries are left (it used to show only in the last two tries).
  * Microsoft once per app per device, then one 4-digit PIN for every NCEMS app. The same PIN screen as Open Shifts.
  *
  * WHAT IT DOES
@@ -446,7 +447,7 @@ h1{margin:0;font-size:26px;line-height:32px;font-weight:700;letter-spacing:-.01e
     if (r.s === 401 && r.j.triesLeft !== undefined) {
       if (changing) { curPin = ''; pinFlow('cur', 'Current PIN is wrong · ' + r.j.triesLeft + ' tr' + (r.j.triesLeft === 1 ? 'y' : 'ies') + ' left'); return; }
       shake(); flashError();
-      if (r.j.triesLeft <= 2) setTimeout(() => perr('Incorrect PIN · ' + r.j.triesLeft + ' tr' + (r.j.triesLeft === 1 ? 'y' : 'ies') + ' left'), 10);
+      setTimeout(() => perr('Incorrect PIN · ' + r.j.triesLeft + ' tr' + (r.j.triesLeft === 1 ? 'y' : 'ies') + ' left'), 10);   // 1.1.1: every wrong PIN says so, not just the last two
       return;
     }
     if (r.s === 0) { updateDisplay(); perr('Could not reach the server.'); return; }
