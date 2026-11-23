@@ -2,7 +2,7 @@
 
 Equipment and property check submission tool for North Country EMS crews.
 
-**Version 2.54**
+**Version 2.57**
 
 ## Links
 
@@ -489,3 +489,9 @@ Doug 11/1: a check item is a problem (flag, email flag block, known problem popu
 - Every submit is held on the test Worker (1.16-test). When the partner submits too, one combined email goes out with both crews, each report in full.
 - If no partner submits, the held report goes out from the 11 AM sweep, one combined email per unit.
 - No signal: the report stays on the phone and sends at 11 AM, the same as before.
+
+## 2.57
+- A clean check (100% complete with no problems) is emailed right away. If a second clean check for the same unit and date comes in later that day, it isn't emailed again. Its record still saves, but its crew isn't named in the email.
+- A check with a problem, or under 100%, is held and goes out in the combined 11 AM email, as before.
+- Needs ncems-checks Worker 1.17 (live now). Works with 1.16 too, but clean checks wait for 11 AM until the Worker is updated.
+- Changed index.html and README.md only
