@@ -1959,7 +1959,7 @@
    APP STATE
    ============================================================ */
 const APP = {
-  version: '2.56',
+  version: '2.57',
   data: null,        // loaded units.json
   screen: 'home',
   check: null,       // current in-progress check
@@ -6256,13 +6256,18 @@ async function submitCheck() {
     // 2.56: every submit is held on the server. If the partner already submitted, one combined email goes out now.
     let sentNow = false;
     try {
-      const res = await cfFetch('/held', { method: 'POST', auth: true, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ unit: c.unitName, date: c.date, crew: crewLine, params }) });
+      // 2.57: a clean 100% check (no problems) goes out right away. A later clean check the same day is disregarded.
+      // Anything with a problem, or under 100%, is held and goes out at the 11 AM sweep.
+      const clean = pct >= 100 && summary.flagCount === 0;
+      const res = await cfFetch('/held', { method: 'POST', auth: true, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ unit: c.unitName, date: c.date, crew: crewLine, params, clean }) });
       const list = (res && res.held) || [];
       tm('held on server');
-      if (list.length > 1) {
+      if (res && res.disregard) {
+        sentNow = true; tm('clean check already sent today, disregarded');
+      } else if (res && res.sendNow && list.length) {
         await sendReport(combineHeld(list));
         await cfFetch('/held/clear', { method: 'POST', auth: true, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ unit: c.unitName, date: c.date }) });
-        sentNow = true; tm('combined email sent');
+        sentNow = true; tm('clean report sent now');
       }
     } catch (e) {
       // No signal: keep it on this phone until the 11 AM hold, the way it worked before 2.56
